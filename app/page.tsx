@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,7 +11,7 @@ export default function Home() {
   const showSession = () => {
     if (status === "authenticated") {
       return (
-        <button
+        <Button
           className="border border-solid border-black rounded"
           onClick={() => {
             signOut({ redirect: false }).then(() => {
@@ -19,18 +20,20 @@ export default function Home() {
           }}
         >
           Sign Out
-        </button>
+        </Button>
       );
     } else if (status === "loading") {
       return <span className="text-[#888] text-sm mt-7">Loading...</span>;
     } else {
       return (
-        <Link
-          href="/login"
-          className="border border-solid border-black rounded"
-        >
-          Sign In
-        </Link>
+        <Button>
+          <Link
+            href="/login"
+            className="border border-solid border-black rounded"
+          >
+            Sign In
+          </Link>
+        </Button>
       );
     }
   };
