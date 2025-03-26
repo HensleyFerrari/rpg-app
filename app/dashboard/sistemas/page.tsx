@@ -1,6 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getSistemas } from "../../../lib/actions/sistema.actions";
+import { SistemaDocument } from "@/models/Sistema";
 
-const Sistemas = () => {
+const Sistemas = async () => {
+  const sistemas: SistemaDocument = await getSistemas();
+
   return (
     <div className="flex flex-col w-svh gap-5">
       <div className="justify-between flex">
@@ -11,7 +15,10 @@ const Sistemas = () => {
           <TabsTrigger value="sistemas">Sistemas</TabsTrigger>
           <TabsTrigger value="meuSistemas">Meus sistemas</TabsTrigger>
         </TabsList>
-        <TabsContent value="sistemas">Lista dos sistemas</TabsContent>
+        <TabsContent value="sistemas">
+          Lista dos sistemas <br />
+          {sistemas?.message}
+        </TabsContent>
         <TabsContent value="meuSistemas">Lista dos seus sistemas.</TabsContent>
       </Tabs>
     </div>
