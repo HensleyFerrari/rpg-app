@@ -20,8 +20,8 @@ const items = [
     icons: LayoutDashboard,
   },
   {
-    title: "Sistemas",
-    url: "/dashboard/sistemas",
+    title: "Campanhas",
+    url: "/dashboard/campaigns",
   },
   {
     title: "Personagens",
@@ -29,7 +29,7 @@ const items = [
   },
   {
     title: "Login",
-    url: "login",
+    url: "/login",
   },
 ];
 

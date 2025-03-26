@@ -1,6 +1,6 @@
 import mongoose, { Schema, model } from "mongoose";
 
-export interface SistemaDocument {
+export interface CampaignDocument {
   _id: string;
   name: string;
   owner: string;
@@ -10,7 +10,7 @@ export interface SistemaDocument {
   updateAt: Date;
 }
 
-const SitemaSchema = new Schema<SistemaDocument>(
+const CampaignSchema = new Schema<CampaignDocument>(
   {
     name: {
       type: String,
@@ -22,6 +22,7 @@ const SitemaSchema = new Schema<SistemaDocument>(
   }
 );
 
-const Sistema =
-  mongoose.models?.Sistema || model<SistemaDocument>("Sistema", SitemaSchema);
-export default Sistema;
+const Campaign =
+  mongoose.models?.Campaign ||
+  model<CampaignDocument>("Campaign", CampaignSchema);
+export default Campaign;
