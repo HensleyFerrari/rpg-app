@@ -5,8 +5,7 @@ export interface UserDocument {
   email: string;
   password: string;
   name: string;
-  phone: string;
-  image: string;
+  avatarUrl: string;
   createdAt: Date;
   updatedAt: Date;
 }
