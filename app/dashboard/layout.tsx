@@ -17,7 +17,7 @@ export default function RootLayout({
       <AppSidebar />
       <main>
         <SidebarTrigger />
-        <div className="p-8 w-svh">{children}</div>
+        <div className="p-8">{children}</div>
       </main>
     </SidebarProvider>
   );

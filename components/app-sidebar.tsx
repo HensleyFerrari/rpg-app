@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard } from "lucide-react";
+import { Heart, LayoutDashboard } from "lucide-react";
 import { ModeToggle } from "./theme-toggle";
 
 const items = [
@@ -57,7 +57,10 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter className="font-semibold flex">
+        <span>Desenvolvido por Hensley</span>
+        <Heart />
+      </SidebarFooter>
     </Sidebar>
   );
 }

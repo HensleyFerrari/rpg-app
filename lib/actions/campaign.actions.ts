@@ -15,7 +15,6 @@ export const getCampaigns = async () => {
 };
 
 export const createCampaign = async (data: any) => {
-  console.log(data);
   await connectDB();
 
   const campaign = await Campaign.create(data);
