@@ -26,14 +26,12 @@ export default function Home() {
       return <span className="text-[#888] text-sm mt-7">Loading...</span>;
     } else {
       return (
-        <Button>
-          <Link
-            href="/login"
-            className="border border-solid border-black rounded"
-          >
-            Sign In
-          </Link>
-        </Button>
+        <Link
+          href="/login"
+          className="border border-solid border-black rounded"
+        >
+          <Button>Sign In</Button>
+        </Link>
       );
     }
   };

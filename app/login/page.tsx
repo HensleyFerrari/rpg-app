@@ -10,7 +10,7 @@ export default function Login() {
   const router = useRouter();
 
   useEffect(() => {
-    if (status) {
+    if (status === "authenticated") {
       router.push("/dashboard");
     }
   }, []);
