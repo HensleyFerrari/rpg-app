@@ -55,7 +55,7 @@ const CreateCampaign = () => {
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
             <Button type="button" variant="secondary">
-              Criar
+              Fechar
             </Button>
           </DialogClose>
         </DialogFooter>
