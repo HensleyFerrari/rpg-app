@@ -1,16 +1,16 @@
 import mongoose, { Schema, model } from "mongoose";
 
-export interface CampaignDocument {
+export interface CharacterDocument {
   _id: string;
   name: string;
   owner: string;
-  sistemaUrl: string;
+  characterUrl: string;
   message: string;
   createdAt: Date;
   updateAt: Date;
 }
 
-const CampaignSchema = new Schema<CampaignDocument>(
+const CharacterSchema = new Schema<CharacterDocument>(
   {
     name: {
       type: String,
@@ -22,7 +22,7 @@ const CampaignSchema = new Schema<CampaignDocument>(
   }
 );
 
-const Campaign =
-  mongoose.models?.Campaign ||
-  model<CampaignDocument>("Campaign", CampaignSchema);
-export default Campaign;
+const Character =
+  mongoose.models?.Character ||
+  model<CharacterDocument>("Character", CharacterSchema);
+export default Character;
