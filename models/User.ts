@@ -6,6 +6,7 @@ export interface UserDocument {
   password: string;
   name: string;
   avatarUrl: string;
+  campaigns: Array<T>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +30,12 @@ const UserSchema = new Schema<UserDocument>(
       type: String,
       required: [true, "Name is required"],
     },
+    campaigns: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Campaign",
+      },
+    ],
   },
   {
     timestamps: true,

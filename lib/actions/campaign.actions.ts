@@ -2,7 +2,7 @@
 
 import { connectDB } from "../mongodb";
 import Campaign from "@/models/Campaign";
-import { findByEmail } from "./user.actions";
+import { findByEmail, updateUserCampaign } from "./user.actions";
 
 export const getCampaigns = async () => {
   await connectDB();
@@ -25,8 +25,12 @@ export const createCampaign = async ({ name, email }: createCamp) => {
   const user = await findByEmail(email);
   const data = { name, owner: user._id };
   const campaign = await Campaign.create(data);
+  const updatedUser = await updateUserCampaign({
+    campaign: campaign._id,
+    _id: user._id,
+  });
 
-  if (!campaign) {
+  if (!updatedUser && !campaign) {
     return { ok: false, message: "Não foi possivel criar sua campanha" };
   }
 
