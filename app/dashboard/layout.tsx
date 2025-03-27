@@ -15,9 +15,9 @@ export default function RootLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main>
+      <main className="w-screen overflow-auto">
         <SidebarTrigger />
-        <div className="p-8">{children}</div>
+        <div className="p-8 ">{children}</div>
       </main>
     </SidebarProvider>
   );

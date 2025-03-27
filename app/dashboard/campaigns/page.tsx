@@ -1,14 +1,20 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getCampaigns } from "../../../lib/actions/campaign.actions";
+import {
+  getCampaigns,
+  getMyCampaigns,
+} from "../../../lib/actions/campaign.actions";
 import CreateCampaign from "./components/createCampaign";
 import Link from "next/link";
 import CampaignCard from "./components/campaignCard";
 
 const Sistemas = async () => {
   const campaigns: any = await getCampaigns();
+  const myCampaigns: any = await getMyCampaigns({
+    email: "hensleyferrari@gmail.com",
+  });
 
   return (
-    <div className="flex flex-col w-svh gap-5">
+    <div className="flex flex-col gap-5">
       <div className="justify-between flex">
         <h1 className="font-bold text-6xl">Campanhas </h1>
       </div>
@@ -29,7 +35,15 @@ const Sistemas = async () => {
           )}
         </TabsContent>
         <TabsContent value="myCampaigns">
-          Lista das suas campanhas
+          {!myCampaigns ? (
+            <>Não existem campanhas cadastradas</>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {myCampaigns.map((data) => {
+                return <CampaignCard key={data._id} name={data.name} />;
+              })}
+            </div>
+          )}
           <Link href="/dashboard/campaigns/createCampaign">
             Criar uma nova campanha
           </Link>

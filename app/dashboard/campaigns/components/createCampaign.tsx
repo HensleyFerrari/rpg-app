@@ -16,13 +16,17 @@ import { Label } from "@/components/ui/label";
 import { Copy } from "lucide-react";
 import { FormEvent } from "react";
 import { createCampaign } from "@/lib/actions/campaign.actions";
+import { useSession } from "next-auth/react";
 
 const CreateCampaign = () => {
+  const { data } = useSession();
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const userEmail = data?.user?.email;
     const formData = new FormData(event.currentTarget);
     const name = formData.get("name");
-    const campaign = await createCampaign({ name });
+    const campaign = await createCampaign({ name, email: userEmail });
     if (campaign.ok) {
       return console.log("Created!");
     }
