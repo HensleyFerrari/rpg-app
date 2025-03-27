@@ -1,9 +1,10 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { ObjectId, Schema, model } from "mongoose";
 
 export interface CharacterDocument {
   _id: string;
   name: string;
-  owner: string;
+  owner: ObjectId;
+  campaign: ObjectId;
   characterUrl: string;
   message: string;
   createdAt: Date;
@@ -15,6 +16,16 @@ const CharacterSchema = new Schema<CharacterDocument>(
     name: {
       type: String,
       required: [true, "Name is required"],
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    campaign: {
+      type: Schema.Types.ObjectId,
+      ref: "Campaign",
+      required: true,
     },
   },
   {

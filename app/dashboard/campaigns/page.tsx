@@ -1,53 +1,28 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  getCampaigns,
-  getMyCampaigns,
-} from "../../../lib/actions/campaign.actions";
-import CreateCampaign from "./components/createCampaign";
+import { getCampaigns } from "../../../lib/actions/campaign.actions";
 import Link from "next/link";
 import CampaignCard from "./components/campaignCard";
+import { CampaignDocument } from "@/models/Campaign";
 
 const Sistemas = async () => {
-  const campaigns: any = await getCampaigns();
-  const myCampaigns: any = await getMyCampaigns({
-    email: "hensleyferrari@gmail.com",
-  });
+  const campaigns: Array<CampaignDocument> = await getCampaigns();
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="justify-between flex">
-        <h1 className="font-bold text-6xl">Campanhas </h1>
-      </div>
       <Tabs defaultValue="campaigns" className="w-full">
         <TabsList>
           <TabsTrigger value="campaigns">Campanhas</TabsTrigger>
-          <TabsTrigger value="myCampaigns">Minhas campanhas</TabsTrigger>
         </TabsList>
         <TabsContent value="campaigns">
-          {campaigns.length === 0 ? (
+          {campaigns.message ? (
             <>Não existem campanhas cadastradas</>
           ) : (
             <div className="flex flex-col gap-4">
-              {campaigns.map((data) => {
+              {campaigns.map((data: CampaignDocument) => {
                 return <CampaignCard key={data._id} name={data.name} />;
               })}
             </div>
           )}
-        </TabsContent>
-        <TabsContent value="myCampaigns">
-          <CreateCampaign />
-          {!myCampaigns ? (
-            <>Não existem campanhas cadastradas</>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {myCampaigns.map((data) => {
-                return <CampaignCard key={data._id} name={data.name} />;
-              })}
-            </div>
-          )}
-          {/* <Link href="/dashboard/campaigns/createCampaign">
-            Criar uma nova campanha
-          </Link> */}
         </TabsContent>
       </Tabs>
     </div>

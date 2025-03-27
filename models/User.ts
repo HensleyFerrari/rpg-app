@@ -1,4 +1,6 @@
 import mongoose, { Schema, model } from "mongoose";
+import { CampaignDocument } from "./Campaign";
+import { CharacterDocument } from "./Character";
 
 export interface UserDocument {
   _id: string;
@@ -6,7 +8,8 @@ export interface UserDocument {
   password: string;
   name: string;
   avatarUrl: string;
-  campaigns: Array<T>;
+  campaigns: Array<CampaignDocument>;
+  characters: Array<CharacterDocument>;
   createdAt: Date;
   updatedAt: Date;
 }
