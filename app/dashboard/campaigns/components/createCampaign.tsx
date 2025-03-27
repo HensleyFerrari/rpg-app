@@ -34,8 +34,8 @@ const CreateCampaign = () => {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Criar campanha</Button>
+      <DialogTrigger asChild className="mb-5">
+        <Button variant="default">Criar campanha</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

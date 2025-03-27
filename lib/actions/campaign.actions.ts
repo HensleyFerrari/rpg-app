@@ -26,8 +26,6 @@ export const createCampaign = async ({ name, email }: createCamp) => {
   const data = { name, owner: user._id };
   const campaign = await Campaign.create(data);
 
-  console.log(campaign);
-
   if (!campaign) {
     return { ok: false, message: "Não foi possivel criar sua campanha" };
   }

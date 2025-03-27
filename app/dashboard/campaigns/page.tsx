@@ -35,6 +35,7 @@ const Sistemas = async () => {
           )}
         </TabsContent>
         <TabsContent value="myCampaigns">
+          <CreateCampaign />
           {!myCampaigns ? (
             <>Não existem campanhas cadastradas</>
           ) : (
@@ -44,10 +45,9 @@ const Sistemas = async () => {
               })}
             </div>
           )}
-          <Link href="/dashboard/campaigns/createCampaign">
+          {/* <Link href="/dashboard/campaigns/createCampaign">
             Criar uma nova campanha
-          </Link>
-          <CreateCampaign />
+          </Link> */}
         </TabsContent>
       </Tabs>
     </div>
