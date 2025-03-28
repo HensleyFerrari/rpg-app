@@ -153,7 +153,7 @@ export const getCampaignById = async (
 
     const campaignData = await Campaign.findById(id).populate(
       "owner",
-      "username name _id"
+      "username email name _id"
     );
 
     if (!campaignData) {
