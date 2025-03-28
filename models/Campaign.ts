@@ -4,7 +4,8 @@ export interface CampaignDocument {
   _id: string;
   name: string;
   owner: ObjectId;
-  sistemaUrl: string;
+  imageUrl: string;
+  description: string;
   message: string;
   active: boolean;
   createdAt: Date;
@@ -26,6 +27,13 @@ const CampaignSchema = new Schema<CampaignDocument>(
       type: Boolean,
       required: true,
       default: true,
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+    imageUrl: {
+      type: String,
     },
   },
   {

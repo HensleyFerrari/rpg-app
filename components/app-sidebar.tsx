@@ -10,7 +10,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ChevronDown, Book, Heart, LayoutDashboard, User } from "lucide-react";
+import {
+  ChevronDown,
+  Book,
+  Heart,
+  LayoutDashboard,
+  User,
+  Home,
+  Users,
+  Bookmark,
+  BookOpen,
+  PlusCircle,
+  List,
+  Settings,
+} from "lucide-react";
 import { ModeToggle } from "./theme-toggle";
 import {
   Collapsible,
@@ -26,43 +39,50 @@ const items = [
   },
   {
     title: "Campanhas",
-    icons: Book,
+    icons: BookOpen,
     itens: [
       {
         title: "Minhas Campanhas",
         url: "/dashboard/campaigns",
-        icons: Book,
+        icons: Bookmark,
       },
       {
         title: "Campanhas Criadas",
         url: "/dashboard/campaigns/mycampaigns",
-        icons: Book,
+        icons: PlusCircle,
       },
       {
         title: "Todas as campanhas",
         url: "/dashboard/campaigns",
-        icons: Book,
+        icons: List,
       },
     ],
   },
   {
     title: "Personagens",
+    icons: Users,
     itens: [
       {
         title: "Meus Personagens",
-        url: "#",
+        url: "/dashboard/characters/mycharacters",
         icons: User,
       },
       {
         title: "Todos os Personagens",
-        url: "#",
-        icons: User,
+        url: "/dashboard/personagens",
+        icons: Users,
       },
     ],
   },
   {
+    title: "Configurações",
+    url: "/dashboard/settings",
+    icons: Settings,
+  },
+  {
     title: "Home",
     url: "/",
+    icons: Home,
   },
 ];
 

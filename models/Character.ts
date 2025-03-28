@@ -27,6 +27,14 @@ const CharacterSchema = new Schema<CharacterDocument>(
       ref: "Campaign",
       required: true,
     },
+    characterUrl: {
+      type: String,
+      default: "",
+    },
+    message: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,
