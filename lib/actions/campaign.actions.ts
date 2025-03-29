@@ -21,14 +21,10 @@ export async function getCampaigns() {
   try {
     await connectDB();
 
-    const campaigns = await Campaign.find({})
-      .select("_id name")
-      .sort({ createdAt: -1 })
-      .lean();
+    const campaigns = await Campaign.find({}).sort({ createdAt: -1 }).lean();
 
     return campaigns.map((campaign) => ({
-      id: campaign._id.toString(),
-      name: campaign.name,
+      ...campaign,
     }));
   } catch (error) {
     console.error("Erro ao buscar campanhas:", error);

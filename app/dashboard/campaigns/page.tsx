@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCampaigns } from "../../../lib/actions/campaign.actions";
 import Link from "next/link";
 import CampaignCard from "./components/campaignCard";
@@ -20,7 +19,8 @@ const CampaignsPage = async () => {
           </Button>
         </Link>
       </div>
-      {!campaignsResponse?.ok || campaignsResponse.data.length === 0 ? (
+      {JSON.stringify(campaignsResponse)}
+      {!campaignsResponse.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 text-center">
           <p className="text-muted-foreground mb-4">
             Não existem campanhas cadastradas
@@ -31,7 +31,7 @@ const CampaignsPage = async () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {campaignsResponse.data.map((campaign: any) => (
+          {campaignsResponse.map((campaign: any) => (
             <CampaignCard
               key={campaign._id}
               id={campaign._id}
