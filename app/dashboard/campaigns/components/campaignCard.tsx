@@ -41,7 +41,7 @@ const CampaignCard = ({
 
   return (
     <Card className="overflow-hidden flex flex-col h-full transition-all hover:shadow-md">
-      <div className="flex flex-col sm:flex-row p-3 sm:p-4">
+      <div className="flex flex-col sm:flex-row p-3 sm:p-4 flex-grow">
         {/* Imagem/Ícone - responsivo */}
         <div className="mb-3 sm:mb-0 sm:mr-4 flex-shrink-0 self-center sm:self-start">
           {imageUrl ? (
@@ -62,7 +62,7 @@ const CampaignCard = ({
         </div>
 
         {/* Conteúdo - responsivo */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col">
           <CardHeader className="p-0 pb-2 text-center sm:text-left">
             <CardTitle className="text-lg sm:text-xl font-bold line-clamp-1">
               {name}
