@@ -7,6 +7,7 @@ export interface CharacterDocument {
   campaign: ObjectId;
   characterUrl: string;
   message: string;
+  status: string;
   createdAt: Date;
   updateAt: Date;
 }
@@ -34,6 +35,11 @@ const CharacterSchema = new Schema<CharacterDocument>(
     message: {
       type: String,
       default: "",
+    },
+    status: {
+      type: String,
+      enum: ["alive", "dead"],
+      default: "active",
     },
   },
   {
