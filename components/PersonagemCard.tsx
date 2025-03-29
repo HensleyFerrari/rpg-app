@@ -33,8 +33,8 @@ export default function PersonagemCard({ personagem }: PersonagemCardProps) {
   return (
     <Link href={`/dashboard/personagens/${personagem._id}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-        <div className="flex p-4">
-          <div className="relative w-20 h-20 mr-4 flex-shrink-0">
+        <div className="flex flex-col sm:flex-row p-4">
+          <div className="relative w-full h-40 sm:w-20 sm:h-20 mb-4 sm:mb-0 sm:mr-4 flex-shrink-0">
             {personagem.characterUrl ? (
               <Image
                 src={personagem.characterUrl}
@@ -44,7 +44,9 @@ export default function PersonagemCard({ personagem }: PersonagemCardProps) {
               />
             ) : (
               <div className="w-full h-full bg-muted flex items-center justify-center rounded-md">
-                <span className="text-2xl text-muted-foreground">🧙</span>
+                <span className="text-4xl sm:text-2xl text-muted-foreground">
+                  🧙
+                </span>
               </div>
             )}
           </div>
@@ -60,7 +62,7 @@ export default function PersonagemCard({ personagem }: PersonagemCardProps) {
               </div>
             </CardContent>
 
-            <CardFooter className="flex justify-between p-0 pt-2">
+            <CardFooter className="flex flex-wrap gap-2 p-0 pt-2">
               <Badge
                 variant={
                   personagem.status === "alive" ? "default" : "destructive"
