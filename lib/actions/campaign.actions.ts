@@ -21,7 +21,10 @@ export async function getCampaigns() {
   try {
     await connectDB();
 
-    const campaigns = await Campaign.find({}).sort({ createdAt: -1 }).lean();
+    const campaigns = await Campaign.find({})
+      .populate("owner", "name")
+      .sort({ createdAt: -1 })
+      .lean();
 
     return campaigns.map((campaign) => ({
       ...campaign,

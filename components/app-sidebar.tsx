@@ -62,15 +62,31 @@ const items = [
     title: "Personagens",
     icons: Users,
     itens: [
-      {
-        title: "Meus Personagens",
-        url: "/dashboard/characters/mycharacters",
-        icons: User,
-      },
+      // {
+      //   title: "Meus Personagens",
+      //   url: "/dashboard/characters/mycharacters",
+      //   icons: User,
+      // },
       {
         title: "Todos os Personagens",
         url: "/dashboard/personagens",
         icons: Users,
+      },
+    ],
+  },
+  {
+    title: "Batalhas",
+    icons: Book,
+    itens: [
+      {
+        title: "Minhas Batalhas",
+        url: "/dashboard/battles/mybattles",
+        icons: BookOpen,
+      },
+      {
+        title: "Todas as Batalhas",
+        url: "/dashboard/battles",
+        icons: List,
       },
     ],
   },

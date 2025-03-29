@@ -41,47 +41,49 @@ const CampaignCard = ({
 
   return (
     <Card className="overflow-hidden flex flex-col h-full transition-all hover:shadow-md">
-      <div className="flex p-4">
-        {/* Imagem/Ícone à esquerda */}
-        <div className="mr-4 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row p-3 sm:p-4">
+        {/* Imagem/Ícone - responsivo */}
+        <div className="mb-3 sm:mb-0 sm:mr-4 flex-shrink-0 self-center sm:self-start">
           {imageUrl ? (
-            <div className="relative w-20 h-20 rounded-md overflow-hidden">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-md overflow-hidden mx-auto sm:mx-0">
               <Image
                 src={imageUrl}
                 alt={name}
                 fill
                 className="object-cover"
-                sizes="80px"
+                sizes="(max-width: 640px) 64px, 80px"
               />
             </div>
           ) : (
-            <div className="bg-muted/30 w-20 h-20 rounded-md flex items-center justify-center">
-              <Book className="h-10 w-10 text-muted-foreground/40" />
+            <div className="bg-muted/30 w-16 h-16 sm:w-20 sm:h-20 rounded-md flex items-center justify-center mx-auto sm:mx-0">
+              <Book className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground/40" />
             </div>
           )}
         </div>
 
-        {/* Conteúdo à direita */}
+        {/* Conteúdo - responsivo */}
         <div className="flex-1 min-w-0">
-          <CardHeader className="p-0 pb-2">
-            <CardTitle className="text-xl font-bold line-clamp-1">
+          <CardHeader className="p-0 pb-2 text-center sm:text-left">
+            <CardTitle className="text-lg sm:text-xl font-bold line-clamp-1">
               {name}
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="p-0 flex-grow">
+          <CardContent className="p-0 flex-grow text-center sm:text-left">
             {description ? (
-              <p className="text-muted-foreground line-clamp-3">
+              <p className="text-muted-foreground text-sm sm:text-base line-clamp-2 sm:line-clamp-3">
                 {description}
               </p>
             ) : (
-              <p className="text-muted-foreground/50 italic">Sem descrição</p>
+              <p className="text-muted-foreground/50 italic text-sm sm:text-base">
+                Sem descrição
+              </p>
             )}
 
-            <div className="mt-2 space-y-1 text-sm">
+            <div className="mt-2 space-y-1 text-xs sm:text-sm mx-auto sm:mx-0 max-w-fit sm:max-w-none">
               {owner && (
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
+                  <User className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">
                     {owner.name || owner.username || "Usuário desconhecido"}
                   </span>
@@ -90,7 +92,7 @@ const CampaignCard = ({
 
               {formattedDate && (
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">{formattedDate}</span>
                 </div>
               )}
@@ -99,10 +101,13 @@ const CampaignCard = ({
         </div>
       </div>
 
-      <CardFooter className="border-t bg-muted/10 pt-4">
+      <CardFooter className="border-t bg-muted/10 p-3 sm:pt-4">
         <Link href={`/dashboard/campaigns/${id}`} className="w-full">
-          <Button variant="default" className="w-full gap-2">
-            <Info className="h-4 w-4" />
+          <Button
+            variant="default"
+            className="w-full gap-2 text-xs sm:text-sm py-1.5 sm:py-2"
+          >
+            <Info className="h-3 w-3 sm:h-4 sm:w-4" />
             Ver Detalhes
           </Button>
         </Link>
