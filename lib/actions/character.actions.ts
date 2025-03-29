@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import Character, { CharacterDocument } from "@/models/Character";
 import { connectDB } from "../mongodb";
 import mongoose from "mongoose";
+import { findByEmail } from "./user.actions";
+import User from "@/models/User";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
@@ -15,6 +17,7 @@ interface CharacterParams {
   campaign: string;
   characterUrl?: string;
   message?: string;
+  status: string;
 }
 
 interface CharacterResponse {
@@ -29,6 +32,7 @@ export async function createCharacter({
   campaign,
   characterUrl = "",
   message = "",
+  status,
 }: CharacterParams): Promise<CharacterResponse> {
   try {
     if (!name || !owner || !campaign) {
@@ -40,23 +44,28 @@ export async function createCharacter({
 
     await connectDB();
 
-    // Validate ObjectIds
-    if (
-      !mongoose.isValidObjectId(owner) ||
-      !mongoose.isValidObjectId(campaign)
-    ) {
+    if (!mongoose.isValidObjectId(campaign)) {
       return {
         ok: false,
-        message: "ID de proprietário ou campanha inválido",
+        message: "ID da campanha inválido",
+      };
+    }
+
+    const ownerData = await User.findOne({ email: owner });
+    if (!ownerData) {
+      return {
+        ok: false,
+        message: "Proprietário não encontrado",
       };
     }
 
     const newCharacterData = await Character.create({
       name,
-      owner,
+      owner: ownerData._id,
       campaign,
       characterUrl,
       message,
+      status,
     });
 
     const newCharacter = serializeData(newCharacterData);
@@ -351,6 +360,40 @@ export async function deleteCharacter(id: string): Promise<CharacterResponse> {
     return {
       ok: false,
       message: error.message || "Falha ao excluir personagem",
+    };
+  }
+}
+
+export async function getAllCharacters(): Promise<CharacterResponse> {
+  try {
+    await connectDB();
+
+    const charactersData = await Character.find({})
+      .populate("owner", "username name _id")
+      .populate("campaign", "name _id")
+      .sort({ createdAt: -1 });
+
+    const characters = serializeData(charactersData);
+
+    if (characters.length === 0) {
+      return {
+        ok: true,
+        message: "Nenhum personagem encontrado",
+        data: [],
+      };
+    }
+
+    return {
+      ok: true,
+      message: "Personagens encontrados",
+      data: characters,
+    };
+  } catch (error: any) {
+    console.error("Error fetching all characters:", error);
+
+    return {
+      ok: false,
+      message: error.message || "Falha ao buscar todos os personagens",
     };
   }
 }

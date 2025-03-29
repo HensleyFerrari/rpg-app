@@ -1,13 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 type Personagem = {
-  id: string;
-  nome: string;
-  classe: string;
-  nivel: number;
-  raca: string;
-  imageUrl?: string;
+  _id: string;
+  name: string;
+  owner: string;
+  campaign: string;
+  characterUrl: string;
+  battles: string[];
+  message: string;
+  status: string;
+  createdAt: Date;
+  updateAt: Date;
 };
 
 interface PersonagemCardProps {
@@ -16,34 +28,43 @@ interface PersonagemCardProps {
 
 export default function PersonagemCard({ personagem }: PersonagemCardProps) {
   return (
-    <Link href={`/dashboard/personagens/${personagem.id}`}>
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <Link href={`/dashboard/personagens/${personagem._id}`}>
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
         <div className="relative h-48 w-full">
-          {personagem.imageUrl ? (
+          {personagem.characterUrl ? (
             <Image
-              src={personagem.imageUrl}
-              alt={personagem.nome}
+              src={personagem.characterUrl}
+              alt={personagem.name}
               fill
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-              <span className="text-4xl text-gray-500">🧙</span>
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <span className="text-4xl text-muted-foreground">🧙</span>
             </div>
           )}
         </div>
 
-        <div className="p-4">
-          <h3 className="text-xl font-bold mb-1">{personagem.nome}</h3>
-          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
-            <span>{personagem.raca}</span>
-            <span>{personagem.classe}</span>
+        <CardHeader className="pb-2">
+          <h3 className="text-xl font-bold">{personagem.name}</h3>
+        </CardHeader>
+
+        <CardContent className="pb-2">
+          <div className="text-sm text-muted-foreground">
+            {personagem.message}
           </div>
-          <div className="mt-2 text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full inline-block">
-            Nível {personagem.nivel}
-          </div>
-        </div>
-      </div>
+        </CardContent>
+
+        <CardFooter className="flex justify-between pt-0">
+          <Badge
+            variant={personagem.status === "alive" ? "success" : "destructive"}
+          >
+            {personagem.status === "alive" ? "Vivo" : "Morto"}
+          </Badge>
+
+          <Badge variant="outline">Batalhas: {personagem.battles.length}</Badge>
+        </CardFooter>
+      </Card>
     </Link>
   );
 }

@@ -17,37 +17,26 @@ const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
 
-export const getCampaigns = async (): Promise<CampaignResponse> => {
+export async function getCampaigns() {
   try {
     await connectDB();
 
-    const campaignsData = await Campaign.find()
-      .populate("owner", "username name _id")
-      .sort({ createdAt: -1 });
+    const campaigns = await Campaign.find({})
+      .select("_id name")
+      .sort({ createdAt: -1 })
+      .lean();
 
-    // Serialize the MongoDB documents
-    const campaigns = serializeData(campaignsData);
-
-    if (campaigns.length === 0) {
-      return {
-        ok: true,
-        message: "Não existem campanhas cadastradas",
-        data: [],
-      };
-    }
-    return {
-      ok: true,
-      message: "Campanhas encontradas com sucesso",
-      data: campaigns,
-    };
-  } catch (error: any) {
-    console.error("Error fetching campaigns:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao buscar campanhas",
-    };
+    return campaigns.map((campaign) => ({
+      id: campaign._id.toString(),
+      name: campaign.name,
+    }));
+  } catch (error) {
+    console.error("Erro ao buscar campanhas:", error);
+    throw new Error(
+      "Falha ao carregar campanhas. Por favor, tente novamente mais tarde."
+    );
   }
-};
+}
 
 type createCamp = {
   name: string;

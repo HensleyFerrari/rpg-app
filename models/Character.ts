@@ -40,7 +40,7 @@ const CharacterSchema = new Schema<CharacterDocument>(
     status: {
       type: String,
       enum: ["alive", "dead"],
-      default: "active",
+      default: "alive",
     },
     battles: [
       {
