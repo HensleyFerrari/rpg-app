@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -147,8 +148,8 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
                         <Image
                           src={character.characterUrl}
                           alt={character.name}
-                          width={40}
-                          height={40}
+                          width={60}
+                          height={60}
                           className="rounded-md"
                         />
                       ) : (
@@ -156,9 +157,19 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
                       )}
                       <div>
                         <p className="font-medium">{character.name}</p>
+                        <Badge
+                          variant={
+                            character.status === "alive"
+                              ? "default"
+                              : "destructive"
+                          }
+                          className="text-sm"
+                        >
+                          {character.status === "alive" ? "Vivo" : "Morto"}
+                        </Badge>
                         <p className="text-sm text-muted-foreground">
-                          {character.player?.name ||
-                            character.player?.username ||
+                          {character.owner?.name ||
+                            character.owner?.username ||
                             "Jogador"}
                         </p>
                       </div>
