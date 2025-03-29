@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 
 // Schema de validação baseado no modelo de Character
 const characterFormSchema = z.object({
@@ -46,7 +46,7 @@ type CharacterFormValues = z.infer<typeof characterFormSchema>;
 
 // Interface para as campanhas
 interface Campaign {
-  id: string;
+  _id: string;
   name: string;
 }
 
@@ -97,6 +97,7 @@ const NewCharacter = () => {
         campaign: values.campaign,
         characterUrl: values.characterUrl || "",
         message: values.message,
+        status: values.status, // Adicionando o status aqui
       });
       if (response.ok) {
         toast("Sucesso!");
@@ -163,7 +164,7 @@ const NewCharacter = () => {
                       </SelectItem>
                     ) : campaigns.length > 0 ? (
                       campaigns.map((campaign) => (
-                        <SelectItem key={campaign.id} value={campaign.id}>
+                        <SelectItem key={campaign._id} value={campaign._id}>
                           {campaign.name}
                         </SelectItem>
                       ))

@@ -6,6 +6,7 @@ export interface CampaignDocument {
   owner: ObjectId;
   imageUrl: string;
   description: string;
+  characters: Array<ObjectId>;
   message: string;
   active: boolean;
   createdAt: Date;
@@ -35,6 +36,12 @@ const CampaignSchema = new Schema<CampaignDocument>(
     imageUrl: {
       type: String,
     },
+    characters: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Character",
+      },
+    ],
   },
   {
     timestamps: true,

@@ -6,6 +6,8 @@ import { connectDB } from "../mongodb";
 import mongoose from "mongoose";
 import { findByEmail } from "./user.actions";
 import User from "@/models/User";
+import { updateCampaign } from "./campaign.actions";
+import Campaign from "@/models/Campaign";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
@@ -67,6 +69,39 @@ export async function createCharacter({
       message,
       status,
     });
+
+    if (!newCharacterData) {
+      return {
+        ok: false,
+        message: "Falha ao criar personagem",
+      };
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      ownerData._id,
+      { $push: { characters: newCharacterData._id } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return {
+        ok: false,
+        message: "Falha ao atualizar proprietário",
+      };
+    }
+
+    const updateCampaign = await Campaign.findByIdAndUpdate(
+      campaign,
+      { $push: { characters: newCharacterData._id } },
+      { new: true }
+    );
+
+    if (!updateCampaign) {
+      return {
+        ok: false,
+        message: "Falha ao atualizar campanha",
+      };
+    }
 
     const newCharacter = serializeData(newCharacterData);
 
