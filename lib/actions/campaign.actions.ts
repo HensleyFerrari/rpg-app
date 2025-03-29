@@ -135,11 +135,16 @@ export const getCampaignById = async (
         message: "ID de campanha inválido",
       };
     }
-
-    const campaignData = await Campaign.findById(id).populate(
-      "owner",
-      "username email name _id"
-    );
+    const campaignData = await Campaign.findById(id)
+      .populate("owner", "username email name _id")
+      .populate({
+        path: "characters",
+        populate: {
+          path: "owner",
+          model: "User",
+          select: "username name _id",
+        },
+      });
 
     if (!campaignData) {
       return {

@@ -20,7 +20,8 @@ interface CampaignDetailProps {
 }
 
 const CampaignDetail = async ({ params }: CampaignDetailProps) => {
-  const campaignResponse = await getCampaignById(params.id);
+  const { id } = await params;
+  const campaignResponse = await getCampaignById(id);
 
   if (!campaignResponse.ok || !campaignResponse.data) {
     notFound();
@@ -117,7 +118,7 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
                       "Mestre"}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Criador da campanha
+                    Mestre da campanha
                   </p>
                 </div>
               </div>
@@ -129,19 +130,46 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
               <CardTitle className="flex items-center justify-between">
                 <span className="text-xl font-semibold">Personagens</span>
                 <span className="text-sm bg-muted rounded-full px-2 py-1">
-                  0
+                  {campaign.characters.length || 0}{" "}
                 </span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-center p-4">
-                <div className="text-center">
-                  <Users className="h-10 w-10 text-muted-foreground/50 mx-auto mb-2" />
-                  <p className="text-muted-foreground">
-                    Nenhum personagem participando
-                  </p>
+              {campaign.characters.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {campaign.characters.map((character) => (
+                    <Link
+                      key={character._id}
+                      href="#"
+                      className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/10"
+                    >
+                      {character.characterUrl ? (
+                        <Image
+                          src={character.characterUrl}
+                          alt={character.name}
+                          width={40}
+                          height={40}
+                          className="rounded-md"
+                        />
+                      ) : (
+                        <Users className="h-5 w-5 text-primary" />
+                      )}
+                      <div>
+                        <p className="font-medium">{character.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {character.player?.name ||
+                            character.player?.username ||
+                            "Jogador"}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <p className="text-muted-foreground italic">
+                  Nenhum personagem adicionado ainda.
+                </p>
+              )}
             </CardContent>
             {/* <CardFooter>
               <Button className="w-full">Participar da campanha</Button>
