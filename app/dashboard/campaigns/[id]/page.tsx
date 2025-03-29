@@ -127,7 +127,7 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span className="text-xl font-semibold">Jogadores</span>
+                <span className="text-xl font-semibold">Personagens</span>
                 <span className="text-sm bg-muted rounded-full px-2 py-1">
                   0
                 </span>
@@ -138,14 +138,14 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
                 <div className="text-center">
                   <Users className="h-10 w-10 text-muted-foreground/50 mx-auto mb-2" />
                   <p className="text-muted-foreground">
-                    Nenhum jogador participando
+                    Nenhum personagem participando
                   </p>
                 </div>
               </div>
             </CardContent>
-            <CardFooter>
+            {/* <CardFooter>
               <Button className="w-full">Participar da campanha</Button>
-            </CardFooter>
+            </CardFooter> */}
           </Card>
 
           <Card>
