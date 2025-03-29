@@ -6,6 +6,7 @@ export interface CharacterDocument {
   owner: ObjectId;
   campaign: ObjectId;
   characterUrl: string;
+  battles: Array<ObjectId>;
   message: string;
   status: string;
   createdAt: Date;
@@ -41,6 +42,12 @@ const CharacterSchema = new Schema<CharacterDocument>(
       enum: ["alive", "dead"],
       default: "active",
     },
+    battles: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Battle",
+      },
+    ],
   },
   {
     timestamps: true,
