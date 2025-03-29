@@ -79,25 +79,27 @@ const CampaignCard = ({
                 Sem descrição
               </p>
             )}
-
-            <div className="mt-2 space-y-1 text-xs sm:text-sm mx-auto sm:mx-0 max-w-fit sm:max-w-none">
-              {owner && (
-                <div className="flex items-center gap-2">
-                  <User className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    {owner.name || owner.username || "Usuário desconhecido"}
-                  </span>
-                </div>
-              )}
-
-              {formattedDate && (
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">{formattedDate}</span>
-                </div>
-              )}
-            </div>
           </CardContent>
+
+          <div className="mt-auto space-y-1 text-xs sm:text-sm mx-auto sm:mx-0 max-w-fit sm:max-w-none overflow-x-auto">
+            {owner && (
+              <div className="flex items-center gap-2 truncate">
+                <User className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                <span className="text-muted-foreground truncate">
+                  {owner.name || owner.username || "Usuário desconhecido"}
+                </span>
+              </div>
+            )}
+
+            {formattedDate && (
+              <div className="flex items-center gap-2 truncate">
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                <span className="text-muted-foreground truncate">
+                  {formattedDate}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

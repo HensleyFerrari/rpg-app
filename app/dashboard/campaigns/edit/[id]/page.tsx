@@ -36,7 +36,6 @@ export default async function EditCampaignPage({
     <div className="container py-10">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Editar Campanha</h1>
-        {JSON.stringify(campaign)}
         <EditCampaignForm campaign={campaign.data} />
       </div>
     </div>
