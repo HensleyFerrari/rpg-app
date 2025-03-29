@@ -100,15 +100,17 @@ const NewCharacter = () => {
         status: values.status, // Adicionando o status aqui
       });
       if (response.ok) {
-        toast("Sucesso!");
+        toast.success("Sucesso!", {
+          description: "Personagem criado com sucesso.",
+        });
 
         // Redireciona para a página do personagem ou lista de personagens
         router.push("/dashboard/personagens");
       } else {
-        toast("Erro Ao criar personagem");
+        toast.error("Erro Ao criar personagem");
       }
     } catch (error) {
-      toast("Erro ao criar personagem!", error);
+      toast.error("Erro ao criar personagem!", error);
     } finally {
       setIsSubmitting(false);
     }

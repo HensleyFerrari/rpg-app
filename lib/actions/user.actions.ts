@@ -2,6 +2,7 @@
 
 import { connectDB } from "../mongodb";
 import User from "@/models/User";
+import { auth } from "@/auth";
 
 export const findByEmail = async (email: string) => {
   await connectDB();
@@ -19,4 +20,28 @@ export const updateUserCampaign = async ({ campaign, _id }: any) => {
     { new: true }
   );
   return updatedUser;
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const session = await auth();
+    // If no session or no user, return null
+    if (!session || !session.user) {
+      return null;
+    }
+    // Get the user email from the session
+    const email = session.user.email;
+    if (!email) {
+      return null;
+    }
+    // Connect to the database
+    await connectDB();
+
+    // Find the user by email and return complete user data
+    const currentUser = await User.findOne({ email }).select("-password");
+    return currentUser;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
+  }
 };

@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getCampaignById } from "@/lib/actions/campaign.actions";
+import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Calendar, ChevronLeft, User, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,6 +24,7 @@ interface CampaignDetailProps {
 const CampaignDetail = async ({ params }: CampaignDetailProps) => {
   const { id } = await params;
   const campaignResponse = await getCampaignById(id);
+  const currentUser = await getCurrentUser();
 
   if (!campaignResponse.ok || !campaignResponse.data) {
     notFound();
@@ -37,15 +39,22 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
       })
     : "Data desconhecida";
 
+  const isOwner = currentUser?._id.toString() === campaign.owner?._id;
+
   return (
     <div className="container mx-auto py-8">
-      <div className="mb-8">
+      <div className="mb-8 flex justify-between items-center">
         <Link href="/dashboard/campaigns">
           <Button variant="ghost" className="flex items-center gap-2 p-0">
             <ChevronLeft className="h-4 w-4" />
             Voltar para campanhas
           </Button>
         </Link>
+        {isOwner && (
+          <Link href={`/dashboard/campaigns/${id}/edit`}>
+            <Button variant="default">Editar campanha</Button>
+          </Link>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

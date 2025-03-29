@@ -71,7 +71,7 @@ const EditCampaignForm = ({ campaign }: any) => {
         toast.success("Sucesso!", {
           description: "Campanha atualizada com sucesso",
         });
-        router.push("/dashboard/campaigns");
+        router.push(`/dashboard/campaigns/${campaign._id}`);
       } else {
         toast.error("Erro", {
           description:
