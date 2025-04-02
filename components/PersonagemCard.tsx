@@ -31,10 +31,13 @@ interface PersonagemCardProps {
 
 export default function PersonagemCard({ personagem }: PersonagemCardProps) {
   return (
-    <Link href={`/dashboard/personagens/${personagem._id}`}>
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-        <div className="flex flex-col sm:flex-row p-4">
-          <div className="relative w-full h-40 sm:w-20 sm:h-20 mb-4 sm:mb-0 sm:mr-4 flex-shrink-0">
+    <Link
+      href={`/dashboard/personagens/${personagem._id}`}
+      className="block h-full"
+    >
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
+        <div className="flex flex-col p-4 h-full">
+          <div className="relative w-full h-40 mb-4 flex-shrink-0">
             {personagem.characterUrl ? (
               <Image
                 src={personagem.characterUrl}
@@ -44,25 +47,25 @@ export default function PersonagemCard({ personagem }: PersonagemCardProps) {
               />
             ) : (
               <div className="w-full h-full bg-muted flex items-center justify-center rounded-md">
-                <span className="text-4xl sm:text-2xl text-muted-foreground">
-                  🧙
-                </span>
+                <span className="text-4xl text-muted-foreground">🧙</span>
               </div>
             )}
           </div>
 
           <div className="flex flex-col flex-grow">
             <CardHeader className="p-0 pb-2">
-              <h3 className="text-xl font-bold">{personagem.name}</h3>
+              <h3 className="text-xl font-bold line-clamp-1">
+                {personagem.name}
+              </h3>
             </CardHeader>
 
-            <CardContent className="p-0 pb-2">
-              <div className="text-sm text-muted-foreground">
+            <CardContent className="p-0 pb-2 flex-grow">
+              <div className="text-sm text-muted-foreground line-clamp-2">
                 {personagem.message}
               </div>
             </CardContent>
 
-            <CardFooter className="flex flex-wrap gap-2 p-0 pt-2">
+            <CardFooter className="flex flex-wrap gap-2 p-0 pt-2 mt-auto">
               <Badge
                 variant={
                   personagem.status === "alive" ? "default" : "destructive"
@@ -71,7 +74,9 @@ export default function PersonagemCard({ personagem }: PersonagemCardProps) {
                 {personagem.status === "alive" ? "Vivo" : "Morto"}
               </Badge>
 
-              <Badge variant="outline">{personagem.campaign.name}</Badge>
+              <Badge variant="outline" className="line-clamp-1">
+                {personagem.campaign.name}
+              </Badge>
               <Badge variant="outline">
                 Batalhas: {personagem.battles.length}
               </Badge>
