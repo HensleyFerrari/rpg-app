@@ -18,7 +18,7 @@ const BattlesDashboard = async () => {
   return (
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Todas as Batalhas ativas</h1>
+        <h1 className="text-2xl font-bold">Todas as Batalhas</h1>
         <Link href="/dashboard/battles/newBattle">
           <Button>Criar nova batalha</Button>
         </Link>
@@ -47,6 +47,8 @@ const BattlesDashboard = async () => {
                         fill
                         style={{ objectFit: "cover" }}
                         className="rounded-md"
+                        unoptimized={false}
+                        sizes="(max-width: 640px) 64px, 80px"
                       />
                     </div>
                   )}
