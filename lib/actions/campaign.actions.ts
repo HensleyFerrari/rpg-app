@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { connectDB } from "../mongodb";
 import Campaign from "@/models/Campaign";
-import { findByEmail, updateUserCampaign } from "./user.actions";
+import {
+  findByEmail,
+  getCurrentUser,
+  updateUserCampaign,
+} from "./user.actions";
 import mongoose from "mongoose";
 
 interface CampaignResponse {
@@ -174,22 +178,12 @@ export const getCampaignById = async (
   }
 };
 
-export const getMyCampaigns = async ({
-  email,
-}: {
-  email: string;
-}): Promise<CampaignResponse> => {
+export const getMyCampaigns = async () => {
   try {
-    if (!email) {
-      return {
-        ok: false,
-        message: "Email é obrigatório",
-      };
-    }
-
+    const userData = await getCurrentUser();
     await connectDB();
 
-    const user = await findByEmail(email);
+    const user = await findByEmail(userData.email);
 
     if (!user || !user._id) {
       return {

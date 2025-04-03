@@ -79,8 +79,8 @@ const items = [
     icons: Book,
     itens: [
       {
-        title: "Minhas Batalhas",
-        url: "/dashboard/battles/mybattles",
+        title: "Criar Batalha",
+        url: "/dashboard/battles/newBattle",
         icons: BookOpen,
       },
       {
