@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { connectDB } from "../mongodb";
 import Campaign from "@/models/Campaign";
+import Character from "@/models/Character"; // Add this import
 import {
   findByEmail,
   getCurrentUser,
@@ -142,8 +143,16 @@ export const getCampaignById = async (
         message: "ID de campanha inválido",
       };
     }
+
+    // Touch the Character model to ensure its schema is registered
+    // await Character.findOne({});
+
     const campaignData = await Campaign.findById(id)
-      .populate("owner", "username email name _id")
+      .populate({
+        path: "owner",
+        select: "username name email _id",
+        model: "User",
+      })
       .populate({
         path: "characters",
         populate: {
