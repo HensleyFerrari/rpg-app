@@ -71,5 +71,5 @@ const BattleSchema = new Schema<BattleDocument>(
 );
 
 const Battle =
-  mongoose.models?.Battle || model<BattleDocument>("Character", BattleSchema);
+  mongoose.models?.Battle || model<BattleDocument>("Battle", BattleSchema);
 export default Battle;

@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createBattle } from "@/lib/actions/battle.actions";
 
 const formSchema = z.object({
   name: z.string().min(3, {
@@ -70,12 +71,14 @@ const NewBattle = () => {
 
     try {
       console.log("Form values submitted:", values);
-      // Here you would add the API call to save the battle
-      // await fetch('/api/battles', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(values)
-      // });
+
+      const battleCreated = await createBattle(values);
+      if (!battleCreated) {
+        toast.error("Erro", {
+          description: "Não foi possivel criar a batalha",
+        });
+        return;
+      }
 
       toast.success("Batalha criada", {
         description: "A batalha foi criada com sucesso.",

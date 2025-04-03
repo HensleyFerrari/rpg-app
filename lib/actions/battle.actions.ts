@@ -4,21 +4,26 @@ import { revalidatePath } from "next/cache";
 import Battle, { BattleDocument } from "@/models/Battle";
 import { connectDB } from "../mongodb";
 import mongoose from "mongoose";
-import { BattleDocument } from "../../models/Battle";
 import User from "@/models/User";
 import Campaign from "@/models/Campaign";
+import { getCurrentUser } from "./user.actions";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
 
-export const createBattle = async ({ BattleParams }: BattleDocument) => {
+export const createBattle = async (BattleParams: BattleDocument) => {
   try {
     await connectDB();
 
-    const newBattle = await Battle.create(BattleParams);
+    const userData = await getCurrentUser();
+    console.log(BattleParams);
+    const newBattle = await Battle.create({
+      ...BattleParams,
+      owner: userData._id,
+    });
 
-    revalidatePath("/dashboard/campaigns");
+    revalidatePath("/dashboard/battles");
 
     return {
       ok: true,
@@ -211,4 +216,23 @@ export const deleteBattle = async (id: string) => {
       message: "Erro ao deletar batalha",
     };
   }
+};
+
+export const getAllBattles = async () => {
+  await connectDB();
+
+  const battles = await Battle.find()
+    .populate({
+      path: "owner",
+      select: "name",
+    })
+    .populate({
+      path: "campaign",
+      select: "name imageUrl",
+    });
+
+  return {
+    ok: true,
+    data: serializeData(battles),
+  };
 };
