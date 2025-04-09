@@ -3,11 +3,10 @@
 import { revalidatePath } from "next/cache";
 import Character, { CharacterDocument } from "@/models/Character";
 import { connectDB } from "../mongodb";
-import mongoose from "mongoose";
-import { findByEmail } from "./user.actions";
 import User from "@/models/User";
-import { updateCampaign } from "./campaign.actions";
 import Campaign from "@/models/Campaign";
+import { getCurrentUser } from "./user.actions";
+import mongoose from "mongoose";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
@@ -188,12 +187,11 @@ export async function getCharactersByCampaign(
         message: "ID de campanha inválido",
       };
     }
-
     const charactersData = await Character.find({ campaign: campaignId })
       .populate("owner", "username name _id")
       .sort({ createdAt: -1 });
 
-    const characters = serializeData(charactersData);
+    const characters = charactersData;
 
     if (characters.length === 0) {
       return {
@@ -206,7 +204,7 @@ export async function getCharactersByCampaign(
     return {
       ok: true,
       message: "Personagens encontrados",
-      data: characters,
+      data: serializeData(characters),
     };
   } catch (error: any) {
     console.error("Error fetching campaign characters:", error);
@@ -451,3 +449,28 @@ export async function countCharacters(): Promise<
     };
   }
 }
+
+export const getCharacterByActualUser = async () => {
+  await connectDB();
+
+  const actualUser = await getCurrentUser();
+
+  const characters = await Character.find({ owner: actualUser?._id });
+
+  return serializeData(characters);
+};
+
+export const getCharactersByActualUserAndCampaign = async (
+  campaignId: string
+) => {
+  await connectDB();
+
+  const actualUser = await getCurrentUser();
+
+  const characters = await Character.find({
+    owner: actualUser?._id,
+    campaign: campaignId,
+  });
+
+  return serializeData(characters);
+};

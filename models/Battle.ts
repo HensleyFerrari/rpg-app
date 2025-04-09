@@ -45,23 +45,8 @@ const BattleSchema = new Schema<BattleDocument>(
     },
     rounds: [
       {
-        damage: {
-          type: Number,
-          required: true,
-        },
-        isCritical: {
-          type: Boolean,
-          required: true,
-        },
-        character: {
-          type: Schema.Types.ObjectId,
-          ref: "Character",
-          required: true,
-        },
-        round: {
-          type: Number,
-          required: true,
-        },
+        type: Schema.Types.ObjectId,
+        ref: "Damage",
       },
     ],
   },

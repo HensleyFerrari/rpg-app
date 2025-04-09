@@ -60,7 +60,7 @@ const BattlesDashboard = async () => {
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Rounds:</span>
+                      <span className="text-muted-foreground">Turnos:</span>
                       <span>{battle.round || 0}</span>
                     </div>
                     <div className="flex justify-between">

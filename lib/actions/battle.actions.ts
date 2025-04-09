@@ -6,7 +6,10 @@ import { connectDB } from "../mongodb";
 import mongoose from "mongoose";
 import User from "@/models/User";
 import Campaign from "@/models/Campaign";
+import Character from "@/models/Character";
 import { getCurrentUser } from "./user.actions";
+import Damage from "@/models/Damage";
+import path from "path";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
@@ -57,7 +60,28 @@ export const getBattleById = async (id: string) => {
       };
     }
 
-    const battle = await Battle.findById(id).populate("characters");
+    const battle = await Battle.findById(id)
+      .populate({
+        path: "characters",
+        model: Character,
+      })
+      .populate({
+        path: "owner",
+        model: User,
+        select: "name _id",
+      })
+      .populate({
+        path: "campaign",
+        model: Campaign,
+      })
+      .populate({
+        path: "rounds",
+        model: Damage,
+        populate: {
+          path: "character",
+          model: Character,
+        },
+      });
 
     if (!battle) {
       return {
@@ -225,14 +249,72 @@ export const getAllBattles = async () => {
     .populate({
       path: "owner",
       select: "name",
+      model: User,
     })
     .populate({
       path: "campaign",
       select: "name imageUrl",
+      model: Campaign,
     });
 
   return {
     ok: true,
     data: serializeData(battles),
   };
+};
+
+export const addCharacterToBattle = async (
+  battleId: string,
+  characterId: string
+) => {
+  try {
+    if (!battleId || !characterId) {
+      return {
+        ok: false,
+        message: "ID da batalha e do personagem são obrigatórios",
+      };
+    }
+
+    await connectDB();
+
+    if (!mongoose.isValidObjectId(battleId)) {
+      return {
+        ok: false,
+        message: "ID de batalha inválido",
+      };
+    }
+
+    if (!mongoose.isValidObjectId(characterId)) {
+      return {
+        ok: false,
+        message: "ID de personagem inválido",
+      };
+    }
+
+    const battle = await Battle.findByIdAndUpdate(
+      battleId,
+      { $addToSet: { characters: characterId } },
+      { new: true }
+    );
+
+    if (!battle) {
+      return {
+        ok: false,
+        message: "Batalha não encontrada",
+      };
+    }
+
+    revalidatePath(`/dashboard/battles/${battleId}`);
+
+    return {
+      ok: true,
+      data: serializeData(battle),
+    };
+  } catch (error) {
+    console.error("Error adding character to battle:", error);
+    return {
+      ok: false,
+      message: "Erro ao adicionar personagem à batalha",
+    };
+  }
 };

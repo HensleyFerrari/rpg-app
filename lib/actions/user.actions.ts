@@ -4,6 +4,10 @@ import { connectDB } from "../mongodb";
 import User from "@/models/User";
 import { auth } from "@/auth";
 
+const serializeData = (data: any) => {
+  return JSON.parse(JSON.stringify(data));
+};
+
 export const findByEmail = async (email: string) => {
   await connectDB();
 
@@ -39,7 +43,7 @@ export const getCurrentUser = async () => {
 
     // Find the user by email and return complete user data
     const currentUser = await User.findOne({ email }).select("-password");
-    return currentUser;
+    return serializeData(currentUser);
   } catch (error) {
     console.error("Error getting current user:", error);
     return null;
