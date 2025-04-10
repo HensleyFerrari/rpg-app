@@ -16,6 +16,7 @@ import { CalendarIcon, UsersIcon, SwordsIcon, LayersIcon } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { createDamage } from "@/lib/actions/damage.actions";
 import NewDamage from "./components/newDamage";
+import AddCharacterModal from "./components/addCharacter";
 
 // Define type for Battle object
 interface Battle {
@@ -87,6 +88,7 @@ const BattlePage = () => {
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <NewDamage />
+      <AddCharacterModal />
       {battle && (
         <Card className="w-full shadow-lg">
           <CardHeader>

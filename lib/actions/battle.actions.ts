@@ -291,6 +291,24 @@ export const addCharacterToBattle = async (
       };
     }
 
+    // Verifica se o personagem já está na batalha
+    const battleVerify = await Battle.findById(battleId);
+    if (!battleVerify) {
+      return {
+        ok: false,
+        message: "Batalha não encontrada",
+      };
+    }
+    const characterExists = battleVerify.characters.some(
+      (character) => character.toString() === characterId
+    );
+    if (characterExists) {
+      return {
+        ok: false,
+        message: "Personagem já está na batalha",
+      };
+    }
+
     const battle = await Battle.findByIdAndUpdate(
       battleId,
       { $addToSet: { characters: characterId } },
