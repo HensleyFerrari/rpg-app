@@ -15,6 +15,14 @@ export const createDamage = async (damage: DamageDocument) => {
   await connectDB();
   const characterInfo = await getCharacterById(damage.character);
 
+  const battleInfo = await getBattleById(damage.battle);
+  if (!battleInfo.data.active) {
+    return {
+      ok: false,
+      message: "Batalha já finalizada! ",
+    };
+  }
+
   const payload = {
     ...damage,
     owner: characterInfo.data.owner._id,
@@ -30,7 +38,11 @@ export const createDamage = async (damage: DamageDocument) => {
     $push: { rounds: savedDamage._id },
   });
 
-  return serializeData(savedDamage);
+  return {
+    ok: true,
+    message: "Dano registrado com sucesso",
+    data: serializeData(savedDamage),
+  };
 };
 
 export const getAllDamagesByCampaignId = async (campaignId: string) => {

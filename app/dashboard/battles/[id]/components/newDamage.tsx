@@ -94,13 +94,17 @@ const NewDamage = () => {
       };
 
       const created = await createDamage(payload);
-      if (created) {
+      if (created.ok) {
         toast.success("Success", {
-          description: "Damage was registered successfully",
+          description: created.message,
         });
         setOpen(false);
         window.location.reload();
         // form.reset();
+      } else {
+        toast.error("Error", {
+          description: created.message,
+        });
       }
     } catch (error) {
       toast.error("Error", {
