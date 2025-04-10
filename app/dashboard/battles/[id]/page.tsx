@@ -133,10 +133,14 @@ const BattlePage = () => {
               </div>
             </div>
 
-            <div className="flex gap-4 mb-4 sm:gap-6">
-              <NewDamage />
-              {currentUser?._id === battle?.owner?._id && <AddCharacterModal />}
-            </div>
+            {battle.active && (
+              <div className="flex gap-4 mb-4 sm:gap-6">
+                <NewDamage />
+                {currentUser?._id === battle?.owner?._id && (
+                  <AddCharacterModal />
+                )}
+              </div>
+            )}
 
             <div className="border rounded-lg p-3 sm:p-4">
               <h3 className="text-lg font-medium mb-2">Histórico de turnos</h3>

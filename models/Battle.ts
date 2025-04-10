@@ -13,6 +13,7 @@ export interface BattleDocument {
     character: ObjectId;
     round: number;
   }>;
+  active: boolean;
   createdAt: Date;
   updateAt: Date;
 }
@@ -49,6 +50,10 @@ const BattleSchema = new Schema<BattleDocument>(
         ref: "Damage",
       },
     ],
+    active: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
