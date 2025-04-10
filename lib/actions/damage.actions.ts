@@ -4,6 +4,8 @@ import Damage, { DamageDocument } from "@/models/Damage";
 import { connectDB } from "../mongodb";
 import Character from "@/models/Character";
 import Battle from "@/models/Battle";
+import { getBattleById } from "./battle.actions";
+import { getCharacterById } from "./character.actions";
 
 const serializeData = (data: DamageDocument) => {
   return JSON.parse(JSON.stringify(data));
@@ -11,24 +13,22 @@ const serializeData = (data: DamageDocument) => {
 
 export const createDamage = async (damage: DamageDocument) => {
   await connectDB();
-  // const { character } = damage;
-  // const { owner, campaign } = character;
-  // const damageData = {
-  //   ...damage,
-  //   owner,
-  //   campaign
-  // };
-  const newDamage = new Damage(damage);
-  const savedDamage = await newDamage.save();
-  // await Character.findByIdAndUpdate(character, { $push: { damages: savedDamage._id } });
+  const characterInfo = await getCharacterById(damage.character);
 
-  const battleDamge = await Battle.findByIdAndUpdate(damage.battle, {
+  const payload = {
+    ...damage,
+    owner: characterInfo.data.owner._id,
+    campaign: characterInfo.data.campaign._id,
+  };
+  const newDamage = new Damage(payload);
+  const savedDamage = await newDamage.save();
+  // await Character.findByIdAndUpdate(payload.character, {
+  //   $push: { damages: savedDamage._id },
+  // });
+
+  await Battle.findByIdAndUpdate(payload.battle, {
     $push: { rounds: savedDamage._id },
   });
-
-  if (!battleDamge) {
-    throw new Error("Battle not found");
-  }
 
   return serializeData(savedDamage);
 };

@@ -45,16 +45,6 @@ const BattlePage = () => {
 
         const user = await getCurrentUser();
         setCurrentUser(user);
-
-        // const damage = await createDamage({
-        //   campaign: battle.data.campaign._id,
-        //   owner: battle.data.owner._id,
-        //   battle: id,
-        //   damage: 17,
-        //   isCritical: false,
-        //   character: "67e807cb65b4d8d2a8a77d46",
-        //   round: 1,
-        // });
       } else {
         console.error(battle.message);
       }
@@ -96,6 +86,7 @@ const BattlePage = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
+      <NewDamage />
       {battle && (
         <Card className="w-full shadow-lg">
           <CardHeader>
@@ -179,7 +170,6 @@ const BattlePage = () => {
           </CardFooter>
         </Card>
       )}
-      <NewDamage />
     </div>
   );
 };
