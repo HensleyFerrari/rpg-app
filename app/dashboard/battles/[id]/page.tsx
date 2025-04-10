@@ -88,7 +88,8 @@ const BattlePage = () => {
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <NewDamage />
-      <AddCharacterModal />
+      {/* {JSON.stringify(currentUser?._id)} */}
+      {currentUser?._id === battle?.owner?._id && <AddCharacterModal />}
       {battle && (
         <Card className="w-full shadow-lg">
           <CardHeader>
