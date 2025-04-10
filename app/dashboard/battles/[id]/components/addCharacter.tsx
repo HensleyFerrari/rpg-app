@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 
 const AddCharacterModal = () => {
   const { id } = useParams();
@@ -76,23 +77,25 @@ const AddCharacterModal = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Add Character</Button>
+        <Button variant="outline">
+          <Plus /> Personagem à batalha
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Character to Battle</DialogTitle>
+          <DialogTitle>Adicionar personagem à batalha</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="character" className="text-right">
-              Character
+              Personagem
             </Label>
             <Select
               value={selectedCharacter}
               onValueChange={setSelectedCharacter}
             >
               <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select a character" />
+                <SelectValue placeholder="Selecione um personagem" />
               </SelectTrigger>
               <SelectContent>
                 {characters.map((character) => (
@@ -106,10 +109,10 @@ const AddCharacterModal = () => {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Cancelar</Button>
           </DialogClose>
           <Button type="submit" onClick={onSubmit}>
-            Add
+            Adicionar
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -87,11 +87,6 @@ const BattlePage = () => {
 
   return (
     <div className="container mx-auto p-2 sm:p-4 max-w-4xl">
-      <div className="grid grid-cols-1 gap-4 mb-4 sm:gap-6">
-        <NewDamage />
-        {currentUser?._id === battle?.owner?._id && <AddCharacterModal />}
-      </div>
-
       {battle && (
         <Card className="w-full shadow-lg">
           <CardHeader className="px-3 sm:px-6">
@@ -136,6 +131,11 @@ const BattlePage = () => {
                   </p>
                 </div>
               </div>
+            </div>
+
+            <div className="flex gap-4 mb-4 sm:gap-6">
+              <NewDamage />
+              {currentUser?._id === battle?.owner?._id && <AddCharacterModal />}
             </div>
 
             <div className="border rounded-lg p-3 sm:p-4">
