@@ -1,24 +1,62 @@
 "use client";
-import { FormEvent, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { register } from "@/actions/register";
-import { Label } from "@/components/ui/label";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
+  }),
+});
 
 export default function Register() {
   const [error, setError] = useState<string>();
   const router = useRouter();
-  const ref = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = async (formData: FormData) => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const r = await register({
-      email: formData.get("email"),
-      password: formData.get("password"),
-      name: formData.get("name"),
+      email: values.email,
+      password: values.password,
+      name: values.name,
     });
-    ref.current?.reset();
+
     if (r?.error) {
       setError(r.error);
       return;
@@ -28,56 +66,85 @@ export default function Register() {
   };
 
   return (
-    <section className="w-full h-screen flex items-center justify-center">
-      <form
-        ref={ref}
-        action={handleSubmit}
-        className="p-6 w-full max-w-[400px] flex flex-col justify-between items-center gap-2 
-            border border-solid border-black bg-white rounded"
-      >
-        {error && <div className="">{error}</div>}
-        <h1 className="mb-5 w-full text-2xl font-bold">Register</h1>
+    <section className="w-full min-h-screen flex items-center justify-center px-4 py-8">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Criar uma conta</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-        <Label className="w-full text-sm">Full Name</Label>
-        <Input
-          type="text"
-          placeholder="Full Name"
-          className="w-full h-8 border border-solid border-black py-1 px-2.5 rounded text-[13px]"
-          name="name"
-        />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <Label className="w-full text-sm">Email</Label>
-        <Input
-          type="email"
-          placeholder="Email"
-          className="w-full h-8 border border-solid border-black py-1 px-2.5 rounded"
-          name="email"
-        />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <Label className="w-full text-sm">Password</Label>
-        <div className="flex w-full">
-          <Input
-            type="password"
-            placeholder="Password"
-            className="w-full h-8 border border-solid border-black py-1 px-2.5 rounded"
-            name="password"
-          />
-        </div>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Senha</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Create a password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <Button
-          className="w-full border border-solid border-black py-1.5 mt-2.5 rounded
-            transition duration-150 ease hover:bg-black"
-        >
-          Sign up
-        </Button>
-
-        <Link
-          href="/login"
-          className="text-sm text-[#888] transition duration-150 ease hover:text-black"
-        >
-          Already have an account?
-        </Link>
-      </form>
+              <Button type="submit" className="w-full mt-6">
+                Sign up
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="flex justify-center border-t pt-4">
+          <Link
+            href="/login"
+            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            Já tem uma conta? Log in
+          </Link>
+        </CardFooter>
+      </Card>
     </section>
   );
 }
