@@ -1,3 +1,4 @@
+"use client";
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +24,7 @@ import {
   PlusCircle,
   List,
   Settings,
+  LogOut,
 } from "lucide-react";
 import { ModeToggle } from "./theme-toggle";
 import {
@@ -30,6 +32,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
+import { signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/actions/user.actions";
 
 const items = [
   {
@@ -41,11 +46,11 @@ const items = [
     title: "Campanhas",
     icons: BookOpen,
     itens: [
-      {
-        title: "Minhas Campanhas",
-        url: "/dashboard/campaigns",
-        icons: Bookmark,
-      },
+      // {
+      //   title: "Minhas Campanhas",
+      //   url: "/dashboard/campaigns/mycampaigns",
+      //   icons: Bookmark,
+      // },
       {
         title: "Campanhas Criadas",
         url: "/dashboard/campaigns/mycampaigns",
@@ -62,15 +67,20 @@ const items = [
     title: "Personagens",
     icons: Users,
     itens: [
-      // {
-      //   title: "Meus Personagens",
-      //   url: "/dashboard/characters/mycharacters",
-      //   icons: User,
-      // },
+      {
+        title: "Meus Personagens",
+        url: "/dashboard/personagens/mycharacters",
+        icons: User,
+      },
       {
         title: "Todos os Personagens",
         url: "/dashboard/personagens",
         icons: Users,
+      },
+      {
+        title: "Criar Personagem",
+        url: "/dashboard/personagens/new",
+        icons: PlusCircle,
       },
     ],
   },
@@ -90,19 +100,30 @@ const items = [
       },
     ],
   },
-  {
-    title: "Configurações",
-    url: "/dashboard/settings",
-    icons: Settings,
-  },
-  {
-    title: "Home",
-    url: "/",
-    icons: Home,
-  },
+  // {
+  //   title: "Configurações",
+  //   url: "/dashboard/settings",
+  //   icons: Settings,
+  // },
+  // {
+  //   title: "Home",
+  //   url: "/",
+  //   icons: Home,
+  // },
 ];
 
 export function AppSidebar() {
+  const [actualUser, setActualUser] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const getUser = await getCurrentUser();
+      setActualUser(getUser);
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Sidebar>
       <SidebarHeader />
@@ -164,12 +185,29 @@ export function AppSidebar() {
                   );
                 }
               })}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  onClick={() => {
+                    signOut({ redirect: false }).then(() => {
+                      window.location.href = "/";
+                    });
+                  }}
+                >
+                  <a href="#">
+                    <LogOut />
+                    <span>Logout</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="font-semibold flex">
-        <span>Desenvolvido por Hensley</span>
+      <SidebarFooter className="font-semibold">
+        <span className="flex gap-2">
+          <User className="w-6 h-6" /> {actualUser.name}
+        </span>
         <Heart />
       </SidebarFooter>
     </Sidebar>

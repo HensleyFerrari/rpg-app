@@ -216,28 +216,17 @@ export async function getCharactersByCampaign(
   }
 }
 
-export async function getCharactersByOwner(
-  ownerId: string
-): Promise<CharacterResponse> {
+export async function getCharactersByOwner(): Promise<CharacterResponse> {
   try {
-    if (!ownerId) {
-      return {
-        ok: false,
-        message: "ID do proprietário é obrigatório",
-      };
-    }
-
     await connectDB();
 
-    if (!mongoose.isValidObjectId(ownerId)) {
-      return {
-        ok: false,
-        message: "ID de proprietário inválido",
-      };
-    }
+    const actualUser = await getCurrentUser();
 
-    const charactersData = await Character.find({ owner: ownerId })
+    const charactersData = await Character.find({ owner: actualUser?._id })
       .populate("campaign", "name _id")
+      .populate({
+        path: "battles",
+      })
       .sort({ createdAt: -1 });
 
     const characters = serializeData(charactersData);

@@ -1,7 +1,6 @@
 "use client";
 
 import { getMyCampaigns } from "@/lib/actions/campaign.actions";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import CampaignCard from "../components/campaignCard";
 import { CampaignDocument } from "@/models/Campaign";
@@ -16,21 +15,18 @@ interface CampaignResponse {
 }
 
 const MyCampaigns = () => {
-  const { data: session } = useSession();
   const [campaignsResponse, setCampaignsResponse] =
     useState<CampaignResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (session?.user?.email) {
-      fetchMyCampaigns(session.user.email);
-    }
-  }, [session]);
+    fetchMyCampaigns();
+  }, []);
 
-  const fetchMyCampaigns = async (email: string) => {
+  const fetchMyCampaigns = async () => {
     try {
       setLoading(true);
-      const response = await getMyCampaigns({ email });
+      const response = await getMyCampaigns();
       setCampaignsResponse(response);
     } catch (error) {
       console.error("Error fetching campaigns:", error);
