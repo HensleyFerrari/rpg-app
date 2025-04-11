@@ -150,6 +150,13 @@ export const updateBattle = async (
       };
     }
 
+    if (!battleParams) {
+      return {
+        ok: false,
+        message: "Dados da batalha são obrigatórios",
+      };
+    }
+
     await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {

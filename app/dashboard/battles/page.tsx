@@ -11,9 +11,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
+import { getCurrentUser } from "@/lib/actions/user.actions";
 
 const BattlesDashboard = async () => {
   const battles = await getAllBattles();
+  const currentUser = await getCurrentUser();
 
   return (
     <div className="container mx-auto py-8">
@@ -80,11 +82,13 @@ const BattlesDashboard = async () => {
                     Visualizar
                   </Link>
                 </Button>
-                <Button variant="default" size="sm" asChild>
-                  <Link href={`/dashboard/battles/${battle._id}/edit`}>
-                    Editar
-                  </Link>
-                </Button>
+                {currentUser._id === battle.owner._id && (
+                  <Button variant="default" size="sm" asChild>
+                    <Link href={`/dashboard/battles/${battle._id}/edit`}>
+                      Editar
+                    </Link>
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
