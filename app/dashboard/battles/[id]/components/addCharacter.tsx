@@ -39,7 +39,12 @@ const AddCharacterModal = () => {
       const { data: characterData } = await getCharactersByCampaign(
         battleData.campaign._id
       );
-      setCharacters(characterData);
+
+      const data = await characterData.map((character) => {
+        if (character.status === "dead") return;
+        return character;
+      });
+      setCharacters(data.length > 0 ? data : []);
     };
 
     fetchData();
@@ -98,15 +103,21 @@ const AddCharacterModal = () => {
                 <SelectValue placeholder="Selecione um personagem" />
               </SelectTrigger>
               <SelectContent>
-                {characters.map((character) => (
-                  <SelectItem key={character._id} value={character._id}>
-                    {character.name}
-                  </SelectItem>
-                ))}
+                {characters.map((character) => {
+                  if (!character) return null;
+                  return (
+                    <SelectItem key={character._id} value={character._id}>
+                      {character.name}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
         </div>
+        <span className="text-sm text-zinc-500">
+          * Apenas personagens vivos irão aparecer
+        </span>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancelar</Button>
