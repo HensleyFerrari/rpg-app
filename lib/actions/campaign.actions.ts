@@ -31,9 +31,7 @@ export async function getCampaigns() {
       .sort({ createdAt: -1 })
       .lean();
 
-    return campaigns.map((campaign) => ({
-      ...campaign,
-    }));
+    return serializeData(campaigns);
   } catch (error) {
     console.error("Erro ao buscar campanhas:", error);
     throw new Error(
