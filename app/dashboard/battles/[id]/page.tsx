@@ -39,10 +39,11 @@ const BattlePage = () => {
 
   useEffect(() => {
     const fecthBattle = async () => {
+      if (!loading) return;
       const battle = await getBattleById(id);
       if (battle.ok) {
-        setBattle(battle.data);
         setLoading(false);
+        setBattle(battle.data);
 
         const user = await getCurrentUser();
         setCurrentUser(user);
