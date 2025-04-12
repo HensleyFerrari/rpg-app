@@ -7,7 +7,8 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Book, Sword } from "lucide-react";
+import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
 
 type Personagem = {
   _id: string;
@@ -66,18 +67,19 @@ export default function PersonagemCard({ personagem }: PersonagemCardProps) {
             </CardContent>
 
             <CardFooter className="flex flex-wrap gap-2 p-0 pt-2 mt-auto">
-              <Badge
-                variant={
-                  personagem.status === "alive" ? "default" : "destructive"
-                }
-              >
-                {personagem.status === "alive" ? "Vivo" : "Morto"}
-              </Badge>
+              <CharacterStatusBadge
+                status={personagem.status as "alive" | "dead"}
+              />
 
-              <Badge variant="outline" className="line-clamp-1">
+              <Badge
+                variant="outline"
+                className="line-clamp-1 flex items-center gap-1"
+              >
+                <Book className="w-3 h-3" />
                 {personagem.campaign.name}
               </Badge>
-              <Badge variant="outline">
+              <Badge variant="outline" className="flex items-center gap-1">
+                <Sword className="w-3 h-3" />
                 Batalhas: {personagem.battles.length}
               </Badge>
             </CardFooter>
