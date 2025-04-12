@@ -23,6 +23,7 @@ import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { CharacterStatusBadge } from "../../../../components/ui/character-status-badge";
 
 // Character type definition
 type Character = {
@@ -76,17 +77,6 @@ const CharacterPage = () => {
     fetchCharacter();
   }, [id]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "alive":
-        return "bg-purple-700";
-      case "dead":
-        return "bg-red-700";
-      default:
-        return "bg-gray-700";
-    }
-  };
-
   if (loading) {
     return (
       <div className="p-6">
@@ -134,25 +124,7 @@ const CharacterPage = () => {
                   </div>
                 )}
               </div>
-              <Badge
-                className={`${getStatusColor(
-                  character.status
-                )} text-white mb-2 font-bold flex items-center gap-2`}
-              >
-                {character.status === "alive" ? (
-                  <>
-                    <User2 className="w-4 h-4" /> Vivo
-                  </>
-                ) : character.status === "dead" ? (
-                  <>
-                    <Skull className="w-4 h-4" /> Morto
-                  </>
-                ) : (
-                  <>
-                    <User2 className="w-4 h-4" /> Desconhecido
-                  </>
-                )}
-              </Badge>
+              <CharacterStatusBadge status={character.status} />
               <h2 className="text-2xl font-bold text-center mb-4">
                 {character.name}
               </h2>
@@ -169,7 +141,7 @@ const CharacterPage = () => {
                 <div className="text-center p-3 bg-secondary rounded-lg">
                   <p className="text-2xl font-bold flex items-center justify-center gap-2">
                     <Dice1 className="w-5 h-5" />
-                    12
+                    {Math.floor(Math.random() * 100)}
                   </p>
                   <p className="text-sm">Dados Rolados</p>
                 </div>

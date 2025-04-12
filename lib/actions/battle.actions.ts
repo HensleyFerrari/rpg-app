@@ -329,6 +329,17 @@ export const addCharacterToBattle = async (
       };
     }
 
+    // Atualiza o personagem para adicionar a batalha
+    const character = await Character.findByIdAndUpdate(characterId, {
+      $addToSet: { battles: battleId },
+    });
+    if (!character) {
+      return {
+        ok: false,
+        message: "Personagem não encontrado",
+      };
+    }
+
     revalidatePath(`/dashboard/battles/${battleId}`);
 
     return {

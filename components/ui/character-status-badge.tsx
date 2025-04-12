@@ -9,7 +9,7 @@ export function CharacterStatusBadge({ status }: CharacterStatusBadgeProps) {
   return (
     <Badge
       variant={status === "alive" ? "default" : "destructive"}
-      className="flex items-center gap-1"
+      className="flex items-center gap-1 font-bold"
     >
       {status === "alive" ? (
         <>
