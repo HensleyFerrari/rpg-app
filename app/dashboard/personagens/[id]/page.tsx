@@ -22,6 +22,7 @@ import { getCharacterById } from "@/lib/actions/character.actions";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Character type definition
 type Character = {
@@ -108,6 +109,13 @@ const CharacterPage = () => {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Personagens", href: "/dashboard/personagens" },
+          { label: character.name },
+        ]}
+      />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1">
           <Card className="h-full">

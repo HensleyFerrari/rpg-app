@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 const EditBattle = () => {
   const { id } = useParams();
@@ -102,6 +103,14 @@ const EditBattle = () => {
 
   return (
     <div className="container mx-auto py-6">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Batalhas", href: "/dashboard/battles" },
+          { label: formData.name, href: `/dashboard/battles/${id}` },
+          { label: "Editar" },
+        ]}
+      />
       <h1 className="text-3xl font-bold mb-6">Editar batalha</h1>
 
       <Card>

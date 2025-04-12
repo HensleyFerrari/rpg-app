@@ -14,6 +14,7 @@ import { Calendar, ChevronLeft, User, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 interface CampaignDetailProps {
   params: {
@@ -43,13 +44,20 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
 
   return (
     <div className="container mx-auto py-8">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Campanhas", href: "/dashboard/campaigns" },
+          { label: campaign.name },
+        ]}
+      />
       <div className="mb-8 flex justify-between items-center">
-        <Link href="/dashboard/campaigns">
+        {/* <Link href="/dashboard/campaigns">
           <Button variant="ghost" className="flex items-center gap-2 p-0">
             <ChevronLeft className="h-4 w-4" />
             Voltar para campanhas
           </Button>
-        </Link>
+        </Link> */}
         {isOwner && (
           <Link href={`/dashboard/campaigns/${id}/edit`}>
             <Button variant="default">Editar campanha</Button>

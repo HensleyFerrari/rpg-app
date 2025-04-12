@@ -27,6 +27,7 @@ import {
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
 import AddCharacterModal from "./components/addCharacter";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Define type for Battle object
 interface Battle {
@@ -98,6 +99,13 @@ const BattlePage = () => {
 
   return (
     <div className="container mx-auto p-2 sm:p-4 max-w-4xl">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Batalhas", href: "/dashboard/battles" },
+          { label: battle?.name || "Detalhes da Batalha" },
+        ]}
+      />
       {battle && (
         <Card className="w-full shadow-lg">
           <CardHeader className="px-3 sm:px-6">

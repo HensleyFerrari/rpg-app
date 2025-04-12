@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useSession, signIn } from "next-auth/react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Schema de validação baseado no modelo de Character
 const characterFormSchema = z.object({
@@ -118,6 +119,13 @@ const NewCharacter = () => {
 
   return (
     <div className="container mx-auto py-10">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Personagens", href: "/dashboard/personagens" },
+          { label: "Novo Personagem" },
+        ]}
+      />
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Criar Novo Personagem</h1>
         <p className="text-muted-foreground">

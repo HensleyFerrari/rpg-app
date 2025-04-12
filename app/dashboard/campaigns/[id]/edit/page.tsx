@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getCampaignById } from "@/lib/actions/campaign.actions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import EditCampaignForm from "./EditCampaignForm";
 
 export const metadata: Metadata = {
@@ -35,6 +36,13 @@ export default async function EditCampaignPage({
   return (
     <div className="container py-10">
       <div className="max-w-4xl mx-auto">
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Campanhas", href: "/dashboard/campaigns" },
+            { label: "Editar Campanha" },
+          ]}
+        />
         <h1 className="text-3xl font-bold mb-6">Editar Campanha</h1>
         <EditCampaignForm campaign={campaign.data} />
       </div>

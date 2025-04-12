@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createBattle } from "@/lib/actions/battle.actions";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 const formSchema = z.object({
   name: z.string().min(3, {
@@ -96,6 +97,13 @@ const NewBattle = () => {
 
   return (
     <div className="container mx-auto py-6">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Batalhas", href: "/dashboard/battles" },
+          { label: "Nova Batalha" },
+        ]}
+      />
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Nova Batalha</CardTitle>

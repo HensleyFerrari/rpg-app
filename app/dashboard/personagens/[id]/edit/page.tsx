@@ -31,6 +31,7 @@ import {
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CharacterDocument } from "@/models/Character";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -114,6 +115,17 @@ const CharacterEdit = () => {
 
   return (
     <Card className="max-w-2xl mx-auto">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Personagens", href: "/dashboard/personagens" },
+          {
+            label: form.getValues("name") || "Personagem",
+            href: `/dashboard/personagens/${id}`,
+          },
+          { label: "Editar" },
+        ]}
+      />
       <CardHeader>
         <CardTitle>Editar Personagem</CardTitle>
       </CardHeader>

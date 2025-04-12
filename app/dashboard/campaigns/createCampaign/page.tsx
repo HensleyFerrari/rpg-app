@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 type FormData = {
   name: string;
@@ -81,7 +82,14 @@ const CreateCampaign = () => {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-10 max-w-3xl">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Campanhas", href: "/dashboard/campaigns" },
+          { label: "Nova Campanha" },
+        ]}
+      />
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Criar Nova Campanha</CardTitle>
