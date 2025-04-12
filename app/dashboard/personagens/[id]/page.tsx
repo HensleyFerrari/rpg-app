@@ -3,6 +3,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import {
+  Skull,
+  User2,
+  Swords,
+  Dice1,
+  Trophy,
+  Edit,
+  Dices,
+  Book,
+} from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -102,7 +112,7 @@ const CharacterPage = () => {
         <div className="md:col-span-1">
           <Card className="h-full">
             <CardContent className="p-4 flex flex-col items-center">
-              <div className="relative w-full aspect-square rounded-lg overflow-hidden mb-4">
+              <div className="relative w-full aspect-square rounded-lg overflow-hidden mb-4 border-2 border-primary/20 shadow-xl">
                 {character.characterUrl ? (
                   <Image
                     src={character.characterUrl}
@@ -112,20 +122,28 @@ const CharacterPage = () => {
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <p>Sem imagem</p>
+                    <User2 className="w-20 h-20 text-gray-400" />
                   </div>
                 )}
               </div>
               <Badge
                 className={`${getStatusColor(
                   character.status
-                )} text-white mb-2 font-bold`}
+                )} text-white mb-2 font-bold flex items-center gap-2`}
               >
-                {character.status === "alive"
-                  ? "Vivo"
-                  : character.status === "dead"
-                  ? "Morto"
-                  : "Desconhecido"}
+                {character.status === "alive" ? (
+                  <>
+                    <User2 className="w-4 h-4" /> Vivo
+                  </>
+                ) : character.status === "dead" ? (
+                  <>
+                    <Skull className="w-4 h-4" /> Morto
+                  </>
+                ) : (
+                  <>
+                    <User2 className="w-4 h-4" /> Desconhecido
+                  </>
+                )}
               </Badge>
               <h2 className="text-2xl font-bold text-center mb-4">
                 {character.name}
@@ -134,13 +152,17 @@ const CharacterPage = () => {
               {/* Quick Stats */}
               <div className="w-full grid grid-cols-2 gap-4 mt-4">
                 <div className="text-center p-3 bg-secondary rounded-lg">
-                  <p className="text-2xl font-bold">
+                  <p className="text-2xl font-bold flex items-center justify-center gap-2">
+                    <Swords className="w-5 h-5" />
                     {character.battles?.length || 0}
                   </p>
                   <p className="text-sm">Batalhas</p>
                 </div>
                 <div className="text-center p-3 bg-secondary rounded-lg">
-                  <p className="text-2xl font-bold">12</p>
+                  <p className="text-2xl font-bold flex items-center justify-center gap-2">
+                    <Dice1 className="w-5 h-5" />
+                    12
+                  </p>
                   <p className="text-sm">Dados Rolados</p>
                 </div>
               </div>
@@ -158,9 +180,13 @@ const CharacterPage = () => {
                   {isOwner && (
                     <div className="flex gap-2">
                       <Link href={`/dashboard/personagens/${id}/edit`}>
-                        <Button variant="outline">Editar Personagem</Button>
+                        <Button variant="outline">
+                          <Edit className="w-4 h-4 mr-2" /> Editar Personagem
+                        </Button>
                       </Link>
-                      <Button variant="default">Rolar Dados</Button>
+                      <Button variant="default">
+                        <Dices className="w-4 h-4 mr-2" /> Rolar Dados
+                      </Button>
                     </div>
                   )}
                 </CardTitle>
@@ -174,14 +200,18 @@ const CharacterPage = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Biografia</h3>
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <User2 className="w-5 h-5" /> Biografia
+                  </h3>
                   <p>{character.message}</p>
                 </div>
 
                 <Separator />
 
                 <div>
-                  <h3 className="text-lg font-semibold">Campanha</h3>
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Book className="w-5 h-5" /> Campanha
+                  </h3>
                   <p>{character.campaign.name}</p>
                 </div>
               </CardContent>
@@ -191,8 +221,8 @@ const CharacterPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">
-                    Estatísticas de Batalha
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Swords className="w-5 h-5" /> Estatísticas de Batalha
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -215,7 +245,9 @@ const CharacterPage = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Dados</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Dice1 className="w-5 h-5" /> Dados
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -237,7 +269,9 @@ const CharacterPage = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Conquistas</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Trophy className="w-5 h-5" /> Conquistas
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
