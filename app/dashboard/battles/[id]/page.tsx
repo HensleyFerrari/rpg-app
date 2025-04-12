@@ -134,6 +134,53 @@ const BattlePage = () => {
               </div>
             </div>
 
+            {/* Battle Statistics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <Card className="bg-card/50">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Rodada Atual
+                    </h3>
+                    <div className="text-2xl font-bold mt-1">6</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card/50">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Dano Total
+                    </h3>
+                    <div className="text-2xl font-bold mt-1">487</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card/50">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Personagens Ativos
+                    </h3>
+                    <div className="text-2xl font-bold mt-1">4/6</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card/50">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Maior Dano
+                    </h3>
+                    <div className="text-2xl font-bold mt-1">85</div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
             {battle.active && (
               <div className="flex gap-4 mb-4 sm:gap-6">
                 <NewDamage />
