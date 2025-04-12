@@ -29,15 +29,41 @@ import NewDamage from "./components/newDamage";
 import AddCharacterModal from "./components/addCharacter";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 
+// Define type for User object
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+}
+
 // Define type for Battle object
 interface Battle {
   _id: string;
   name: string;
-  owner: string;
-  campaign: string;
-  characters: any[];
+  owner: {
+    _id: string;
+    name: string;
+  };
+  campaign: {
+    _id: string;
+    name: string;
+  };
+  characters: Array<{
+    _id: string;
+    name: string;
+    active: boolean;
+  }>;
+  active: boolean;
   round: number;
-  rounds: any[];
+  rounds: Array<{
+    _id: string;
+    damage: number;
+    round: number;
+    isCritical: boolean;
+    character: {
+      name: string;
+    };
+  }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -46,24 +72,44 @@ const BattlePage = () => {
   const { id } = useParams<{ id: string }>();
   const [battle, setBattle] = useState<Battle | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const fecthBattle = async () => {
-      if (!loading) return;
-      const battle = await getBattleById(id);
-      if (battle.ok) {
+    const fetchBattle = async () => {
+      try {
+        const battle = await getBattleById(id as string);
+        if (battle.ok) {
+          setBattle(battle.data);
+          const user = await getCurrentUser();
+          setCurrentUser(user);
+        } else {
+          console.error(battle.message);
+        }
+      } catch (error) {
+        console.error("Error fetching battle:", error);
+      } finally {
         setLoading(false);
-        setBattle(battle.data);
-
-        const user = await getCurrentUser();
-        setCurrentUser(user);
-      } else {
-        console.error(battle.message);
       }
     };
 
-    fecthBattle();
+    fetchBattle();
+
+    // Adicionar listener para atualização da batalha
+    const handleBattleUpdate = (event: CustomEvent<Battle>) => {
+      setBattle(event.detail);
+    };
+
+    window.addEventListener(
+      "battleUpdated",
+      handleBattleUpdate as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "battleUpdated",
+        handleBattleUpdate as EventListener
+      );
+    };
   }, [id]);
 
   const formatDate = (dateString: string) => {
@@ -121,6 +167,7 @@ const BattlePage = () => {
 
           <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {/* Battle Info Cards */}
               <div className="flex items-center space-x-2 p-3 sm:p-4 bg-muted rounded-lg">
                 <UsersIcon className="h-5 w-5 opacity-70 shrink-0" />
                 <div className="min-w-0">

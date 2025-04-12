@@ -1,6 +1,5 @@
 import { getBattleById } from "@/lib/actions/battle.actions";
 import {
-  getCharacterByActualUser,
   getCharactersByActualUserAndCampaign,
   getCharactersByCampaign,
 } from "@/lib/actions/character.actions";
@@ -50,9 +49,30 @@ const formSchema = z.object({
   round: z.number().min(1, { message: "Round must be at least 1" }),
 });
 
+interface DamagePayload {
+  battle: string;
+  campaign: string;
+  owner: string;
+  character: string;
+  damage: number;
+  isCritical: boolean;
+  round: number;
+}
+
+interface Character {
+  _id: string;
+  name: string;
+  owner: {
+    _id: string;
+  };
+  campaign: {
+    _id: string;
+  };
+}
+
 const NewDamage = () => {
-  const { id } = useParams();
-  const [characters, setCharacters] = useState([]);
+  const { id } = useParams<{ id: string }>();
+  const [characters, setCharacters] = useState<Character[]>([]);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -69,17 +89,47 @@ const NewDamage = () => {
   useEffect(() => {
     const fetchData = async () => {
       const user = await getCurrentUser();
-      const battle = await getBattleById(id);
-      if (user._id === battle.data.owner._id) {
-        const allCharacter = await getCharactersByCampaign(
-          battle.data.campaign._id
-        );
-        setCharacters(allCharacter.data);
-      } else {
-        const allCharacter = await getCharactersByActualUserAndCampaign(
-          battle.data.campaign._id
-        );
-        setCharacters(allCharacter.data);
+      const battle = await getBattleById(id as string);
+      if (battle.ok) {
+        if (user._id === battle.data.owner._id) {
+          const allCharacters = await getCharactersByCampaign(
+            battle.data.campaign._id
+          );
+          if (allCharacters.ok && Array.isArray(allCharacters.data)) {
+            const formattedCharacters: Character[] = allCharacters.data.map(
+              (char) => ({
+                _id: char._id.toString(),
+                name: char.name,
+                owner: {
+                  _id: char.owner._id.toString(),
+                },
+                campaign: {
+                  _id: char.campaign._id.toString(),
+                },
+              })
+            );
+            setCharacters(formattedCharacters);
+          }
+        } else {
+          const userCharacters = await getCharactersByActualUserAndCampaign(
+            battle.data.campaign._id
+          );
+          if (userCharacters.ok && Array.isArray(userCharacters.data)) {
+            const formattedCharacters: Character[] = userCharacters.data.map(
+              (char) => ({
+                _id: char._id.toString(),
+                name: char.name,
+                owner: {
+                  _id: char.owner._id.toString(),
+                },
+                campaign: {
+                  _id: char.campaign._id.toString(),
+                },
+              })
+            );
+            setCharacters(formattedCharacters);
+          }
+        }
       }
     };
     fetchData();
@@ -88,9 +138,19 @@ const NewDamage = () => {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsSubmitting(true);
-      const payload = {
-        ...data,
-        battle: id,
+      const battle = await getBattleById(id as string);
+      if (!battle.ok) {
+        throw new Error("Battle not found");
+      }
+
+      const payload: DamagePayload = {
+        battle: id as string,
+        campaign: battle.data.campaign._id,
+        owner: battle.data.owner._id,
+        character: data.character,
+        damage: data.damage,
+        isCritical: data.isCritical,
+        round: data.round,
       };
 
       const created = await createDamage(payload);
@@ -99,8 +159,13 @@ const NewDamage = () => {
           description: created.message,
         });
         setOpen(false);
-        window.location.reload();
-        // form.reset();
+        form.reset();
+        const updatedBattle = await getBattleById(id as string);
+        if (updatedBattle.ok) {
+          window.dispatchEvent(
+            new CustomEvent("battleUpdated", { detail: updatedBattle.data })
+          );
+        }
       } else {
         toast.error("Error", {
           description: created.message,
@@ -150,7 +215,7 @@ const NewDamage = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {characters.map((character: any) => (
+                        {characters.map((character: Character) => (
                           <SelectItem key={character._id} value={character._id}>
                             {character.name}
                           </SelectItem>
