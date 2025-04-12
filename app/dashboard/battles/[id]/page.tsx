@@ -270,7 +270,9 @@ const BattlePage = () => {
             {battle?.active && (
               <div className="flex flex-col sm:flex-row gap-4 mb-4 sm:gap-6">
                 <div className="flex-1">
-                  <NewDamage />
+                  {battle.characters.some((char) => char.active) && (
+                    <NewDamage />
+                  )}
                 </div>
                 {currentUser?._id === battle?.owner?._id && (
                   <div className="flex-1">

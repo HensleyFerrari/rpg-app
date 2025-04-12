@@ -75,6 +75,7 @@ const NewDamage = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userHasCharacter, setUserHasCharacter] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -90,66 +91,50 @@ const NewDamage = () => {
     const fetchData = async () => {
       const user = await getCurrentUser();
       const battle = await getBattleById(id as string);
+
       if (battle.ok) {
-        if (user._id === battle.data.owner._id) {
-          const allCharacters = await getCharactersByCampaign(
-            battle.data.campaign._id
-          );
-          if (allCharacters.ok && Array.isArray(allCharacters.data)) {
-            // Filter characters that are in the battle and alive
-            const availableCharacters = allCharacters.data
-              .filter((char) => {
-                // Only include characters that are in the battle
-                return battle.data.characters.some(
-                  (battleChar) =>
-                    battleChar._id === char._id && battleChar.active
-                );
-              })
-              .map((char) => ({
-                _id: char._id.toString(),
-                name: char.name,
-                owner: {
-                  _id: char.owner._id.toString(),
-                },
-                campaign: {
-                  _id: char.campaign._id.toString(),
-                },
-              }));
-            setCharacters(availableCharacters);
-          }
-        } else {
-          const userCharacters = await getCharactersByActualUserAndCampaign(
-            battle.data.campaign._id
-          );
-          if (userCharacters.ok && Array.isArray(userCharacters.data)) {
-            // Filter user's characters that are in the battle and alive
-            const availableCharacters = userCharacters.data
-              .filter((char) => {
-                // Only include characters that are in the battle
-                return battle.data.characters.some(
-                  (battleChar) =>
-                    battleChar._id === char._id && battleChar.active
-                );
-              })
-              .map((char) => ({
-                _id: char._id.toString(),
-                name: char.name,
-                owner: {
-                  _id: char.owner._id.toString(),
-                },
-                campaign: {
-                  _id: char.campaign._id.toString(),
-                },
-              }));
-            setCharacters(availableCharacters);
-          }
+        const userCharacters = await getCharactersByActualUserAndCampaign(
+          battle.data.campaign._id
+        );
+
+        if (userCharacters.ok && Array.isArray(userCharacters.data)) {
+          // Filter user's characters that are in the battle and alive
+          const availableCharacters = userCharacters.data
+            .filter((char) => {
+              // Only include characters that are in the battle and active
+              return battle.data.characters.some(
+                (battleChar) => battleChar._id === char._id && battleChar.active
+              );
+            })
+            .map((char) => ({
+              _id: char._id.toString(),
+              name: char.name,
+              owner: {
+                _id: char.owner._id.toString(),
+              },
+              campaign: {
+                _id: char.campaign._id.toString(),
+              },
+            }));
+
+          setCharacters(availableCharacters);
+          setUserHasCharacter(availableCharacters.length > 0);
         }
       }
     };
+
     fetchData();
   }, [id]);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    if (!userHasCharacter) {
+      toast.error("Error", {
+        description:
+          "Você precisa ter um personagem ativo na batalha para registrar dano.",
+      });
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const battle = await getBattleById(id as string);
@@ -199,7 +184,15 @@ const NewDamage = () => {
     <div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="default">
+          <Button
+            variant="default"
+            disabled={!userHasCharacter}
+            title={
+              !userHasCharacter
+                ? "Você precisa ter um personagem ativo na batalha para registrar dano"
+                : ""
+            }
+          >
             <Plus /> Dano
           </Button>
         </DialogTrigger>
