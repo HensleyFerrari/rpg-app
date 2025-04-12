@@ -7,6 +7,7 @@ import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
+import Battle from "@/models/Battle";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
@@ -223,9 +224,14 @@ export async function getCharactersByOwner(): Promise<CharacterResponse> {
     const actualUser = await getCurrentUser();
 
     const charactersData = await Character.find({ owner: actualUser?._id })
-      .populate("campaign", "name _id")
+      .populate({
+        path: "campaign",
+        select: "name _id",
+        model: Campaign,
+      })
       .populate({
         path: "battles",
+        model: Battle,
       })
       .sort({ createdAt: -1 });
 
