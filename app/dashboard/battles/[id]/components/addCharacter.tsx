@@ -26,12 +26,14 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const AddCharacterModal = () => {
   const { id } = useParams();
   const [characters, setCharacters] = useState([]);
-  const [selectedCharacter, setSelectedCharacter] = useState("");
+  const [selectedCharacters, setSelectedCharacters] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,43 +42,62 @@ const AddCharacterModal = () => {
         battleData.campaign._id
       );
 
-      const data = await characterData.map((character) => {
-        if (character.status === "dead") return;
-        return character;
+      // Filter out dead characters and characters already in battle
+      const availableCharacters = characterData.filter((character) => {
+        if (character.status === "dead") return false;
+        const isInBattle = battleData.characters.some(
+          (battleChar) => battleChar._id === character._id
+        );
+        return !isInBattle;
       });
-      setCharacters(data.length > 0 ? data : []);
+
+      setCharacters(availableCharacters || []);
     };
 
     fetchData();
   }, [id]);
 
   const onSubmit = async () => {
-    if (!selectedCharacter) {
+    if (selectedCharacters.length === 0) {
       toast.error("Error", {
-        description: "Please select a character",
+        description: "Please select at least one character",
       });
       return;
     }
-    try {
-      const response = await addCharacterToBattle(id, selectedCharacter);
 
-      if (response.ok) {
-        toast.success("Success", {
-          description: "Character added to battle successfully",
-        });
-        setIsOpen(false);
-        window.location.reload();
-        setSelectedCharacter("");
-      } else {
-        toast.error("Error", {
-          description: response.message || "Failed to add character to battle",
-        });
+    setIsSubmitting(true);
+    try {
+      for (const characterId of selectedCharacters) {
+        const response = await addCharacterToBattle(id, characterId);
+        if (!response.ok) {
+          toast.error("Error", {
+            description:
+              response.message || "Failed to add character to battle",
+          });
+        }
       }
+
+      toast.success("Success", {
+        description: "Characters added to battle successfully",
+      });
+      setIsOpen(false);
+      setSelectedCharacters([]);
+      window.location.reload();
     } catch (error) {
-      toast("Error", {
+      toast.error("Error", {
         description: "Something went wrong",
       });
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const toggleCharacter = (characterId: string) => {
+    setSelectedCharacters((current) =>
+      current.includes(characterId)
+        ? current.filter((id) => id !== characterId)
+        : [...current, characterId]
+    );
   };
 
   return (
@@ -88,42 +109,41 @@ const AddCharacterModal = () => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Adicionar personagem à batalha</DialogTitle>
+          <DialogTitle>Adicionar personagens à batalha</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="character" className="text-right">
-              Personagem
-            </Label>
-            <Select
-              value={selectedCharacter}
-              onValueChange={setSelectedCharacter}
-            >
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Selecione um personagem" />
-              </SelectTrigger>
-              <SelectContent>
-                {characters.map((character) => {
-                  if (!character) return null;
-                  return (
-                    <SelectItem key={character._id} value={character._id}>
-                      {character.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </div>
+          {characters.length > 0 ? (
+            <div className="space-y-4">
+              {characters.map((character) => (
+                <div
+                  key={character._id}
+                  className="flex items-center space-x-2"
+                >
+                  <Checkbox
+                    id={character._id}
+                    checked={selectedCharacters.includes(character._id)}
+                    onCheckedChange={() => toggleCharacter(character._id)}
+                  />
+                  <Label htmlFor={character._id}>{character.name}</Label>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Não há personagens disponíveis para adicionar à batalha
+            </p>
+          )}
         </div>
-        <span className="text-sm text-zinc-500">
-          * Apenas personagens vivos irão aparecer
-        </span>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancelar</Button>
           </DialogClose>
-          <Button type="submit" onClick={onSubmit}>
-            Adicionar
+          <Button
+            type="submit"
+            onClick={onSubmit}
+            disabled={isSubmitting || selectedCharacters.length === 0}
+          >
+            {isSubmitting ? "Adicionando..." : "Adicionar"}
           </Button>
         </DialogFooter>
       </DialogContent>

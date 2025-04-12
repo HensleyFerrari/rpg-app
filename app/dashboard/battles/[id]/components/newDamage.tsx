@@ -96,8 +96,16 @@ const NewDamage = () => {
             battle.data.campaign._id
           );
           if (allCharacters.ok && Array.isArray(allCharacters.data)) {
-            const formattedCharacters: Character[] = allCharacters.data.map(
-              (char) => ({
+            // Filter characters that are in the battle and alive
+            const availableCharacters = allCharacters.data
+              .filter((char) => {
+                // Only include characters that are in the battle
+                return battle.data.characters.some(
+                  (battleChar) =>
+                    battleChar._id === char._id && battleChar.active
+                );
+              })
+              .map((char) => ({
                 _id: char._id.toString(),
                 name: char.name,
                 owner: {
@@ -106,17 +114,24 @@ const NewDamage = () => {
                 campaign: {
                   _id: char.campaign._id.toString(),
                 },
-              })
-            );
-            setCharacters(formattedCharacters);
+              }));
+            setCharacters(availableCharacters);
           }
         } else {
           const userCharacters = await getCharactersByActualUserAndCampaign(
             battle.data.campaign._id
           );
           if (userCharacters.ok && Array.isArray(userCharacters.data)) {
-            const formattedCharacters: Character[] = userCharacters.data.map(
-              (char) => ({
+            // Filter user's characters that are in the battle and alive
+            const availableCharacters = userCharacters.data
+              .filter((char) => {
+                // Only include characters that are in the battle
+                return battle.data.characters.some(
+                  (battleChar) =>
+                    battleChar._id === char._id && battleChar.active
+                );
+              })
+              .map((char) => ({
                 _id: char._id.toString(),
                 name: char.name,
                 owner: {
@@ -125,9 +140,8 @@ const NewDamage = () => {
                 campaign: {
                   _id: char.campaign._id.toString(),
                 },
-              })
-            );
-            setCharacters(formattedCharacters);
+              }));
+            setCharacters(availableCharacters);
           }
         }
       }
