@@ -20,9 +20,14 @@ export const createBattle = async (BattleParams: BattleDocument) => {
     await connectDB();
 
     const userData = await getCurrentUser();
-    console.log(BattleParams);
+
     const newBattle = await Battle.create({
-      ...BattleParams,
+      name: BattleParams.name,
+      description: BattleParams.description,
+      campaign: BattleParams.campaign,
+      active: BattleParams.active,
+      round: 1,
+      characters: BattleParams.characters || [],
       owner: userData._id,
     });
 
