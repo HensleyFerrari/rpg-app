@@ -5,6 +5,7 @@ export interface FeedbackDocument {
   title: string;
   description: string;
   type: string;
+  area: string;
   status: "em aberto" | "em desenvolvimento" | "concluido" | "negado";
   userEmail: string;
   userName: string;
@@ -26,6 +27,11 @@ const FeedbackSchema = new Schema<FeedbackDocument>(
       type: String,
       required: [true, "Tipo de feedback é obrigatório"],
       enum: ["bug", "feature", "improvement", "other"],
+    },
+    area: {
+      type: String,
+      required: [true, "Área da aplicação é obrigatória"],
+      enum: ["geral", "campanhas", "personagens", "batalhas", "outros"],
     },
     status: {
       type: String,

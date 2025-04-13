@@ -4,14 +4,17 @@ import { connectDB } from "../mongodb";
 import { getCurrentUser } from "./user.actions";
 import Feedback from "@/models/Feedback";
 import { revalidatePath } from "next/cache";
+import type { FeedbackDocument } from "@/models/Feedback";
 
-const serializeData = (data: any) => {
+const serializeData = <T>(data: T): T => {
   return JSON.parse(JSON.stringify(data));
 };
 
 export async function createFeedback(values: {
   title: string;
   description: string;
+  type: string;
+  area: string;
 }) {
   try {
     await connectDB();
@@ -37,11 +40,12 @@ export async function createFeedback(values: {
       message: "Feedback enviado com sucesso",
       data: serializeData(feedback),
     };
-  } catch (error: any) {
+  } catch (error: Error | unknown) {
     console.error("Error creating feedback:", error);
     return {
       ok: false,
-      message: error.message || "Falha ao enviar feedback",
+      message:
+        error instanceof Error ? error.message : "Falha ao enviar feedback",
     };
   }
 }
@@ -57,11 +61,12 @@ export async function getAllFeedbacks() {
       message: "Feedbacks encontrados",
       data: serializeData(feedbacks),
     };
-  } catch (error: any) {
+  } catch (error: Error | unknown) {
     console.error("Error fetching feedbacks:", error);
     return {
       ok: false,
-      message: error.message || "Falha ao buscar feedbacks",
+      message:
+        error instanceof Error ? error.message : "Falha ao buscar feedbacks",
     };
   }
 }

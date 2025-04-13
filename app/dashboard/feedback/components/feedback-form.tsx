@@ -30,6 +30,7 @@ export default function FeedbackForm() {
       title: formData.get("title") as string,
       description: formData.get("description") as string,
       type: formData.get("type") as string,
+      area: formData.get("area") as string,
     };
 
     try {
@@ -42,8 +43,10 @@ export default function FeedbackForm() {
       } else {
         toast.error(response.message);
       }
-    } catch (error) {
-      toast.error("Erro ao enviar feedback");
+    } catch (error: Error | unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao enviar feedback"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -65,6 +68,22 @@ export default function FeedbackForm() {
               </SelectItem>
               <SelectItem value="improvement">Melhoria</SelectItem>
               <SelectItem value="other">Outro</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="area">Área da Aplicação</Label>
+          <Select name="area" required>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione a área da aplicação" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="geral">Geral</SelectItem>
+              <SelectItem value="campanhas">Campanhas</SelectItem>
+              <SelectItem value="personagens">Personagens</SelectItem>
+              <SelectItem value="batalhas">Batalhas</SelectItem>
+              <SelectItem value="outros">Outros</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -107,6 +107,11 @@ const items = [
       },
     ],
   },
+  {
+    title: "Feedbacks",
+    url: "/dashboard/feedback",
+    icons: ScrollText,
+  },
 ];
 
 export function AppSidebar() {
