@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createCharacter } from "@/lib/actions/character.actions";
 import { getCampaigns } from "@/lib/actions/campaign.actions";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Schema de validação baseado no modelo de Character
@@ -54,6 +54,8 @@ interface Campaign {
 const NewCharacter = () => {
   const { data } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const campaignFromUrl = searchParams.get("campaign");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(true);
@@ -86,7 +88,10 @@ const NewCharacter = () => {
 
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(characterFormSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      campaign: campaignFromUrl || "",
+    },
   });
 
   async function onSubmit(values: CharacterFormValues) {
@@ -94,24 +99,24 @@ const NewCharacter = () => {
     try {
       const response = await createCharacter({
         name: values.name,
-        owner: data?.user?.email,
+        owner: data?.user?.email || "",
         campaign: values.campaign,
         characterUrl: values.characterUrl || "",
         message: values.message,
-        status: values.status, // Adicionando o status aqui
+        status: values.status,
       });
       if (response.ok) {
         toast.success("Sucesso!", {
           description: "Personagem criado com sucesso.",
         });
 
-        // Redireciona para a página do personagem ou lista de personagens
         router.push("/dashboard/personagens");
       } else {
         toast.error("Erro Ao criar personagem");
       }
     } catch (error) {
-      toast.error("Erro ao criar personagem!", error);
+      toast.error("Erro ao criar personagem");
+      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -161,6 +166,7 @@ const NewCharacter = () => {
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  disabled={!!campaignFromUrl}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -186,7 +192,9 @@ const NewCharacter = () => {
                   </SelectContent>
                 </Select>
                 <FormDescription>
-                  Selecione a campanha para este personagem.
+                  {campaignFromUrl
+                    ? "Campanha pré-selecionada da URL"
+                    : "Selecione a campanha para este personagem."}
                 </FormDescription>
                 <FormMessage />
               </FormItem>

@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import * as zod from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -27,26 +28,39 @@ import {
 } from "@/components/ui/select";
 import { createBattle } from "@/lib/actions/battle.actions";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { CampaignDocument } from "@/models/Campaign";
 
-const formSchema = z.object({
-  name: z.string().min(3, {
+// Type for creating a new battle (subset of BattleDocument)
+type CreateBattleParams = {
+  name: string;
+  campaign: string;
+  characters: string[];
+  active: boolean;
+  round: number;
+};
+
+const formSchema = zod.object({
+  name: zod.string().min(3, {
     message: "O nome da batalha deve ter pelo menos 3 caracteres.",
   }),
-  campaign: z.string().min(2, {
+  campaign: zod.string().min(2, {
     message: "Selecione uma campanha.",
   }),
 });
 
 const NewBattle = () => {
   const router = useRouter();
+  const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const campaignId = searchParams.get("campaign");
   const [isLoading, setIsLoading] = useState(false);
-  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<CampaignDocument[]>([]);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<zod.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      campaign: "",
+      campaign: campaignId || "",
     },
   });
 
@@ -67,16 +81,23 @@ const NewBattle = () => {
     fetchCampaigns();
   }, []);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: zod.infer<typeof formSchema>) => {
     setIsLoading(true);
 
     try {
-      console.log("Form values submitted:", values);
+      const battleData: CreateBattleParams = {
+        name: values.name,
+        campaign: values.campaign,
+        characters: [],
+        active: true,
+        round: 1,
+      };
 
-      const battleCreated = await createBattle(values);
-      if (!battleCreated) {
+      const response = await createBattle(battleData);
+
+      if (!response.ok) {
         toast.error("Erro", {
-          description: "Não foi possivel criar a batalha",
+          description: response.message || "Não foi possível criar a batalha",
         });
         return;
       }
@@ -84,7 +105,7 @@ const NewBattle = () => {
       toast.success("Batalha criada", {
         description: "A batalha foi criada com sucesso.",
       });
-      router.push("/dashboard/battles");
+      router.push(`/dashboard/battles/${response.data._id}`);
     } catch (error) {
       console.error("Erro ao criar batalha:", error);
       toast.error("Erro", {
@@ -134,7 +155,11 @@ const NewBattle = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Campanha</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={!!campaignId}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione uma campanha" />
