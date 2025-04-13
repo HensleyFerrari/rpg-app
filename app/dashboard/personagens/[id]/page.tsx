@@ -138,13 +138,13 @@ const CharacterPage = () => {
                   </p>
                   <p className="text-sm">Batalhas</p>
                 </div>
-                <div className="text-center p-3 bg-secondary rounded-lg">
+                {/* <div className="text-center p-3 bg-secondary rounded-lg">
                   <p className="text-2xl font-bold flex items-center justify-center gap-2">
                     <Dice1 className="w-5 h-5" />
-                    {Math.floor(Math.random() * 100)}
+                    {character.battles?.length || 0}
                   </p>
-                  <p className="text-sm">Dados Rolados</p>
-                </div>
+                  <p className="text-sm">Turnos Jogados</p>
+                </div> */}
               </div>
             </CardContent>
           </Card>
@@ -164,9 +164,9 @@ const CharacterPage = () => {
                           <Edit className="w-4 h-4 mr-2" /> Editar Personagem
                         </Button>
                       </Link>
-                      <Button variant="default">
+                      {/* <Button variant="default">
                         <Dices className="w-4 h-4 mr-2" /> Rolar Dados
-                      </Button>
+                      </Button> */}
                     </div>
                   )}
                 </CardTitle>
@@ -198,7 +198,7 @@ const CharacterPage = () => {
             </Card>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -270,7 +270,7 @@ const CharacterPage = () => {
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

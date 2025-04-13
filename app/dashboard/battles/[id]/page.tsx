@@ -240,9 +240,8 @@ const BattlePage = () => {
                       Personagens Ativos
                     </h3>
                     <div className="text-2xl font-bold">
-                      {battle?.characters?.filter((char) => char.active)
-                        .length || 0}
-                      /{battle?.characters?.length || 0}
+                      {battle?.characters?.filter((char) => char).length || 0}/
+                      {battle?.characters?.length || 0}
                     </div>
                   </div>
                 </CardContent>
