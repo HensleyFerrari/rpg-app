@@ -10,7 +10,16 @@ import {
 } from "@/components/ui/card";
 import { getCampaignById } from "@/lib/actions/campaign.actions";
 import { getCurrentUser } from "@/lib/actions/user.actions";
-import { Calendar, ChevronLeft, User, Users } from "lucide-react";
+import { getBattlesByCampaign } from "@/lib/actions/battle.actions";
+import {
+  Calendar,
+  ChevronLeft,
+  User,
+  Users,
+  Swords,
+  Shield,
+  PlusCircle,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -23,15 +32,17 @@ interface CampaignDetailProps {
 }
 
 const CampaignDetail = async ({ params }: CampaignDetailProps) => {
-  const { id } = await params;
+  const { id } = params;
   const campaignResponse = await getCampaignById(id);
   const currentUser = await getCurrentUser();
+  const battlesResponse = await getBattlesByCampaign(id);
 
   if (!campaignResponse.ok || !campaignResponse.data) {
     notFound();
   }
 
   const campaign = campaignResponse.data;
+  const battles = battlesResponse.ok ? battlesResponse.data : [];
   const formattedDate = campaign.createdAt
     ? new Date(campaign.createdAt).toLocaleDateString("pt-BR", {
         day: "2-digit",
@@ -52,12 +63,6 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
         ]}
       />
       <div className="mb-8 flex justify-between items-center">
-        {/* <Link href="/dashboard/campaigns">
-          <Button variant="ghost" className="flex items-center gap-2 p-0">
-            <ChevronLeft className="h-4 w-4" />
-            Voltar para campanhas
-          </Button>
-        </Link> */}
         {isOwner && (
           <Link href={`/dashboard/campaigns/${id}/edit`}>
             <Button variant="default">Editar campanha</Button>
@@ -105,15 +110,40 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">
-                Próxima sessão
+              <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                <Swords className="h-5 w-5" />
+                Batalhas
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground italic">
-                Nenhuma sessão agendada. O mestre ainda não definiu uma data
-                para a próxima sessão.
-              </p>
+              {battles && battles.length > 0 ? (
+                <div className="space-y-4">
+                  {battles.map((battle) => (
+                    <Link
+                      key={battle._id}
+                      href={`/dashboard/battles/${battle._id}`}
+                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Shield className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium">{battle.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Round {battle.round}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant={battle.active ? "default" : "secondary"}>
+                        {battle.active ? "Em andamento" : "Finalizada"}
+                      </Badge>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground italic">
+                  Nenhuma batalha foi criada para esta campanha ainda.
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -199,25 +229,31 @@ const CampaignDetail = async ({ params }: CampaignDetailProps) => {
                 </p>
               )}
             </CardContent>
-            {/* <CardFooter>
-              <Button className="w-full">Participar da campanha</Button>
-            </CardFooter> */}
           </Card>
 
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-semibold">Ações</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
-                Gerenciar personagens
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                Ver ficha do mestre
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                Sessões anteriores
-              </Button>
+            <CardContent className="space-y-2 gap-2 flex flex-col">
+              <Link
+                href={`/dashboard/personagens/new?campaign=${campaign._id}`}
+              >
+                <Button variant="outline" className="w-full justify-start">
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Criar personagem
+                </Button>
+              </Link>
+              {isOwner && (
+                <Link
+                  href={`/dashboard/battles/newBattle?campaign=${campaign._id}`}
+                >
+                  <Button variant="outline" className="w-full justify-start">
+                    <Swords className="h-4 w-4 mr-2" />
+                    Criar batalha
+                  </Button>
+                </Link>
+              )}
             </CardContent>
           </Card>
         </div>
