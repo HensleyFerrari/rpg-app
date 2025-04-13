@@ -461,7 +461,6 @@ export const getCharactersByActualUserAndCampaign = async (
   await connectDB();
 
   const actualUser = await getCurrentUser();
-
   const characters = await Character.find({
     owner: actualUser?._id,
     campaign: campaignId,

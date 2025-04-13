@@ -83,7 +83,7 @@ const EditBattle = () => {
         description: "A batalha foi atualizada com sucesso",
       });
 
-      router.push(`/dashboard/battles/${id}`);
+      router.push(`/dashboard/battles/`);
     } catch (error) {
       toast("Error", {
         description: "Failed to update battle",

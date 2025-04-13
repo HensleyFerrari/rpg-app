@@ -92,33 +92,36 @@ const NewDamage = () => {
       const user = await getCurrentUser();
       const battle = await getBattleById(id as string);
 
-      if (battle.ok) {
+      if (user._id === battle.data.owner._id) {
+        const characters = await getCharactersByCampaign(
+          battle.data.campaign._id
+        );
+        if (characters.data && Array.isArray(characters.data)) {
+          setCharacters(
+            characters.data.filter((char: Character) => {
+              if (char.status === "alive") {
+                return char;
+              }
+            })
+          );
+        }
+        setUserHasCharacter(true);
+      }
+
+      if (user._id !== battle.data.owner._id) {
         const userCharacters = await getCharactersByActualUserAndCampaign(
           battle.data.campaign._id
         );
 
-        if (userCharacters.ok && Array.isArray(userCharacters.data)) {
-          // Filter user's characters that are in the battle and alive
-          const availableCharacters = userCharacters.data
-            .filter((char) => {
-              // Only include characters that are in the battle and active
-              return battle.data.characters.some(
-                (battleChar) => battleChar._id === char._id && battleChar.active
-              );
+        if (userCharacters && Array.isArray(userCharacters)) {
+          setCharacters(
+            userCharacters.filter((char: Character) => {
+              if (char.status === "alive") {
+                return char;
+              }
             })
-            .map((char) => ({
-              _id: char._id.toString(),
-              name: char.name,
-              owner: {
-                _id: char.owner._id.toString(),
-              },
-              campaign: {
-                _id: char.campaign._id.toString(),
-              },
-            }));
-
-          setCharacters(availableCharacters);
-          setUserHasCharacter(availableCharacters.length > 0);
+          );
+          setUserHasCharacter(true);
         }
       }
     };
