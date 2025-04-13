@@ -25,6 +25,13 @@ import {
   List,
   Settings,
   LogOut,
+  Swords,
+  ScrollText,
+  Crown,
+  UserPlus,
+  UsersRound,
+  ShieldPlus,
+  Skull,
 } from "lucide-react";
 import { ModeToggle } from "./theme-toggle";
 import {
@@ -44,28 +51,23 @@ const items = [
   },
   {
     title: "Campanhas",
-    icons: BookOpen,
+    icons: Crown,
     itens: [
-      // {
-      //   title: "Minhas Campanhas",
-      //   url: "/dashboard/campaigns/mycampaigns",
-      //   icons: Bookmark,
-      // },
       {
-        title: "Campanhas Criadas",
+        title: "Minhas Campanhas",
         url: "/dashboard/campaigns/mycampaigns",
-        icons: PlusCircle,
+        icons: ScrollText,
       },
       {
         title: "Todas as campanhas",
         url: "/dashboard/campaigns",
-        icons: List,
+        icons: Book,
       },
     ],
   },
   {
     title: "Personagens",
-    icons: Users,
+    icons: UsersRound,
     itens: [
       {
         title: "Meus Personagens",
@@ -73,30 +75,30 @@ const items = [
         icons: User,
       },
       {
+        title: "Criar Personagem",
+        url: "/dashboard/personagens/new",
+        icons: UserPlus,
+      },
+      {
         title: "Todos os Personagens",
         url: "/dashboard/personagens",
         icons: Users,
-      },
-      {
-        title: "Criar Personagem",
-        url: "/dashboard/personagens/new",
-        icons: PlusCircle,
       },
     ],
   },
   {
     title: "Batalhas",
-    icons: Book,
+    icons: Swords,
     itens: [
       {
         title: "Minhas Batalhas",
         url: "/dashboard/battles/mybattles",
-        icons: BookOpen,
+        icons: Skull,
       },
       {
         title: "Criar Batalha",
         url: "/dashboard/battles/newBattle",
-        icons: BookOpen,
+        icons: ShieldPlus,
       },
       {
         title: "Todas as Batalhas",
@@ -105,16 +107,6 @@ const items = [
       },
     ],
   },
-  // {
-  //   title: "Configurações",
-  //   url: "/dashboard/settings",
-  //   icons: Settings,
-  // },
-  // {
-  //   title: "Home",
-  //   url: "/",
-  //   icons: Home,
-  // },
 ];
 
 export function AppSidebar() {
