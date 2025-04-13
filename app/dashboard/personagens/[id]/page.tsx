@@ -3,19 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import {
-  Skull,
-  User2,
-  Swords,
-  Dice1,
-  Trophy,
-  Edit,
-  Dices,
-  Book,
-} from "lucide-react";
+import { User2, Swords, Edit, Book } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { getCharacterById } from "@/lib/actions/character.actions";

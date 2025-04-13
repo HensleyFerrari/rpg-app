@@ -2,8 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { connectDB } from "../mongodb";
-import Campaign from "@/models/Campaign";
-import Character from "@/models/Character"; // Add this import
+import Campaign, { CampaignDocument } from "@/models/Campaign";
 import {
   findByEmail,
   getCurrentUser,
@@ -14,11 +13,11 @@ import mongoose from "mongoose";
 interface CampaignResponse {
   ok: boolean;
   message: string;
-  data?: any;
+  data?: CampaignDocument | CampaignDocument[] | null;
 }
 
 // Add this helper function at the top of the file
-const serializeData = (data: any) => {
+const serializeData = (data: CampaignDocument) => {
   return JSON.parse(JSON.stringify(data));
 };
 
@@ -176,11 +175,11 @@ export const getCampaignById = async (
       message: "Campanha encontrada com sucesso",
       data: campaign,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching campaign:", error);
     return {
       ok: false,
-      message: error.message || "Falha ao buscar campanha",
+      message: "Falha ao buscar campanha",
     };
   }
 };

@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -13,7 +12,6 @@ import { getCurrentUser } from "@/lib/actions/user.actions";
 import { getBattlesByCampaign } from "@/lib/actions/battle.actions";
 import {
   Calendar,
-  ChevronLeft,
   User,
   Users,
   Swords,

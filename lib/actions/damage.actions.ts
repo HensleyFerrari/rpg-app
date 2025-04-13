@@ -2,7 +2,6 @@
 
 import Damage, { DamageDocument } from "@/models/Damage";
 import { connectDB } from "../mongodb";
-import Character from "@/models/Character";
 import Battle from "@/models/Battle";
 import { getBattleById } from "./battle.actions";
 import { getCharacterById } from "./character.actions";

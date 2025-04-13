@@ -4,7 +4,6 @@ import { connectDB } from "../mongodb";
 import { getCurrentUser } from "./user.actions";
 import Feedback from "@/models/Feedback";
 import { revalidatePath } from "next/cache";
-import type { FeedbackDocument } from "@/models/Feedback";
 
 const serializeData = <T>(data: T): T => {
   return JSON.parse(JSON.stringify(data));

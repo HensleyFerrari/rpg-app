@@ -163,8 +163,8 @@ const BattlesDashboard = async () => {
           </CardHeader>
           <CardContent>
             <p className="text-center text-muted-foreground">
-              You haven't created any battles yet. Click the button above to
-              create your first battle.
+              Você ainda não possui batalhas. Crie uma nova batalha para começar
+              a jogar!
             </p>
           </CardContent>
         </Card>

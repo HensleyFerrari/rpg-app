@@ -39,7 +39,7 @@ const EditBattle = () => {
         });
       } catch (error) {
         toast.error("Error fetching battle data", {
-          description: "Failed to load battle data",
+          description: "Failed to load battle data" + error,
         });
       } finally {
         setIsLoading(false);
@@ -86,7 +86,7 @@ const EditBattle = () => {
       router.push(`/dashboard/battles/`);
     } catch (error) {
       toast("Error", {
-        description: "Failed to update battle",
+        description: "Failed to update battle" + error,
       });
     } finally {
       setIsLoading(false);

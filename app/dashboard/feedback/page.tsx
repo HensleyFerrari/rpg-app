@@ -1,12 +1,5 @@
 import { getAllFeedbacks } from "@/lib/actions/feedback.actions";
 import FeedbackForm from "./components/feedback-form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import FeedbackList from "./components/feedback-list";
 
 export default async function FeedbackPage() {
