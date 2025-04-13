@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { getCampaigns } from "../../../lib/actions/campaign.actions";
 import Link from "next/link";
 import CampaignCard from "./components/campaignCard";
-import { CampaignDocument } from "@/models/Campaign";
 import { Plus } from "lucide-react";
 
 const CampaignsPage = async () => {

@@ -50,7 +50,6 @@ const formSchema = zod.object({
 
 const NewBattle = () => {
   const router = useRouter();
-  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const campaignId = searchParams.get("campaign");
   const [isLoading, setIsLoading] = useState(false);

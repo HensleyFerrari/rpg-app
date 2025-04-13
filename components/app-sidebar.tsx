@@ -17,13 +17,8 @@ import {
   Heart,
   LayoutDashboard,
   User,
-  Home,
   Users,
-  Bookmark,
-  BookOpen,
-  PlusCircle,
   List,
-  Settings,
   LogOut,
   Swords,
   ScrollText,
@@ -132,7 +127,11 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="flex justify-between mb-5">
-            <span className="self-center">Battle RPG</span> <ModeToggle />
+            <span className="self-center">
+              Dr.PG{" "}
+              <span className="text-blue-500 dark:text-blue-300">alpha</span>
+            </span>{" "}
+            <ModeToggle />
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
