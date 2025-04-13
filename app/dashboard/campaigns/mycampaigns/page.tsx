@@ -6,7 +6,7 @@ import CampaignCard from "../components/campaignCard";
 import { CampaignDocument } from "@/models/Campaign";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Dice4, ScrollText } from "lucide-react";
 
 interface CampaignResponse {
   ok: boolean;
@@ -72,10 +72,24 @@ const MyCampaigns = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-4 py-8">
-          <p>Você ainda não criou nenhuma campanha</p>
+        <div className="flex flex-col items-center justify-center gap-6 py-16 text-center">
+          <div className="flex gap-4">
+            <Dice4 className="h-12 w-12 text-muted-foreground animate-bounce" />
+            <ScrollText className="h-12 w-12 text-muted-foreground animate-bounce delay-100" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold">
+              Nenhuma campanha encontrada
+            </h3>
+            <p className="text-muted-foreground">
+              Comece sua jornada criando sua primeira campanha de RPG
+            </p>
+          </div>
           <Link href="/dashboard/campaigns/createCampaign">
-            <Button>Criar Nova Campanha</Button>
+            <Button className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Criar Primeira Campanha
+            </Button>
           </Link>
         </div>
       )}
