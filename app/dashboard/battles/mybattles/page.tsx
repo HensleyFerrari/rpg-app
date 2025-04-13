@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllBattles } from "@/lib/actions/battle.actions";
+import { getAllBattlesByUser } from "@/lib/actions/battle.actions";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,21 +38,19 @@ interface Battle {
 const MyBattlesDashboard = () => {
   const [battles, setBattles] = useState<Battle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<{ _id: string } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const battlesResponse = await getAllBattles();
+        const battlesResponse = await getAllBattlesByUser();
         const user = await getCurrentUser();
 
         if (battlesResponse.ok && user) {
           // Filter battles where the user is the owner
           const userBattles = battlesResponse.data.filter(
-            (battle) => battle.owner._id === user._id
+            (battle: Battle) => battle.owner._id === user._id
           );
           setBattles(userBattles);
-          setCurrentUser(user);
         }
       } catch (error) {
         console.error("Error fetching battles:", error);

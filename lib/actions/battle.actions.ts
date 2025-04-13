@@ -6,12 +6,11 @@ import { connectDB } from "../mongodb";
 import mongoose from "mongoose";
 import User from "@/models/User";
 import Campaign from "@/models/Campaign";
-import Character from "@/models/Character";
+import Character, { CharacterDocument } from "@/models/Character";
 import { getCurrentUser } from "./user.actions";
 import Damage from "@/models/Damage";
-import path from "path";
 
-const serializeData = (data: any) => {
+const serializeData = (data: BattleDocument[]) => {
   return JSON.parse(JSON.stringify(data));
 };
 
@@ -23,7 +22,6 @@ export const createBattle = async (BattleParams: BattleDocument) => {
 
     const newBattle = await Battle.create({
       name: BattleParams.name,
-      description: BattleParams.description,
       campaign: BattleParams.campaign,
       active: BattleParams.active,
       round: 1,
@@ -312,7 +310,7 @@ export const addCharacterToBattle = async (
       };
     }
     const characterExists = battleVerify.characters.some(
-      (character) => character.toString() === characterId
+      (character: CharacterDocument) => character.toString() === characterId
     );
     if (characterExists) {
       return {
@@ -358,4 +356,33 @@ export const addCharacterToBattle = async (
       message: "Erro ao adicionar personagem à batalha",
     };
   }
+};
+
+export const getAllBattlesByUser = async () => {
+  await connectDB();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      message: "Usuário não encontrado",
+    };
+  }
+
+  const battles = await Battle.find({ owner: user._id })
+    .populate({
+      path: "owner",
+      select: "name",
+      model: User,
+    })
+    .populate({
+      path: "campaign",
+      select: "name imageUrl",
+      model: Campaign,
+    });
+
+  return {
+    ok: true,
+    data: serializeData(battles),
+  };
 };
