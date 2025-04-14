@@ -3,13 +3,10 @@ import PersonagemCard from "@/components/PersonagemCard";
 import { UserPlus, Skull, Heart, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CharacterDocument } from "@/models/Character";
 
 export default async function Personagens() {
   const response = await getAllCharacters();
-  const characters = response.ok
-    ? (response.data as CharacterDocument[]) || []
-    : [];
+  const characters = response.ok ? (response.data as any[]) || [] : [];
 
   // Map CharacterDocument to Personagem type
   const personagens = characters.map((char) => ({
@@ -18,10 +15,10 @@ export default async function Personagens() {
     owner: char.owner.toString(),
     campaign: {
       _id: char.campaign.toString(), // Fix: campaign is an ObjectId
-      name: "", // Note: We'll need to populate campaign name from the database
+      name: char.campaign.name.toString(),
     },
     characterUrl: char.characterUrl || "",
-    battles: char.battles?.map((b) => b.toString()) || [],
+    battles: char.battles?.map((b: any) => b.toString()) || [],
     message: char.message || "",
     status: char.status,
     createdAt: char.createdAt, // Fix: correct property name
