@@ -77,7 +77,7 @@ const AddCharacterModal = () => {
       window.location.reload();
     } catch (error) {
       toast.error("Error", {
-        description: "Something went wrong",
+        description: "Something went wrong" + error.message,
       });
     } finally {
       setIsSubmitting(false);
