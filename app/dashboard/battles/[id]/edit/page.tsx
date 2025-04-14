@@ -72,7 +72,7 @@ const EditBattle = () => {
     setIsLoading(true);
 
     try {
-      const updatedBattle = await updateBattle(id, formData);
+      const updatedBattle = await updateBattle(id as string, formData);
       if (!updatedBattle.ok) {
         toast.error("Error", {
           description: updatedBattle.message,

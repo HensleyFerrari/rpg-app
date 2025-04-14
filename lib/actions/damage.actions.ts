@@ -10,7 +10,7 @@ const serializeData = (data: DamageDocument) => {
   return JSON.parse(JSON.stringify(data));
 };
 
-export const createDamage = async (damage: DamageDocument) => {
+export const createDamage = async (damage: any) => {
   await connectDB();
   const characterInfo = await getCharacterById(damage.character);
 

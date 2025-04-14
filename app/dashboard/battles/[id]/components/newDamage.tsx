@@ -72,7 +72,7 @@ interface Character {
 
 const NewDamage = () => {
   const { id } = useParams<{ id: string }>();
-  const [characters, setCharacters] = useState<Character[]>([]);
+  const [characters, setCharacters] = useState([]);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userHasCharacter, setUserHasCharacter] = useState(false);
@@ -97,13 +97,12 @@ const NewDamage = () => {
           battle.data.campaign._id
         );
         if (characters.data && Array.isArray(characters.data)) {
-          setCharacters(
-            characters.data.filter((char: Character) => {
-              if (char.status === "alive") {
-                return char;
-              }
-            })
-          );
+          const filteredCharacters: any = characters.data.filter((char) => {
+            if (char.status === "alive") {
+              return char;
+            }
+          });
+          setCharacters(filteredCharacters);
         }
         setUserHasCharacter(true);
       }
@@ -114,13 +113,12 @@ const NewDamage = () => {
         );
 
         if (userCharacters && Array.isArray(userCharacters)) {
-          setCharacters(
-            userCharacters.filter((char: Character) => {
-              if (char.status === "alive") {
-                return char;
-              }
-            })
-          );
+          const filteredCharacters: any = userCharacters.filter((char) => {
+            if (char.status === "alive") {
+              return char;
+            }
+          });
+          setCharacters(filteredCharacters);
           setUserHasCharacter(true);
         }
       }
