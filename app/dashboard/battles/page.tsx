@@ -13,6 +13,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
+import ChangeRound from "./[id]/components/changeRound";
 
 const BattlesDashboard = async () => {
   const battles = await getAllBattles();
@@ -35,9 +43,38 @@ const BattlesDashboard = async () => {
               {battle.campaign?.name || "No Campaign"}
             </CardDescription>
           </div>
-          <Badge variant={battle.active ? "default" : "secondary"}>
-            {battle.active ? "Em andamento" : "Finalizada"}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant={battle.active ? "default" : "secondary"}>
+              {battle.active ? "Em andamento" : "Finalizada"}
+            </Badge>
+            {currentUser?._id === battle.owner?._id && battle.active && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreVertical className="h-4 w-4" />
+                    <span className="sr-only">Opções da batalha</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <div className="px-2 py-1.5">
+                    <ChangeRound
+                      battleId={battle._id}
+                      currentRound={battle.round}
+                      advance={true}
+                    />
+                  </div>
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-1.5">
+                    <ChangeRound
+                      battleId={battle._id}
+                      currentRound={battle.round}
+                      advance={false}
+                    />
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>
