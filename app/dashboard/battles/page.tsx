@@ -22,9 +22,9 @@ const BattlesDashboard = async () => {
   const activeBattles = battles.data.filter((battle: any) => battle.active);
   const inactiveBattles = battles.data.filter((battle: any) => !battle.active);
 
-  const BattleCard = ({ battle }: any) => (
+  const BattleCard = async ({ battle }: any) => (
     <Card
-      key={battle._id}
+      key={battle?._id}
       className="shadow hover:shadow-lg transition-shadow duration-300"
     >
       <CardHeader>
@@ -79,11 +79,11 @@ const BattlesDashboard = async () => {
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
         <Button variant="outline" size="sm" asChild>
-          <Link href={`/dashboard/battles/${battle._id}`}>Visualizar</Link>
+          <Link href={`/dashboard/battles/${battle?._id}`}>Visualizar</Link>
         </Button>
-        {currentUser._id === battle.owner._id && (
+        {currentUser?._id === battle.owner?._id && (
           <Button variant="default" size="sm" asChild>
-            <Link href={`/dashboard/battles/${battle._id}/edit`}>Editar</Link>
+            <Link href={`/dashboard/battles/${battle?._id}/edit`}>Editar</Link>
           </Button>
         )}
       </CardFooter>
@@ -114,7 +114,7 @@ const BattlesDashboard = async () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {activeBattles.length > 0 ? (
                 activeBattles.map((battle: any) => (
-                  <BattleCard key={battle._id} battle={battle} />
+                  <BattleCard key={battle?._id} battle={battle} />
                 ))
               ) : (
                 <Card className="col-span-full">
@@ -137,7 +137,7 @@ const BattlesDashboard = async () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {inactiveBattles.length > 0 ? (
                 inactiveBattles.map((battle: any) => (
-                  <BattleCard key={battle._id} battle={battle} />
+                  <BattleCard key={battle?._id} battle={battle} />
                 ))
               ) : (
                 <Card className="col-span-full">

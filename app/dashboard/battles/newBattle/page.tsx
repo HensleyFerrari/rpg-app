@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,7 +47,7 @@ const formSchema = zod.object({
   }),
 });
 
-const NewBattle = () => {
+const BattleForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const campaignId = searchParams.get("campaign");
@@ -115,6 +115,72 @@ const NewBattle = () => {
   };
 
   return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome da Batalha</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite o nome da batalha" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="campaign"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Campanha</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={!!campaignId}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma campanha" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {campaigns.length > 0 ? (
+                    campaigns.map((campaign) => (
+                      <SelectItem key={campaign._id} value={campaign._id}>
+                        {campaign.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-campaigns" disabled>
+                      Nenhuma campanha criada
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-end space-x-4">
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Criando..." : "Criar Batalha"}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+};
+
+const NewBattle = () => {
+  return (
     <div className="container mx-auto py-6">
       <Breadcrumb
         items={[
@@ -128,74 +194,9 @@ const NewBattle = () => {
           <CardTitle className="text-2xl">Nova Batalha</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome da Batalha</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Digite o nome da batalha"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="campaign"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Campanha</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={!!campaignId}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma campanha" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {campaigns.length > 0 ? (
-                          campaigns.map((campaign) => (
-                            <SelectItem key={campaign._id} value={campaign._id}>
-                              {campaign.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="no-campaigns" disabled>
-                            Nenhuma campanha criada
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex justify-end space-x-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.back()}
-                >
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Criando..." : "Criar Batalha"}
-                </Button>
-              </div>
-            </form>
-          </Form>
+          <Suspense fallback={<div>Loading...</div>}>
+            <BattleForm />
+          </Suspense>
         </CardContent>
       </Card>
     </div>

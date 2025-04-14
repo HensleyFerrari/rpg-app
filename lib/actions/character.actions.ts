@@ -122,7 +122,7 @@ export async function createCharacter({
   }
 }
 
-export async function getCharacterById(id: string): Promise<CharacterResponse> {
+export async function getCharacterById(id: string) {
   try {
     if (!id) {
       return {
