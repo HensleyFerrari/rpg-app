@@ -51,7 +51,11 @@ const EditCampaignForm = ({ campaign }: any) => {
     }
 
     // Check if user is the owner of the campaign
-    if (campaign.owner.email !== session.user.email) {
+    if (
+      typeof campaign.owner === "object" &&
+      "email" in campaign.owner &&
+      campaign.owner.email !== session.user.email
+    ) {
       toast.error("Erro", {
         description: "Você não tem permissão para editar esta campanha",
       });
