@@ -111,7 +111,7 @@ const CharacterForm = () => {
           description: "Personagem criado com sucesso.",
         });
 
-        router.push("/dashboard/personagens");
+        router.push(`/dashboard/personagens/${response?.data?._id}`);
       } else {
         toast.error("Erro Ao criar personagem");
       }

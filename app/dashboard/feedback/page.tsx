@@ -9,6 +9,7 @@ export default async function FeedbackPage() {
     <div className="container mx-auto py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-4">Enviar Feedback</h1>
+        <p className="mb-4">Envie seu feedback para nós!</p>
         <FeedbackForm />
       </div>
 

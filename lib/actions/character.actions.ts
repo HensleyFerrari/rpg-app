@@ -35,7 +35,7 @@ export async function createCharacter({
   characterUrl = "",
   message = "",
   status,
-}: CharacterParams): Promise<CharacterResponse> {
+}: CharacterParams) {
   try {
     if (!name || !owner || !campaign) {
       return {
@@ -105,7 +105,9 @@ export async function createCharacter({
 
     const newCharacter = serializeData(newCharacterData);
 
-    revalidatePath(`/campaigns/${campaign}`);
+    revalidatePath(`/dashboard/personagens/${newCharacter._id}`);
+    revalidatePath(`/dashboard/personagens`);
+    revalidatePath(`/dashboard/personagens/mycharacters`);
 
     return {
       ok: true,

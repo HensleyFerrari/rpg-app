@@ -180,7 +180,7 @@ export const updateBattle = async (
       };
     }
 
-    revalidatePath("/dashboard/campaigns");
+    revalidatePath(`/dashboard/battles/${id}`);
 
     return {
       ok: true,
