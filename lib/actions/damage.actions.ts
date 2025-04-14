@@ -5,6 +5,7 @@ import { connectDB } from "../mongodb";
 import Battle from "@/models/Battle";
 import { getBattleById } from "./battle.actions";
 import { getCharacterById } from "./character.actions";
+import { revalidatePath } from "next/cache";
 
 const serializeData = (data: DamageDocument) => {
   return JSON.parse(JSON.stringify(data));
@@ -37,6 +38,7 @@ export const createDamage = async (damage: any) => {
     $push: { rounds: savedDamage._id },
   });
 
+  revalidatePath(`/dashboard/batlles/${damage.battle}`);
   return {
     ok: true,
     message: "Dano registrado com sucesso",

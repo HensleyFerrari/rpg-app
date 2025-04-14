@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { updateBattle } from "@/lib/actions/battle.actions";
+import { getBattleById, updateBattle } from "@/lib/actions/battle.actions";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 
@@ -30,6 +30,14 @@ const ChangeRound = ({
 
       if (response.ok) {
         toast.success(advance ? "Turno avançado!" : "Turno anterior!");
+        // Busca os dados atualizados da batalha
+        const updatedBattle = await getBattleById(battleId);
+        if (updatedBattle.ok) {
+          // Dispara um evento customizado com os dados atualizados
+          window.dispatchEvent(
+            new CustomEvent("battleUpdated", { detail: updatedBattle.data })
+          );
+        }
         router.refresh();
       } else {
         toast.error("Erro ao mudar o turno", {
