@@ -55,6 +55,7 @@ export async function getAllFeedbacks() {
 
     const feedbacks = await Feedback.find().sort({ createdAt: -1 });
 
+    // revalidatePath("/dashboard/feedback");
     return {
       ok: true,
       message: "Feedbacks encontrados",

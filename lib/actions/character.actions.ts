@@ -105,7 +105,9 @@ export async function createCharacter({
 
     const newCharacter = serializeData(newCharacterData);
 
-    // revalidatePath(`/dashboard/personagens/${newCharacter._id}`);
+    revalidatePath(`/dashboard/personagens/${newCharacter._id}`);
+    revalidatePath(`/dashboard/personagens`);
+    revalidatePath(`/dashboard/personagens/mycharacters`);
 
     return {
       ok: true,
