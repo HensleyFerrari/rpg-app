@@ -22,11 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function FeedbackList({
-  feedbacks,
-}: {
-  feedbacks: FeedbackDocument[];
-}) {
+export default function FeedbackList({ feedbacks }: any) {
   const [viewType, setViewType] = useState<"list" | "kanban">("list");
   const [statusFilter, setStatusFilter] = useState<
     FeedbackDocument["status"] | "todos"
@@ -87,7 +83,7 @@ export default function FeedbackList({
   const filteredFeedbacks =
     statusFilter === "todos"
       ? feedbacks
-      : feedbacks.filter((feedback) => feedback.status === statusFilter);
+      : feedbacks.filter((feedback: any) => feedback.status === statusFilter);
 
   const statusOrder: FeedbackDocument["status"][] = [
     "em aberto",
@@ -96,13 +92,16 @@ export default function FeedbackList({
     "negado",
   ];
 
-  const groupedFeedbacks = filteredFeedbacks.reduce((acc, feedback) => {
-    if (!acc[feedback.status]) {
-      acc[feedback.status] = [];
-    }
-    acc[feedback.status].push(feedback);
-    return acc;
-  }, {} as Record<FeedbackDocument["status"], FeedbackDocument[]>);
+  const groupedFeedbacks = filteredFeedbacks.reduce(
+    (acc: any, feedback: any) => {
+      if (!acc[feedback.status]) {
+        acc[feedback.status] = [];
+      }
+      acc[feedback.status].push(feedback);
+      return acc;
+    },
+    {} as Record<FeedbackDocument["status"], FeedbackDocument[]>
+  );
 
   const renderFeedbackCard = (
     feedback: FeedbackDocument,
@@ -141,7 +140,9 @@ export default function FeedbackList({
 
   const renderListView = () => (
     <div className="space-y-4">
-      {filteredFeedbacks.map((feedback) => renderFeedbackCard(feedback, false))}
+      {filteredFeedbacks.map((feedback: any) =>
+        renderFeedbackCard(feedback, false)
+      )}
     </div>
   );
 
@@ -154,7 +155,7 @@ export default function FeedbackList({
             {capitalizeWords(status)} ({groupedFeedbacks[status]?.length || 0})
           </h3>
           <div className="space-y-4">
-            {groupedFeedbacks[status]?.map((feedback) =>
+            {groupedFeedbacks[status]?.map((feedback: any) =>
               renderFeedbackCard(feedback, true)
             ) || []}
           </div>

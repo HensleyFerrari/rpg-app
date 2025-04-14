@@ -426,15 +426,13 @@ export async function getAllCharacters(): Promise<CharacterResponse> {
   }
 }
 
-export async function countCharacters(): Promise<
-  number | { ok: false; message: string }
-> {
+export async function countCharacters() {
   try {
     await connectDB();
 
     const count = await Character.countDocuments();
 
-    return count;
+    return serializeData(count);
   } catch (error: any) {
     console.error("Error counting characters:", error);
 

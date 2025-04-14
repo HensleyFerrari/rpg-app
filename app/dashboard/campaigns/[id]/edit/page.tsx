@@ -2,24 +2,24 @@
 
 import { notFound, redirect } from "next/navigation";
 import { getCampaignById } from "@/lib/actions/campaign.actions";
-import { useSession } from "next-auth/react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import EditCampaignForm from "./EditCampaignForm";
 import { use, useEffect, useState } from "react";
 import type { CampaignDocument } from "@/models/Campaign";
+import { getCurrentUser } from "@/lib/actions/user.actions";
 
 type Params = Promise<{ id: string[] }>;
 
 export default function EditCampaignPage(props: { params: Params }) {
-  const { data: session } = useSession();
   const params = use(props.params);
   const [campaign, setCampaign] = useState<CampaignDocument | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const id = params.id;
-      const campaignData = await getCampaignById(id);
+      const { id } = params;
+      const campaignData = await getCampaignById(id[0]);
+      const actualUser = await getCurrentUser();
 
       if (!campaignData || !campaignData.data) {
         return notFound();
@@ -35,7 +35,7 @@ export default function EditCampaignPage(props: { params: Params }) {
           ? campaign.owner.email
           : undefined;
 
-      if (ownerEmail !== session.user.email) {
+      if (ownerEmail !== actualUser.email) {
         redirect("/dashboard/campaigns");
       }
 
@@ -44,7 +44,7 @@ export default function EditCampaignPage(props: { params: Params }) {
     };
 
     fetchData();
-  }, [params.id, session]);
+  }, [params]);
 
   if (loading) {
     return <div>Loading...</div>;

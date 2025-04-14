@@ -17,7 +17,7 @@ interface CampaignResponse {
 }
 
 // Add this helper function at the top of the file
-const serializeData = (data: CampaignDocument) => {
+const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
 
@@ -121,9 +121,7 @@ export const createCampaign = async ({
   }
 };
 
-export const getCampaignById = async (
-  id: string
-): Promise<CampaignResponse> => {
+export const getCampaignById = async (id: string) => {
   try {
     if (!id) {
       return {
@@ -343,13 +341,13 @@ export const deleteCampaign = async (id: string): Promise<CampaignResponse> => {
   }
 };
 
-export const countCampaigns = async (): Promise<number | CampaignResponse> => {
+export const countCampaigns = async () => {
   try {
     await connectDB();
 
     const count = await Campaign.countDocuments();
 
-    return count;
+    return serializeData(count);
   } catch (error: any) {
     console.error("Error counting campaigns:", error);
     return {

@@ -14,7 +14,7 @@ const serializeData = (data: BattleDocument[]) => {
   return JSON.parse(JSON.stringify(data));
 };
 
-export const createBattle = async (BattleParams: BattleDocument) => {
+export const createBattle = async (BattleParams: any) => {
   try {
     await connectDB();
 

@@ -110,7 +110,7 @@ const CampaignDetail = async ({ params }: any) => {
             <CardContent>
               {battles && battles.length > 0 ? (
                 <div className="space-y-4">
-                  {battles.map((battle) => (
+                  {battles.map((battle: any) => (
                     <Link
                       key={battle._id}
                       href={`/dashboard/battles/${battle._id}`}
@@ -177,7 +177,7 @@ const CampaignDetail = async ({ params }: any) => {
             <CardContent>
               {campaign.characters.length > 0 ? (
                 <div className="flex flex-col gap-2">
-                  {campaign.characters.map((character) => (
+                  {campaign.characters.map((character: any) => (
                     <Link
                       key={character._id}
                       href="#"

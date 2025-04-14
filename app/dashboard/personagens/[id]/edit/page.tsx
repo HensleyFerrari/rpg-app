@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CharacterDocument } from "@/models/Character";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 const formSchema = z.object({
@@ -71,7 +70,7 @@ const CharacterEdit = () => {
         const response = await getCharacterById(id as string);
 
         if (response.ok && response.data) {
-          const character = response.data as CharacterDocument;
+          const character = response.data as any;
           form.reset({
             name: character.name,
             characterUrl: character.characterUrl || "",

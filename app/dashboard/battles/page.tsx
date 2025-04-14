@@ -19,10 +19,10 @@ const BattlesDashboard = async () => {
   const currentUser = await getCurrentUser();
 
   // Separate battles into active and inactive
-  const activeBattles = battles.data.filter((battle) => battle.active);
-  const inactiveBattles = battles.data.filter((battle) => !battle.active);
+  const activeBattles = battles.data.filter((battle: any) => battle.active);
+  const inactiveBattles = battles.data.filter((battle: any) => !battle.active);
 
-  const BattleCard = ({ battle }) => (
+  const BattleCard = ({ battle }: any) => (
     <Card
       key={battle._id}
       className="shadow hover:shadow-lg transition-shadow duration-300"
@@ -113,7 +113,7 @@ const BattlesDashboard = async () => {
           <TabsContent value="active" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {activeBattles.length > 0 ? (
-                activeBattles.map((battle) => (
+                activeBattles.map((battle: any) => (
                   <BattleCard key={battle._id} battle={battle} />
                 ))
               ) : (
@@ -136,7 +136,7 @@ const BattlesDashboard = async () => {
           <TabsContent value="inactive" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {inactiveBattles.length > 0 ? (
-                inactiveBattles.map((battle) => (
+                inactiveBattles.map((battle: any) => (
                   <BattleCard key={battle._id} battle={battle} />
                 ))
               ) : (

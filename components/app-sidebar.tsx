@@ -110,7 +110,9 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const [actualUser, setActualUser] = useState({});
+  const [actualUser, setActualUser] = useState({
+    name: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -207,7 +209,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="font-semibold">
         <span className="flex gap-2">
-          <User className="w-6 h-6" /> {actualUser.name}
+          <User className="w-6 h-6" /> {actualUser?.name}
         </span>
         <Heart />
       </SidebarFooter>

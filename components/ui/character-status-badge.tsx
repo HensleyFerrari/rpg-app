@@ -1,11 +1,7 @@
 import { Badge } from "./badge";
 import { Heart, Skull } from "lucide-react";
 
-interface CharacterStatusBadgeProps {
-  status: "alive" | "dead";
-}
-
-export function CharacterStatusBadge({ status }: CharacterStatusBadgeProps) {
+export function CharacterStatusBadge({ status }: any) {
   return (
     <Badge
       variant={status === "alive" ? "default" : "destructive"}

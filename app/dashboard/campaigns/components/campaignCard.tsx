@@ -18,7 +18,7 @@ type Props = {
   owner?: {
     name?: string;
     username?: string;
-    _id: string;
+    _id?: string;
   };
   createdAt?: string;
 };
