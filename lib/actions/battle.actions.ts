@@ -45,7 +45,7 @@ export const createBattle = async (BattleParams: BattleDocument) => {
   }
 };
 
-export const getBattleById = async (id: string) => {
+export const getBattleById = async (id: any) => {
   try {
     if (!id) {
       return {

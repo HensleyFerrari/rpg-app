@@ -1,36 +1,53 @@
-import { Metadata } from "next";
+"use client";
+
 import { notFound, redirect } from "next/navigation";
 import { getCampaignById } from "@/lib/actions/campaign.actions";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { useSession } from "next-auth/react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import EditCampaignForm from "./EditCampaignForm";
+import { use, useEffect, useState } from "react";
+import type { CampaignDocument } from "@/models/Campaign";
 
-export const metadata: Metadata = {
-  title: "Edit Campaign",
-  description: "Edit your RPG campaign details",
-};
+type Params = Promise<{ id: string[] }>;
 
-export default async function EditCampaignPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const session = await getServerSession(authOptions);
+export default function EditCampaignPage(props: { params: Params }) {
+  const { data: session } = useSession();
+  const params = use(props.params);
+  const [campaign, setCampaign] = useState<CampaignDocument | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!session?.user?.email) {
-    redirect("/login");
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const id = params.id;
+      const campaignData = await getCampaignById(id);
 
-  const campaign = await getCampaignById(params.id);
+      if (!campaignData || !campaignData.data) {
+        return notFound();
+      }
 
-  if (!campaign) {
-    return notFound();
-  }
+      const campaign = Array.isArray(campaignData.data)
+        ? campaignData.data[0]
+        : campaignData.data;
 
-  // Check if the logged-in user is the owner of the campaign
-  if (campaign.data.owner.email !== session.user.email) {
-    redirect("/dashboard/campaigns");
+      // Check if the user is the owner
+      const ownerEmail =
+        typeof campaign.owner === "object" && "email" in campaign.owner
+          ? campaign.owner.email
+          : undefined;
+
+      if (ownerEmail !== session.user.email) {
+        redirect("/dashboard/campaigns");
+      }
+
+      setCampaign(campaign);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [params.id, session]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -44,7 +61,7 @@ export default async function EditCampaignPage({
           ]}
         />
         <h1 className="text-3xl font-bold mb-6">Editar Campanha</h1>
-        <EditCampaignForm campaign={campaign.data} />
+        {campaign && <EditCampaignForm campaign={campaign} />}
       </div>
     </div>
   );

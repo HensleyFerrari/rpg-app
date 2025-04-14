@@ -19,31 +19,40 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CharacterDocument } from "@/models/Character";
 
 const AddCharacterModal = () => {
   const { id } = useParams();
-  const [characters, setCharacters] = useState([]);
-  const [selectedCharacters, setSelectedCharacters] = useState([]);
+  const [characters, setCharacters] = useState<CharacterDocument[]>([]);
+  const [selectedCharacters, setSelectedCharacters] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: battleData } = await getBattleById(id);
+      const battleId =
+        typeof id === "string" ? id : Array.isArray(id) ? id[0] : "";
+      const { data: battleData } = await getBattleById(battleId);
       const { data: characterData } = await getCharactersByCampaign(
         battleData.campaign._id
       );
 
-      // Filter out dead characters and characters already in battle
-      const availableCharacters = characterData.filter((character) => {
-        if (character.status === "dead") return false;
-        const isInBattle = battleData.characters.some(
-          (battleChar) => battleChar._id === character._id
-        );
-        return !isInBattle;
-      });
+      if (!characterData || !Array.isArray(characterData)) {
+        setCharacters([]);
+        return;
+      }
 
-      setCharacters(availableCharacters || []);
+      const availableCharacters = characterData.filter(
+        (character: CharacterDocument) => {
+          if (character.status === "dead") return false;
+          const isInBattle = battleData.characters.some(
+            (battleChar: CharacterDocument) => battleChar._id === character._id
+          );
+          return !isInBattle;
+        }
+      );
+
+      setCharacters(availableCharacters);
     };
 
     fetchData();
@@ -59,8 +68,10 @@ const AddCharacterModal = () => {
 
     setIsSubmitting(true);
     try {
+      const battleId =
+        typeof id === "string" ? id : Array.isArray(id) ? id[0] : "";
       for (const characterId of selectedCharacters) {
-        const response = await addCharacterToBattle(id, characterId);
+        const response = await addCharacterToBattle(battleId, characterId);
         if (!response.ok) {
           toast.error("Error", {
             description:
@@ -75,9 +86,11 @@ const AddCharacterModal = () => {
       setIsOpen(false);
       setSelectedCharacters([]);
       window.location.reload();
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
       toast.error("Error", {
-        description: "Something went wrong" + error.message,
+        description: "Something went wrong: " + errorMessage,
       });
     } finally {
       setIsSubmitting(false);

@@ -23,13 +23,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 
-interface CampaignDetailProps {
-  params: {
-    id: string;
-  };
-}
-
-const CampaignDetail = async ({ params }: CampaignDetailProps) => {
+const CampaignDetail = async ({ params }: any) => {
   const { id } = params;
   const campaignResponse = await getCampaignById(id);
   const currentUser = await getCurrentUser();
