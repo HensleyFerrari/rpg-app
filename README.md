@@ -1,108 +1,197 @@
 # RPG App
 
-## Getting Started
+Um aplicativo web para gerenciar campanhas de RPG, personagens e batalhas.
 
-First, run the development server:
+## Funcionalidades
+
+- **Gerenciamento de Campanhas**
+
+  - Criar e gerenciar múltiplas campanhas
+  - Adicionar descrições e imagens
+  - Controle de estado ativo/inativo
+
+- **Sistema de Personagens**
+
+  - Criação de personagens com detalhes customizados
+  - Vinculação a campanhas específicas
+  - Status de vida/morte
+  - Upload de imagens dos personagens
+
+- **Sistema de Batalhas**
+
+  - Criar encontros com múltiplos personagens
+  - Sistema de rounds
+  - Registro de dano
+  - Acompanhamento de batalhas ativas
+
+- **Feedback e Suporte**
+  - Sistema integrado de feedback
+  - Reporte de bugs
+  - Sugestões de melhorias
+  - Acompanhamento de status
+
+## Requisitos
+
+- Node.js 18.17 ou superior
+- MongoDB
+- NPM ou Yarn
+
+## Instalação
+
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/seu-usuario/rpg-app.git
+cd rpg-app
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+# ou
+yarn install
+```
+
+3. Configure as variáveis de ambiente:
+   Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+
+```env
+MONGODB_URI=sua_uri_do_mongodb
+NEXTAUTH_SECRET=seu_secret_para_autenticacao
+NEXTAUTH_URL=http://localhost:3000
+```
+
+4. Inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O aplicativo estará disponível em [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Comandos Disponíveis
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` - Inicia o servidor de desenvolvimento
+- `npm run build` - Cria a build de produção
+- `npm start` - Inicia o servidor de produção
+- `npm run lint` - Executa a verificação de lint
+- `npm test` - Executa os testes
+- `npm run test:watch` - Executa os testes em modo watch
 
-## Battle Actions API
+## API de Batalhas
 
-This module provides server actions for managing battles in the RPG application.
-
-### Functions
+### Funções
 
 #### `createBattle`
 
-Creates a new battle.
+Cria uma nova batalha.
 
-**Parameters:**
+**Parâmetros:**
 
-- `BattleParams`: Battle document parameters
+- `BattleParams`: Parâmetros do documento da batalha
 
-**Returns:**
+**Retornos:**
 
-- Success: `{ ok: true, message: "Batalha criada com sucesso", data: [battle object] }`
-- Error: `{ ok: false, message: "Erro ao criar batalha" }`
+- Sucesso: `{ ok: true, message: "Batalha criada com sucesso", data: [objeto da batalha] }`
+- Erro: `{ ok: false, message: "Erro ao criar batalha" }`
 
 #### `getBattleById`
 
-Retrieves a battle by its ID.
+Recupera uma batalha pelo seu ID.
 
-**Parameters:**
+**Parâmetros:**
 
-- `id`: String representing the battle ID
+- `id`: String representando o ID da batalha
 
-**Returns:**
+**Retornos:**
 
-- Success: `{ ok: true, data: [battle object with populated characters] }`
-- Error: `{ ok: false, message: [error message] }`
+- Sucesso: `{ ok: true, data: [objeto da batalha com personagens populados] }`
+- Erro: `{ ok: false, message: [mensagem de erro] }`
 
 #### `getBattlesByCampaign`
 
-Retrieves all battles for a specific campaign.
+Recupera todas as batalhas de uma campanha específica.
 
-**Parameters:**
+**Parâmetros:**
 
-- `campaignId`: String representing the campaign ID
+- `campaignId`: String representando o ID da campanha
 
-**Returns:**
+**Retornos:**
 
-- Success: `{ ok: true, data: [array of battle objects with populated characters] }`
-- Error: `{ ok: false, message: [error message] }`
+- Sucesso: `{ ok: true, data: [array de objetos de batalha com personagens populados] }`
+- Erro: `{ ok: false, message: [mensagem de erro] }`
 
 #### `updateBattle`
 
-Updates an existing battle.
+Atualiza uma batalha existente.
 
-**Parameters:**
+**Parâmetros:**
 
-- `id`: String representing the battle ID
-- `battleParams`: Partial battle document with fields to update
+- `id`: String representando o ID da batalha
+- `battleParams`: Documento parcial da batalha com os campos a serem atualizados
 
-**Returns:**
+**Retornos:**
 
-- Success: `{ ok: true, data: [updated battle object] }`
-- Error: `{ ok: false, message: [error message] }`
+- Sucesso: `{ ok: true, data: [objeto da batalha atualizado] }`
+- Erro: `{ ok: false, message: [mensagem de erro] }`
 
 #### `deleteBattle`
 
-Deletes a battle and removes all references to it.
+Deleta uma batalha e remove todas as referências a ela.
 
-**Parameters:**
+**Parâmetros:**
 
-- `id`: String representing the battle ID
+- `id`: String representando o ID da batalha
 
-**Returns:**
+**Retornos:**
 
-- Success: `{ ok: true, message: "Batalha deletada com sucesso" }`
-- Error: `{ ok: false, message: [error message] }`
+- Sucesso: `{ ok: true, message: "Batalha deletada com sucesso" }`
+- Erro: `{ ok: false, message: [mensagem de erro] }`
 
-## Models
+## Banco de Dados
 
-The application uses the following models:
+O aplicativo utiliza MongoDB como banco de dados principal, conectado através do Mongoose. A estrutura do banco inclui as seguintes coleções:
 
-- Battle: Represents a battle with characters
-- User: Represents a user in the system
-- Campaign: Represents a campaign with battles and other elements
+- **Users**: Armazena informações dos usuários
+- **Campaigns**: Gerencia as campanhas de RPG
+- **Characters**: Armazena os personagens
+- **Battles**: Registra as batalhas
+- **Damages**: Registra os danos causados nas batalhas
+- **Feedbacks**: Armazena feedbacks dos usuários
 
-## Database
+## Tecnologias Utilizadas
 
-The application uses MongoDB, connected through Mongoose.
+- **Frontend**:
+
+  - Next.js 14
+  - React
+  - Tailwind CSS
+  - Shadcn/ui
+  - TypeScript
+
+- **Backend**:
+
+  - Next.js API Routes
+  - MongoDB
+  - Mongoose
+  - NextAuth.js
+
+- **Ferramentas de Desenvolvimento**:
+  - ESLint
+  - Prettier
+  - Jest
+  - TypeScript
+
+## Contribuição
+
+Contribuições são bem-vindas! Por favor, sinta-se à vontade para submeter pull requests.
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## Learn More
 

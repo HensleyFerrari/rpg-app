@@ -131,9 +131,9 @@ const BattlesDashboard = async () => {
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Todas as Batalhas</h1>
-        <Link href="/dashboard/battles/newBattle">
+        {/* <Link href="/dashboard/battles/newBattle">
           <Button>Criar nova batalha</Button>
-        </Link>
+        </Link> */}
       </div>
 
       {battles && battles.data.length > 0 ? (
@@ -196,7 +196,9 @@ const BattlesDashboard = async () => {
       ) : (
         <Card className="w-full">
           <CardHeader>
-            <CardTitle className="text-center">No Battles Found</CardTitle>
+            <CardTitle className="text-center">
+              Nenhuma batalha encontrada
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-center text-muted-foreground">

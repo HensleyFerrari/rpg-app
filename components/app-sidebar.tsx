@@ -23,9 +23,7 @@ import {
   Swords,
   ScrollText,
   Crown,
-  UserPlus,
   UsersRound,
-  ShieldPlus,
   Skull,
 } from "lucide-react";
 import { ModeToggle } from "./theme-toggle";
@@ -69,11 +67,11 @@ const items = [
         url: "/dashboard/personagens/mycharacters",
         icons: User,
       },
-      {
-        title: "Criar Personagem",
-        url: "/dashboard/personagens/new",
-        icons: UserPlus,
-      },
+      // {
+      //   title: "Criar Personagem",
+      //   url: "/dashboard/personagens/new",
+      //   icons: UserPlus,
+      // },
       {
         title: "Todos os Personagens",
         url: "/dashboard/personagens",
@@ -90,11 +88,11 @@ const items = [
         url: "/dashboard/battles/mybattles",
         icons: Skull,
       },
-      {
-        title: "Criar Batalha",
-        url: "/dashboard/battles/newBattle",
-        icons: ShieldPlus,
-      },
+      // {
+      //   title: "Criar Batalha",
+      //   url: "/dashboard/battles/newBattle",
+      //   icons: ShieldPlus,
+      // },
       {
         title: "Todas as Batalhas",
         url: "/dashboard/battles",

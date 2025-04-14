@@ -87,7 +87,10 @@ export default function Register() {
                   <FormItem>
                     <FormLabel>Nome</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your full name" {...field} />
+                      <Input
+                        placeholder="Entre com seu nome ou nickname"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -103,7 +106,7 @@ export default function Register() {
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter your email"
+                        placeholder="Entre com seu email"
                         {...field}
                       />
                     </FormControl>
@@ -121,7 +124,7 @@ export default function Register() {
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Create a password"
+                        placeholder="Crie uma senha"
                         {...field}
                       />
                     </FormControl>

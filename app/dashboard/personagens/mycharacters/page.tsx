@@ -16,12 +16,12 @@ const MyCharacters = async () => {
   return (
     <div className="container mx-auto py-8">
       <div className="flex justify-end items-center mb-6">
-        <Link href="/dashboard/personagens/new">
+        {/* <Link href="/dashboard/personagens/new">
           <Button className="gap-2">
             <UserPlus className="h-4 w-4" />
             Criar Personagem
           </Button>
-        </Link>
+        </Link> */}
       </div>
 
       {!response.ok ? (
@@ -38,7 +38,7 @@ const MyCharacters = async () => {
             <h3 className="text-lg font-semibold mb-2">
               Nenhum personagem encontrado
             </h3>
-            <p className="text-muted-foreground mb-6">
+            {/* <p className="text-muted-foreground mb-6">
               Parece que você ainda não criou nenhum personagem. Que tal começar
               sua jornada agora?
             </p>
@@ -47,7 +47,7 @@ const MyCharacters = async () => {
                 <UserPlus className="h-4 w-4" />
                 Criar Meu Primeiro Personagem
               </Button>
-            </Link>
+            </Link> */}
           </CardContent>
         </Card>
       ) : (

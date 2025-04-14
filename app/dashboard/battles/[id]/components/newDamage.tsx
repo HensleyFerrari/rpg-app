@@ -199,9 +199,9 @@ const NewDamage = () => {
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Register New Damage</DialogTitle>
+            <DialogTitle>Registre um novo dano</DialogTitle>
             <DialogDescription>
-              Enter the details of the damage dealt in this battle.
+              Adicione um novo dano a batalha.
             </DialogDescription>
           </DialogHeader>
 
@@ -212,7 +212,7 @@ const NewDamage = () => {
                 name="character"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Character</FormLabel>
+                    <FormLabel>Personagem</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -298,7 +298,7 @@ const NewDamage = () => {
 
               <DialogFooter>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Registering..." : "Register Damage"}
+                  {isSubmitting ? "Registrando..." : "Registrar Dano"}
                 </Button>
               </DialogFooter>
             </form>

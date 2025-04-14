@@ -24,6 +24,7 @@ import {
   History,
   Crown,
   MoreVertical,
+  Pencil,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
@@ -37,6 +38,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ChangeRound from "./components/changeRound";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 // Define type for User object
 interface User {
@@ -196,6 +198,16 @@ const BattlePage = () => {
                           advance={false}
                         />
                       </div>
+                      <DropdownMenuSeparator />
+                      <div className="px-2 py-1 5">
+                        <Link
+                          href={`/dashboard/battles/${battle._id}/edit`}
+                          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Editar
+                        </Link>
+                      </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
@@ -290,7 +302,13 @@ const BattlePage = () => {
                   <div className="text-center space-y-2">
                     <Crown className="h-6 w-6 mx-auto text-muted-foreground" />
                     <h3 className="text-sm font-medium text-muted-foreground">
-                      Maior Dano
+                      Maior Dano <br />
+                      {battle?.rounds?.length > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                          {" "}
+                          ({battle?.rounds[0]?.character.name})
+                        </span>
+                      )}
                     </h3>
                     <div className="text-2xl font-bold">
                       {Math.max(

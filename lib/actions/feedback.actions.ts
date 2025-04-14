@@ -55,7 +55,6 @@ export async function getAllFeedbacks() {
 
     const feedbacks = await Feedback.find().sort({ createdAt: -1 });
 
-    // revalidatePath("/dashboard/feedback");
     return {
       ok: true,
       message: "Feedbacks encontrados",
@@ -67,6 +66,35 @@ export async function getAllFeedbacks() {
       ok: false,
       message:
         error instanceof Error ? error.message : "Falha ao buscar feedbacks",
+    };
+  }
+}
+
+export async function deleteFeedback(id: string) {
+  try {
+    await connectDB();
+
+    const feedback = await Feedback.findByIdAndDelete(id);
+
+    if (!feedback) {
+      return {
+        ok: false,
+        message: "Feedback não encontrado",
+      };
+    }
+
+    revalidatePath("/dashboard/feedback");
+
+    return {
+      ok: true,
+      message: "Feedback deletado com sucesso",
+    };
+  } catch (error: Error | unknown) {
+    console.error("Error deleting feedback:", error);
+    return {
+      ok: false,
+      message:
+        error instanceof Error ? error.message : "Falha ao deletar feedback",
     };
   }
 }

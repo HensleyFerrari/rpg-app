@@ -63,8 +63,8 @@ const ChangeRound = ({
         </>
       ) : (
         <>
-          <ChevronLeft className="h-4 w-4" />
           Turno anterior
+          <ChevronLeft className="h-4 w-4" />
         </>
       )}
     </button>

@@ -161,9 +161,9 @@ const MyBattlesDashboard = () => {
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Minhas Batalhas</h1>
-        <Link href="/dashboard/battles/newBattle">
+        {/* <Link href="/dashboard/battles/newBattle">
           <Button>Criar nova batalha</Button>
-        </Link>
+        </Link> */}
       </div>
 
       {battles.length > 0 ? (
@@ -230,12 +230,12 @@ const MyBattlesDashboard = () => {
               Nenhuma Batalha Encontrada
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          {/* <CardContent>
             <p className="text-center text-muted-foreground">
               Você ainda não criou nenhuma batalha. Clique no botão acima para
               criar sua primeira batalha.
             </p>
-          </CardContent>
+          </CardContent> */}
         </Card>
       )}
     </div>

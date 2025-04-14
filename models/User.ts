@@ -10,6 +10,7 @@ export interface UserDocument {
   avatarUrl: string;
   campaigns: Array<CampaignDocument>;
   characters: Array<CharacterDocument>;
+  role: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,6 +40,11 @@ const UserSchema = new Schema<UserDocument>(
         ref: "Campaign",
       },
     ],
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
   },
   {
     timestamps: true,
