@@ -27,6 +27,8 @@ export default function FeedbackList({ feedbacks }: any) {
   const [statusFilter, setStatusFilter] = useState<
     FeedbackDocument["status"] | "todos"
   >("todos");
+  const [showOnlyMine, setShowOnlyMine] = useState(false);
+  const [hideCompleted, setHideCompleted] = useState(false);
 
   const capitalizeWords = (text: string | undefined) => {
     if (!text) return "";
@@ -81,10 +83,24 @@ export default function FeedbackList({ feedbacks }: any) {
     }
   };
 
-  const filteredFeedbacks =
-    statusFilter === "todos"
-      ? feedbacks
-      : feedbacks.filter((feedback: any) => feedback.status === statusFilter);
+  const filteredFeedbacks = feedbacks.filter((feedback: any) => {
+    // Apply status filter
+    if (statusFilter !== "todos" && feedback.status !== statusFilter) {
+      return false;
+    }
+    // Filter by user's own feedbacks
+    if (showOnlyMine && feedback.userId !== feedback.currentUserId) {
+      return false;
+    }
+    // Hide completed feedbacks
+    if (
+      (hideCompleted && feedback.status === "concluido") ||
+      feedback.status === "negado"
+    ) {
+      return false;
+    }
+    return true;
+  });
 
   const statusOrder: FeedbackDocument["status"][] = [
     "em aberto",
@@ -176,7 +192,7 @@ export default function FeedbackList({ feedbacks }: any) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Filter className="h-4 w-4" />
           <Select
             value={statusFilter}
@@ -197,7 +213,30 @@ export default function FeedbackList({ feedbacks }: any) {
               <SelectItem value="negado">Negado</SelectItem>
             </SelectContent>
           </Select>
+
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={showOnlyMine}
+                onChange={(e) => setShowOnlyMine(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              Apenas meus feedbacks
+            </label>
+
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={hideCompleted}
+                onChange={(e) => setHideCompleted(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              Ocultar concluídos
+            </label>
+          </div>
         </div>
+
         <Tabs
           value={viewType}
           onValueChange={(value) => setViewType(value as "list" | "kanban")}
