@@ -1,8 +1,10 @@
 import { getAllFeedbacks } from "@/lib/actions/feedback.actions";
 import FeedbackForm from "./components/feedback-form";
 import FeedbackList from "./components/feedback-list";
+import { unstable_noStore } from "next/cache";
 
 export default async function FeedbackPage() {
+  unstable_noStore(); // Opt out of static rendering
   const { data: feedbacks } = await getAllFeedbacks();
 
   return (

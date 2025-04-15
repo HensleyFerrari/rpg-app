@@ -28,8 +28,9 @@ export default function FeedbackList({ feedbacks }: any) {
     FeedbackDocument["status"] | "todos"
   >("todos");
 
-  const capitalizeWords = (str: string) => {
-    return str
+  const capitalizeWords = (text: string | undefined) => {
+    if (!text) return "";
+    return text
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
@@ -120,8 +121,8 @@ export default function FeedbackList({ feedbacks }: any) {
                 feedback.status
               )}`}
             >
-              {getStatusIcon(feedback.status)}
-              {capitalizeWords(feedback.status)}
+              {feedback.status && getStatusIcon(feedback.status)}
+              {feedback.status && capitalizeWords(feedback.status)}
             </Badge>
           )}
         </div>
@@ -130,6 +131,14 @@ export default function FeedbackList({ feedbacks }: any) {
         <p className="text-sm text-gray-600 dark:text-gray-300">
           {feedback.description}
         </p>
+        <div className="flex gap-2 mt-2">
+          <Badge variant="outline" className="text-xs">
+            {feedback.type && capitalizeWords(feedback.type)}
+          </Badge>
+          <Badge variant="outline" className="text-xs">
+            {capitalizeWords(feedback.area)}
+          </Badge>
+        </div>
         <div className="mt-2 text-xs text-gray-500">
           Por: {feedback.userName} •{" "}
           {new Date(feedback.createdAt).toLocaleDateString()}
