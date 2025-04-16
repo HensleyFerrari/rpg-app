@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Book, Sword } from "lucide-react";
 import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
+import { stripHtml } from "@/lib/utils";
 
 type Personagem = {
   _id: string;
@@ -61,8 +62,8 @@ export default function PersonagemCard({ personagem }: PersonagemCardProps) {
             </CardHeader>
 
             <CardContent className="p-0 pb-2 flex-grow">
-              <div className="text-sm text-muted-foreground line-clamp-2">
-                {personagem.message}
+              <div className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-line break-words">
+                {stripHtml(personagem.message)}
               </div>
             </CardContent>
 

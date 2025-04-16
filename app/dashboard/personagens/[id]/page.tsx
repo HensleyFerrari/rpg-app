@@ -128,13 +128,6 @@ const CharacterPage = () => {
                   </p>
                   <p className="text-sm">Batalhas</p>
                 </div>
-                {/* <div className="text-center p-3 bg-secondary rounded-lg">
-                  <p className="text-2xl font-bold flex items-center justify-center gap-2">
-                    <Dice1 className="w-5 h-5" />
-                    {character.battles?.length || 0}
-                  </p>
-                  <p className="text-sm">Turnos Jogados</p>
-                </div> */}
               </div>
             </CardContent>
           </Card>
@@ -154,9 +147,6 @@ const CharacterPage = () => {
                           <Edit className="w-4 h-4 mr-2" /> Editar Personagem
                         </Button>
                       </Link>
-                      {/* <Button variant="default">
-                        <Dices className="w-4 h-4 mr-2" /> Rolar Dados
-                      </Button> */}
                     </div>
                   )}
                 </CardTitle>
@@ -173,7 +163,10 @@ const CharacterPage = () => {
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <User2 className="w-5 h-5" /> Biografia
                   </h3>
-                  <p>{character.message}</p>
+                  <div
+                    className="prose dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: character.message }}
+                  />
                 </div>
 
                 <Separator />
@@ -186,81 +179,6 @@ const CharacterPage = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Stats Cards */}
-            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Swords className="w-5 h-5" /> Estatísticas de Batalha
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Vitórias</span>
-                      <span className="font-bold">8</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Derrotas</span>
-                      <span className="font-bold">4</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Dano Total</span>
-                      <span className="font-bold">256</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Dice1 className="w-5 h-5" /> Dados
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>D20s Rolados</span>
-                      <span className="font-bold">45</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Críticos</span>
-                      <span className="font-bold">3</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Falhas</span>
-                      <span className="font-bold">2</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Trophy className="w-5 h-5" /> Conquistas
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Total</span>
-                      <span className="font-bold">5</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Raras</span>
-                      <span className="font-bold">2</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Comuns</span>
-                      <span className="font-bold">3</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div> */}
           </div>
         </div>
       </div>

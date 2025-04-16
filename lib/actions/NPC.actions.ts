@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import NPC, { NPCDocument } from "@/models/NPC";
 import { connectDB } from "../mongodb";
-import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
