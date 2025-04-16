@@ -7,6 +7,7 @@ export interface CampaignDocument {
   imageUrl: string;
   description: string;
   characters: Array<ObjectId>;
+  npcs: Array<ObjectId>;
   message: string;
   active: boolean;
   createdAt: Date;
@@ -40,6 +41,12 @@ const CampaignSchema = new Schema<CampaignDocument>(
       {
         type: Schema.Types.ObjectId,
         ref: "Character",
+      },
+    ],
+    npcs: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "NPC",
       },
     ],
   },
