@@ -10,6 +10,7 @@ export interface CampaignDocument {
   npcs: Array<ObjectId>;
   message: string;
   active: boolean;
+  isAcepptingCharacters: boolean;
   createdAt: Date;
   updateAt: Date;
 }
