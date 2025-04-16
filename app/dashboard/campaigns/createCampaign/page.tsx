@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { createCampaign } from "@/lib/actions/campaign.actions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -115,17 +115,11 @@ const CreateCampaign = () => {
 
             <div className="space-y-2">
               <Label htmlFor="description">Descrição</Label>
-              <Textarea
-                id="description"
-                placeholder="Descreva sua campanha"
-                className="min-h-[100px]"
-                {...register("description")}
+              <RichTextEditor
+                value={""}
+                onChange={() => {}}
+                placeholder="Descreva sua campanha..."
               />
-              {errors.description && (
-                <p className="text-sm text-red-500">
-                  {errors.description.message}
-                </p>
-              )}
             </div>
 
             <div className="space-y-2">

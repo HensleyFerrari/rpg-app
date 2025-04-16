@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createCharacter } from "@/lib/actions/character.actions";
-import { getCampaignById, getCampaigns } from "@/lib/actions/campaign.actions";
+import { getCampaignById } from "@/lib/actions/campaign.actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,7 +18,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import {
   Select,
   SelectContent,
@@ -26,9 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { useSession } from "next-auth/react";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Schema de validação baseado no modelo de Character
 const characterFormSchema = z.object({
@@ -61,26 +61,6 @@ const CharacterForm = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(true);
 
-  // Buscar campanhas quando o componente é montado
-  useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        const campaignsData = await getCampaignById(campaignFromUrl);
-        setCampaigns(campaignsData.data);
-      } catch (error) {
-        console.error("Erro ao buscar campanhas:", error);
-        toast("Não foi possível carregar as campanhas.");
-      } finally {
-        setIsLoadingCampaigns(false);
-      }
-    };
-
-    if (!campaignFromUrl) {
-      router.push("/dashboard/personagens/");
-    }
-    fetchCampaigns();
-  }, [campaignFromUrl]);
-
   // Valores default do formulário
   const defaultValues: Partial<CharacterFormValues> = {
     name: "",
@@ -97,6 +77,33 @@ const CharacterForm = () => {
       campaign: campaignFromUrl || "",
     },
   });
+
+  // Buscar campanhas quando o componente é montado
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        if (!campaignFromUrl) {
+          router.push("/dashboard/personagens/");
+          return;
+        }
+        const campaignsData = await getCampaignById(campaignFromUrl);
+        if (campaignsData.ok && campaignsData.data) {
+          const campaign = Array.isArray(campaignsData.data)
+            ? campaignsData.data[0]
+            : campaignsData.data;
+          setCampaigns([campaign]);
+          form.setValue("campaign", campaign._id);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar campanhas:", error);
+        toast.error("Não foi possível carregar as campanhas.");
+      } finally {
+        setIsLoadingCampaigns(false);
+      }
+    };
+
+    fetchCampaigns();
+  }, [campaignFromUrl, form, router]);
 
   async function onSubmit(values: CharacterFormValues) {
     setIsSubmitting(true);
@@ -214,10 +221,10 @@ const CharacterForm = () => {
             <FormItem>
               <FormLabel>Mensagem/Descrição</FormLabel>
               <FormControl>
-                <Textarea
+                <RichTextEditor
+                  value={field.value || ""}
+                  onChange={field.onChange}
                   placeholder="Descrição do personagem ou mensagem"
-                  className="resize-none"
-                  {...field}
                 />
               </FormControl>
               <FormDescription>
