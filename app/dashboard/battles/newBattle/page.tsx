@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { getMyCampaigns } from "@/lib/actions/campaign.actions";
+import { getCampaignById } from "@/lib/actions/campaign.actions";
 import {
   Select,
   SelectContent,
@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/select";
 import { createBattle } from "@/lib/actions/battle.actions";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
-import { CampaignDocument } from "@/models/Campaign";
 
 // Type for creating a new battle (subset of BattleDocument)
 type CreateBattleParams = {
@@ -52,7 +51,7 @@ const BattleForm = () => {
   const searchParams = useSearchParams();
   const campaignId = searchParams.get("campaign");
   const [isLoading, setIsLoading] = useState(false);
-  const [campaigns, setCampaigns] = useState<CampaignDocument[]>([]);
+  const [campaign, setCampaign] = useState<any>(null);
 
   const form = useForm<zod.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,22 +61,24 @@ const BattleForm = () => {
     },
   });
 
-  // Fetch campaigns on component mount
   useEffect(() => {
-    const fetchCampaigns = async () => {
+    const fetchCampaign = async () => {
       try {
-        const campaignsData = await getMyCampaigns();
-        setCampaigns(campaignsData.data);
+        if (campaignId) {
+          const { data: campaignData } = await getCampaignById(campaignId);
+          setCampaign(campaignData);
+          form.setValue("campaign", campaignId);
+        }
       } catch (error) {
-        console.error("Erro ao buscar campanhas:", error);
+        console.error("Erro ao buscar campanha:", error);
         toast.error("Erro", {
-          description: "Não foi possível carregar as campanhas.",
+          description: "Não foi possível carregar a campanha.",
         });
       }
     };
 
-    fetchCampaigns();
-  }, []);
+    fetchCampaign();
+  }, [campaignId, form]);
 
   const onSubmit = async (values: zod.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -148,15 +149,13 @@ const BattleForm = () => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {campaigns.length > 0 ? (
-                    campaigns.map((campaign) => (
-                      <SelectItem key={campaign._id} value={campaign._id}>
-                        {campaign.name}
-                      </SelectItem>
-                    ))
+                  {campaign ? (
+                    <SelectItem value={campaign._id}>
+                      {campaign.name}
+                    </SelectItem>
                   ) : (
                     <SelectItem value="no-campaigns" disabled>
-                      Nenhuma campanha criada
+                      Nenhuma campanha disponível
                     </SelectItem>
                   )}
                 </SelectContent>

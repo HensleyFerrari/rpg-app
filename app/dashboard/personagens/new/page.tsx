@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createCharacter } from "@/lib/actions/character.actions";
-import { getCampaigns } from "@/lib/actions/campaign.actions";
+import { getCampaignById, getCampaigns } from "@/lib/actions/campaign.actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -65,8 +65,8 @@ const CharacterForm = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const campaignsData = await getCampaigns();
-        setCampaigns(campaignsData);
+        const campaignsData = await getCampaignById(campaignFromUrl);
+        setCampaigns(campaignsData.data);
       } catch (error) {
         console.error("Erro ao buscar campanhas:", error);
         toast("Não foi possível carregar as campanhas.");
@@ -75,8 +75,11 @@ const CharacterForm = () => {
       }
     };
 
+    if (!campaignFromUrl) {
+      router.push("/dashboard/personagens/");
+    }
     fetchCampaigns();
-  }, []);
+  }, [campaignFromUrl]);
 
   // Valores default do formulário
   const defaultValues: Partial<CharacterFormValues> = {

@@ -139,9 +139,6 @@ export const getCampaignById = async (id: string) => {
       };
     }
 
-    // Touch the Character model to ensure its schema is registered
-    // await Character.findOne({});
-
     const campaignData = await Campaign.findById(id)
       .populate({
         path: "owner",
@@ -165,7 +162,6 @@ export const getCampaignById = async (id: string) => {
       };
     }
 
-    // Serialize the MongoDB document
     const campaign = serializeData(campaignData);
 
     return {
