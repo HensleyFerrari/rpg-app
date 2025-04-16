@@ -29,6 +29,7 @@ const EditCampaignForm = ({ campaign }: any) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
+  const [description, setDescription] = useState(campaign.description || "");
 
   const {
     register,
@@ -67,7 +68,7 @@ const EditCampaignForm = ({ campaign }: any) => {
 
       const result = await updateCampaign(campaign._id, {
         name: data.name,
-        description: data.description,
+        description: description, // Usando o estado description ao invés de data.description
         imageUrl: data.imageUrl,
       });
 
@@ -119,8 +120,8 @@ const EditCampaignForm = ({ campaign }: any) => {
           <div className="space-y-2">
             <Label htmlFor="description">Descrição</Label>
             <RichTextEditor
-              value={""} // Replace with appropriate value binding
-              onChange={() => {}} // Replace with appropriate onChange handler
+              value={description}
+              onChange={setDescription}
               placeholder="Descreva sua campanha..."
             />
           </div>

@@ -23,6 +23,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { stripHtml } from "../../../../lib/utils";
 
 const CampaignDetail = async ({ params }: any) => {
   const { id } = params;
@@ -115,7 +116,7 @@ const CampaignDetail = async ({ params }: any) => {
                   <h3 className="text-xl font-semibold mb-4">Descrição</h3>
                   {campaign.description ? (
                     <p className="text-muted-foreground">
-                      {campaign.description}
+                      {stripHtml(campaign.description)}
                     </p>
                   ) : (
                     <p className="text-muted-foreground/60 italic">
