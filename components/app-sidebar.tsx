@@ -209,7 +209,9 @@ export function AppSidebar() {
         <span className="flex gap-2">
           <User className="w-6 h-6" /> {actualUser?.name}
         </span>
-        <Heart />
+        <span className="flex gap-2 text-xs">
+          <Heart className="text-red-600 w-3 h-3 self-center" /> Hens
+        </span>
       </SidebarFooter>
     </Sidebar>
   );
