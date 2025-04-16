@@ -68,6 +68,8 @@ const BattleForm = () => {
           const { data: campaignData } = await getCampaignById(campaignId);
           setCampaign(campaignData);
           form.setValue("campaign", campaignId);
+        } else {
+          router.push("/dashboard/battles");
         }
       } catch (error) {
         console.error("Erro ao buscar campanha:", error);
@@ -78,7 +80,7 @@ const BattleForm = () => {
     };
 
     fetchCampaign();
-  }, [campaignId, form]);
+  }, [campaignId, form, router]);
 
   const onSubmit = async (values: zod.infer<typeof formSchema>) => {
     setIsLoading(true);
