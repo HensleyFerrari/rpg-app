@@ -20,7 +20,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -31,6 +30,7 @@ import {
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -175,10 +175,10 @@ const CharacterEdit = () => {
                 <FormItem>
                   <FormLabel>Mensagem/Descrição</FormLabel>
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Descrição do personagem"
-                      className="resize-none"
+                    <RichTextEditor
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="Escreva uma mensagem ou descrição sobre o personagem"
                     />
                   </FormControl>
                   <FormDescription>

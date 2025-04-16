@@ -41,12 +41,16 @@ export function RichTextEditor({
 
   return (
     <div className="border border-input rounded-md">
-      <div className="border-b border-input bg-transparent p-1">
+      {/* <div className="border-b border-input bg-transparent p-1">
         <div className="flex gap-1">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleBold().run()}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleBold().run();
+            }}
             data-active={editor.isActive("bold")}
             className="data-[active=true]:bg-muted"
           >
@@ -55,7 +59,11 @@ export function RichTextEditor({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleItalic().run();
+            }}
             data-active={editor.isActive("italic")}
             className="data-[active=true]:bg-muted"
           >
@@ -64,7 +72,11 @@ export function RichTextEditor({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleBulletList().run();
+            }}
             data-active={editor.isActive("bulletList")}
             className="data-[active=true]:bg-muted"
           >
@@ -73,14 +85,18 @@ export function RichTextEditor({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleOrderedList().run();
+            }}
             data-active={editor.isActive("orderedList")}
             className="data-[active=true]:bg-muted"
           >
             <ListOrdered className="h-4 w-4" />
           </Button>
         </div>
-      </div>
+      </div> */}
       <div className="p-2">
         <EditorContent
           editor={editor}
