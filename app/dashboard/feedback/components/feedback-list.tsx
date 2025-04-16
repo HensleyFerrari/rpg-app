@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { stripHtml } from "@/lib/utils";
 
 export default function FeedbackList({ feedbacks }: any) {
   const [viewType, setViewType] = useState<"list" | "kanban">("list");
@@ -145,7 +146,7 @@ export default function FeedbackList({ feedbacks }: any) {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-gray-600 dark:text-gray-300">
-          {feedback.description}
+          {stripHtml(feedback.description)}
         </p>
         <div className="flex gap-2 mt-2">
           <Badge variant="outline" className="text-xs">

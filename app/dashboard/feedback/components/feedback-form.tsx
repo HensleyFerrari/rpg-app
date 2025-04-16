@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { createFeedback } from "@/lib/actions/feedback.actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,6 +20,7 @@ import {
 export default function FeedbackForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [description, setDescription] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -28,7 +29,7 @@ export default function FeedbackForm() {
     const formData = new FormData(e.currentTarget);
     const values = {
       title: formData.get("title") as string,
-      description: formData.get("description") as string,
+      description: description,
       type: formData.get("type") as string,
       area: formData.get("area") as string,
     };
@@ -39,6 +40,7 @@ export default function FeedbackForm() {
       if (response.ok) {
         toast.success(response.message);
         (e.target as HTMLFormElement).reset();
+        setDescription("");
         router.refresh();
       } else {
         toast.error(response.message);
@@ -100,12 +102,11 @@ export default function FeedbackForm() {
 
         <div className="space-y-2">
           <Label htmlFor="description">Descrição</Label>
-          <Textarea
-            id="description"
-            name="description"
+          <RichTextEditor
+            value={description}
+            onChange={setDescription}
             placeholder="Descreva seu feedback em detalhes"
-            required
-            className="min-h-[100px]"
+            className="min-h-[150px]"
           />
         </div>
 
