@@ -3,8 +3,8 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { cn } from "@/lib/utils";
-import { Button } from "./button";
-import { Bold, Italic, List, ListOrdered } from "lucide-react";
+// import { Button } from "./button";
+// import { Bold, Italic, List, ListOrdered } from "lucide-react";
 
 interface RichTextEditorProps {
   value: string;
