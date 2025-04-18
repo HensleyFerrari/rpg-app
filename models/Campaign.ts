@@ -46,6 +46,7 @@ const CampaignSchema = new Schema<CampaignDocument>(
     ],
     isAcepptingCharacters: {
       type: Boolean,
+      required: true,
       default: true,
     },
     npcs: [

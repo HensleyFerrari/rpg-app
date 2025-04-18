@@ -12,6 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { Switch } from "@/components/ui/switch";
+import { FormField } from "@/components/ui/form";
 import { updateCampaign } from "@/lib/actions/campaign.actions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -23,6 +25,7 @@ type FormData = {
   name: string;
   description: string;
   imageUrl: string;
+  isAcepptingCharacters: boolean;
 };
 
 const EditCampaignForm = ({ campaign }: any) => {
@@ -35,11 +38,13 @@ const EditCampaignForm = ({ campaign }: any) => {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<FormData>({
     defaultValues: {
       name: campaign.name || "",
       description: campaign.description || "",
       imageUrl: campaign.imageUrl || "",
+      isAcepptingCharacters: Boolean(campaign.isAcepptingCharacters),
     },
   });
 
@@ -65,11 +70,11 @@ const EditCampaignForm = ({ campaign }: any) => {
 
     try {
       setIsLoading(true);
-
       const result = await updateCampaign(campaign._id, {
         name: data.name,
-        description: description, // Usando o estado description ao invés de data.description
+        description: description,
         imageUrl: data.imageUrl,
+        isAcepptingCharacters: Boolean(data.isAcepptingCharacters),
       });
 
       if (result.ok) {
@@ -137,6 +142,24 @@ const EditCampaignForm = ({ campaign }: any) => {
               <p className="text-sm text-red-500">{errors.imageUrl.message}</p>
             )}
           </div>
+
+          {/* <div className="flex items-center justify-between space-x-2">
+            <Label htmlFor="isAcepptingCharacters">
+              Aceitando novos personagens
+            </Label>
+            <FormField
+              control={control}
+              name="isAcepptingCharacters"
+              render={({ field }) => (
+                <Switch
+                  id="isAcepptingCharacters"
+                  checked={field.value}
+                  {...register("isAcepptingCharacters")}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
+          </div> */}
         </CardContent>
         <CardFooter className="flex justify-between mt-4">
           <Button type="button" variant="outline" onClick={() => router.back()}>

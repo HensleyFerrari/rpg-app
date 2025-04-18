@@ -229,6 +229,7 @@ export const updateCampaign = async (
     name: string;
     description: string;
     imageUrl: string;
+    isAcepptingCharacters: boolean;
   }>
 ): Promise<CampaignResponse> => {
   try {
@@ -255,6 +256,11 @@ export const updateCampaign = async (
       };
     }
 
+    // Garantir que isAcepptingCharacters seja um booleano
+    if ("isAcepptingCharacters" in updates) {
+      updates.isAcepptingCharacters = Boolean(updates.isAcepptingCharacters);
+    }
+
     const updatedCampaignData = await Campaign.findByIdAndUpdate(
       id,
       { ...updates },
@@ -269,7 +275,6 @@ export const updateCampaign = async (
       };
     }
 
-    // Serialize the MongoDB document
     const updatedCampaign = serializeData(updatedCampaignData);
 
     revalidatePath(`/campaigns/${id}`);
