@@ -26,6 +26,9 @@ import {
   MoreVertical,
   Pencil,
   Settings,
+  Swords,
+  ScrollText,
+  CalendarDays,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
@@ -134,23 +137,83 @@ const BattlePage = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4 max-w-4xl">
-        <Card className="w-full">
-          <CardHeader>
-            <Skeleton className="h-8 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/2" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 mt-4">
-              <Skeleton className="h-20 w-full rounded-md" />
-              <Skeleton className="h-20 w-full rounded-md" />
-              <Skeleton className="h-20 w-full rounded-md" />
-            </div>
-          </CardContent>
-        </Card>
+      <div className="container mx-auto p-4">
+        <div className="flex items-center gap-4 mb-8">
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-9 w-40" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <Card>
+              <CardHeader className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Swords className="h-5 w-5 text-muted-foreground" />
+                  <Skeleton className="h-7 w-3/4" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg border">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between p-4 border-b last:border-0"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-9 w-20" />
+                        <Skeleton className="h-9 w-24" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <ScrollText className="h-5 w-5 text-muted-foreground" />
+                  <Skeleton className="h-6 w-1/2" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="flex gap-2">
+                  <Skeleton className="h-10 w-1/2" />
+                  <Skeleton className="h-10 w-1/2" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <CalendarDays className="h-5 w-5 text-muted-foreground" />
+                  <Skeleton className="h-6 w-2/3" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-[200px] w-full" />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }

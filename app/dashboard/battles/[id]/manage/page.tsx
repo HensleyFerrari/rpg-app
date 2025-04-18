@@ -152,17 +152,35 @@ const ManageBattlePage = () => {
   if (loading) {
     return (
       <div className="container mx-auto p-4">
-        <Card className="w-full">
-          <CardHeader>
-            <Skeleton className="h-8 w-3/4 mb-2" />
+        <Card>
+          <CardHeader className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Swords className="h-5 w-5 text-muted-foreground" />
+              <Skeleton className="h-8 w-2/3" />
+            </div>
             <Skeleton className="h-4 w-1/2" />
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <Skeleton className="h-10 w-full" />
+              <div className="flex items-center gap-3">
+                <Users className="h-5 w-5 text-muted-foreground" />
+                <Skeleton className="h-6 w-36" />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-20" />
+                  <div key={i} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-full" />
+                      <Skeleton className="h-3 w-2/3" />
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

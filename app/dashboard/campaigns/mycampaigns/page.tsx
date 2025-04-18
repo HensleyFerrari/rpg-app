@@ -7,6 +7,7 @@ import { CampaignDocument } from "@/models/Campaign";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, Dice4, ScrollText } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CampaignResponse {
   ok: boolean;
@@ -40,7 +41,31 @@ const MyCampaigns = () => {
   };
 
   if (loading) {
-    return <div>Carregando suas campanhas...</div>;
+    return (
+      <div className="flex flex-col gap-8">
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-36" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="flex flex-col space-y-3 p-6 rounded-lg border"
+            >
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <div className="flex gap-2 items-center">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+              <Skeleton className="h-24 w-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
