@@ -17,7 +17,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, ArrowLeft, UserMinus } from "lucide-react";
+import {
+  Trash2,
+  ArrowLeft,
+  UserMinus,
+  Shield,
+  Users,
+  Swords,
+} from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
@@ -32,6 +39,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Battle = {
   _id: string;
@@ -141,11 +150,50 @@ const ManageBattlePage = () => {
   };
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return (
+      <div className="container mx-auto p-4">
+        <Card className="w-full">
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/2" />
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-20" />
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   if (!battle || !isOwner) {
-    return <div>Acesso não autorizado</div>;
+    return (
+      <div className="container mx-auto p-4">
+        <Card className="w-full">
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <Shield className="h-12 w-12 text-muted-foreground mb-4" />
+            <h2 className="text-2xl font-semibold mb-2">
+              Acesso não autorizado
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              Você não tem permissão para gerenciar esta batalha.
+            </p>
+            <Link href="/dashboard/battles">
+              <Button variant="outline" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Voltar para Batalhas
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -174,15 +222,19 @@ const ManageBattlePage = () => {
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
+              <TableRow className="hover:bg-muted/50">
+                <TableHead className="font-semibold">Nome</TableHead>
+                <TableHead className="text-right font-semibold">
+                  Ações
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {battle.characters.map((character) => (
-                <TableRow key={character._id}>
-                  <TableCell>{character.name}</TableCell>
+                <TableRow key={character._id} className="hover:bg-muted/50">
+                  <TableCell className="font-medium">
+                    {character.name}
+                  </TableCell>
                   <TableCell className="text-right">
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -221,7 +273,11 @@ const ManageBattlePage = () => {
               ))}
               {battle.characters.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center">
+                  <TableCell
+                    colSpan={2}
+                    className="text-center text-muted-foreground h-24"
+                  >
+                    <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     Nenhum personagem na batalha
                   </TableCell>
                 </TableRow>
@@ -234,19 +290,21 @@ const ManageBattlePage = () => {
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Round</TableHead>
-              <TableHead>Personagem</TableHead>
-              <TableHead>Dano</TableHead>
-              <TableHead>Crítico</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+            <TableRow className="hover:bg-muted/50">
+              <TableHead className="font-semibold">Round</TableHead>
+              <TableHead className="font-semibold">Personagem</TableHead>
+              <TableHead className="font-semibold">Dano</TableHead>
+              <TableHead className="font-semibold">Crítico</TableHead>
+              <TableHead className="text-right font-semibold">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {battle.rounds.map((round) => (
-              <TableRow key={round._id}>
+              <TableRow key={round._id} className="hover:bg-muted/50">
                 <TableCell>{round.round}</TableCell>
-                <TableCell>{round.character.name}</TableCell>
+                <TableCell className="font-medium">
+                  {round.character.name}
+                </TableCell>
                 <TableCell>{round.damage}</TableCell>
                 <TableCell>{round.isCritical ? "Sim" : "Não"}</TableCell>
                 <TableCell className="text-right">
@@ -287,7 +345,11 @@ const ManageBattlePage = () => {
             ))}
             {battle.rounds.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-muted-foreground h-24"
+                >
+                  <Swords className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   Nenhum dano registrado
                 </TableCell>
               </TableRow>
