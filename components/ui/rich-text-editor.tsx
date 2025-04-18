@@ -1,10 +1,21 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import {
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  thematicBreakPlugin,
+  markdownShortcutPlugin,
+  toolbarPlugin,
+  MDXEditor,
+  UndoRedo,
+  BoldItalicUnderlineToggles,
+  ListsToggle,
+  BlockTypeSelect,
+} from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
 import { cn } from "@/lib/utils";
-// import { Button } from "./button";
-// import { Bold, Italic, List, ListOrdered } from "lucide-react";
+import { Separator } from "@radix-ui/react-separator";
 
 interface RichTextEditorProps {
   value: string;
@@ -19,91 +30,35 @@ export function RichTextEditor({
   className,
   placeholder,
 }: RichTextEditorProps) {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: value,
-    editorProps: {
-      attributes: {
-        class: cn(
-          "prose dark:prose-invert prose-sm sm:prose-base focus:outline-none min-h-[150px] max-w-none",
-          className
-        ),
-      },
-    },
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-  });
-
-  if (!editor) {
-    return null;
-  }
-
   return (
-    <div className="border border-input rounded-md">
-      {/* <div className="border-b border-input bg-transparent p-1">
-        <div className="flex gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              editor.chain().focus().toggleBold().run();
-            }}
-            data-active={editor.isActive("bold")}
-            className="data-[active=true]:bg-muted"
-          >
-            <Bold className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              editor.chain().focus().toggleItalic().run();
-            }}
-            data-active={editor.isActive("italic")}
-            className="data-[active=true]:bg-muted"
-          >
-            <Italic className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              editor.chain().focus().toggleBulletList().run();
-            }}
-            data-active={editor.isActive("bulletList")}
-            className="data-[active=true]:bg-muted"
-          >
-            <List className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              editor.chain().focus().toggleOrderedList().run();
-            }}
-            data-active={editor.isActive("orderedList")}
-            className="data-[active=true]:bg-muted"
-          >
-            <ListOrdered className="h-4 w-4" />
-          </Button>
-        </div>
-      </div> */}
-      <div className="p-2">
-        <EditorContent
-          editor={editor}
-          placeholder={placeholder}
-          className="outline-none"
-        />
-      </div>
-    </div>
+    <MDXEditor
+      className={cn(`file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input  rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium",
+        ${className}`)}
+      markdown={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      plugins={[
+        headingsPlugin(),
+        listsPlugin(),
+        quotePlugin(),
+        thematicBreakPlugin(),
+        markdownShortcutPlugin(),
+        toolbarPlugin({
+          toolbarClassName: "flex gap-2",
+          toolbarContents: () => {
+            return (
+              <>
+                <UndoRedo />
+                <Separator />
+                <BlockTypeSelect />
+                <BoldItalicUnderlineToggles />
+                <Separator />
+                <ListsToggle />
+              </>
+            );
+          },
+        }),
+      ]}
+    />
   );
 }
