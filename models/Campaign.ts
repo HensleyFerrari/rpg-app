@@ -44,6 +44,10 @@ const CampaignSchema = new Schema<CampaignDocument>(
         ref: "Character",
       },
     ],
+    isAcepptingCharacters: {
+      type: Boolean,
+      default: true,
+    },
     npcs: [
       {
         type: Schema.Types.ObjectId,
