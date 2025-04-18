@@ -19,7 +19,19 @@ export const createDamage = async (damage: any) => {
   if (!battleInfo.data.active) {
     return {
       ok: false,
-      message: "Batalha já finalizada! ",
+      message: "Batalha já finalizada!",
+    };
+  }
+
+  // Verificar se o personagem está na batalha
+  const characterInBattle = battleInfo.data.characters.some(
+    (char: any) => char._id.toString() === damage.character
+  );
+
+  if (!characterInBattle) {
+    return {
+      ok: false,
+      message: "Personagem não está na batalha!",
     };
   }
 
@@ -30,15 +42,12 @@ export const createDamage = async (damage: any) => {
   };
   const newDamage = new Damage(payload);
   const savedDamage = await newDamage.save();
-  // await Character.findByIdAndUpdate(payload.character, {
-  //   $push: { damages: savedDamage._id },
-  // });
 
   await Battle.findByIdAndUpdate(payload.battle, {
     $push: { rounds: savedDamage._id },
   });
 
-  revalidatePath(`/dashboard/batlles/${damage.battle}`);
+  revalidatePath(`/dashboard/battles/${damage.battle}`);
   return {
     ok: true,
     message: "Dano registrado com sucesso",
@@ -77,4 +86,28 @@ export const getAllDamagesByCharacterId = async (characterId: string) => {
     .populate("character")
     .sort({ createdAt: -1 });
   return damages.map(serializeData);
+};
+
+export const deleteDamage = async (damageId: string, battleId: string) => {
+  try {
+    await connectDB();
+    await Damage.findByIdAndDelete(damageId);
+
+    // Remove damage reference from battle rounds
+    await Battle.findByIdAndUpdate(battleId, {
+      $pull: { rounds: damageId },
+    });
+
+    revalidatePath(`/dashboard/battles/${battleId}`);
+    return {
+      ok: true,
+      message: "Dano removido com sucesso",
+    };
+  } catch (error) {
+    console.error("Error deleting damage:", error);
+    return {
+      ok: false,
+      message: "Erro ao remover dano",
+    };
+  }
 };

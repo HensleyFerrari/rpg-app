@@ -76,6 +76,12 @@ const CampaignDetail = async ({ params }: any) => {
                     Nova Batalha
                   </Button>
                 </Link>
+                <Link href={`/dashboard/campaigns/${id}/manage`}>
+                  <Button variant="outline" className="gap-2">
+                    <Users className="h-4 w-4" />
+                    Gerenciar Personagens
+                  </Button>
+                </Link>
                 <Link href={`/dashboard/campaigns/${id}/edit`}>
                   <Button variant="default" className="gap-2">
                     Editar Campanha

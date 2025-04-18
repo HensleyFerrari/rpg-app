@@ -358,6 +358,69 @@ export const addCharacterToBattle = async (
   }
 };
 
+export const removeCharacterFromBattle = async (
+  characterId: string,
+  battleId: string
+) => {
+  try {
+    if (!battleId || !characterId) {
+      return {
+        ok: false,
+        message: "ID da batalha e do personagem são obrigatórios",
+      };
+    }
+
+    await connectDB();
+
+    if (!mongoose.isValidObjectId(battleId)) {
+      return {
+        ok: false,
+        message: "ID de batalha inválido",
+      };
+    }
+
+    if (!mongoose.isValidObjectId(characterId)) {
+      return {
+        ok: false,
+        message: "ID de personagem inválido",
+      };
+    }
+
+    // Remove character from battle
+    const battle = await Battle.findByIdAndUpdate(
+      battleId,
+      { $pull: { characters: characterId } },
+      { new: true }
+    );
+
+    if (!battle) {
+      return {
+        ok: false,
+        message: "Batalha não encontrada",
+      };
+    }
+
+    // Remove battle from character's battles array
+    await Character.findByIdAndUpdate(characterId, {
+      $pull: { battles: battleId },
+    });
+
+    revalidatePath(`/dashboard/battles/${battleId}`);
+
+    return {
+      ok: true,
+      message: "Personagem removido da batalha com sucesso",
+      data: serializeData(battle),
+    };
+  } catch (error) {
+    console.error("Error removing character from battle:", error);
+    return {
+      ok: false,
+      message: "Erro ao remover personagem da batalha",
+    };
+  }
+};
+
 export const getAllBattlesByUser = async () => {
   await connectDB();
   const user = await getCurrentUser();

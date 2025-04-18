@@ -25,6 +25,7 @@ import {
   Crown,
   MoreVertical,
   Pencil,
+  Settings,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
@@ -208,6 +209,16 @@ const BattlePage = () => {
                           Editar
                         </Link>
                       </div>
+                      <DropdownMenuSeparator />
+                      <div className="px-2 py-1 5">
+                        <Link
+                          href={`/dashboard/battles/${battle._id}/manage`}
+                          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <Settings className="h-4 w-4" />
+                          Gerenciar Batalha
+                        </Link>
+                      </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
@@ -311,11 +322,13 @@ const BattlePage = () => {
                       )}
                     </h3>
                     <div className="text-2xl font-bold">
-                      {Math.max(
-                        ...(battle?.rounds?.map(
-                          (round) => round.damage || 0
-                        ) || [0])
-                      )}
+                      {battle?.rounds?.length > 0
+                        ? Math.max(
+                            ...(battle?.rounds?.map(
+                              (round) => round.damage || 0
+                            ) || [0])
+                          )
+                        : 0}
                     </div>
                   </div>
                 </CardContent>

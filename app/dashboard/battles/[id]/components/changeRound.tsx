@@ -58,13 +58,13 @@ const ChangeRound = ({
     >
       {advance ? (
         <>
-          Próximo turno
           <ChevronRight className="h-4 w-4" />
+          Próximo turno
         </>
       ) : (
         <>
-          Turno anterior
           <ChevronLeft className="h-4 w-4" />
+          Turno anterior
         </>
       )}
     </button>
