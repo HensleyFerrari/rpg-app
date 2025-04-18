@@ -12,8 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { Switch } from "@/components/ui/switch";
-import { FormField } from "@/components/ui/form";
 import { updateCampaign } from "@/lib/actions/campaign.actions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -38,7 +36,6 @@ const EditCampaignForm = ({ campaign }: any) => {
     register,
     handleSubmit,
     formState: { errors },
-    control,
   } = useForm<FormData>({
     defaultValues: {
       name: campaign.name || "",
