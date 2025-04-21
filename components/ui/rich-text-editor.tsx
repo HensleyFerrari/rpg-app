@@ -2,6 +2,10 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Heading from "@tiptap/extension-heading";
+import BulletList from "@tiptap/extension-bullet-list";
+import OrderedList from "@tiptap/extension-ordered-list";
+import ListItem from "@tiptap/extension-list-item";
 import { cn } from "@/lib/utils";
 import {
   Bold,
@@ -30,12 +34,41 @@ export function RichTextEditor({
   placeholder,
 }: RichTextEditorProps) {
   const editor = useEditor({
-    extensions: [StarterKit],
-    content: value,
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        bulletList: false,
+        orderedList: false,
+        listItem: false,
+      }),
+      Heading.configure({
+        levels: [1, 2],
+        HTMLAttributes: {
+          1: { class: "text-2xl font-bold mt-4 mb-2" },
+          2: { class: "text-xl font-bold mt-3 mb-2" },
+        },
+      }),
+      BulletList.configure({
+        HTMLAttributes: {
+          class: "list-disc ml-4",
+        },
+      }),
+      OrderedList.configure({
+        HTMLAttributes: {
+          class: "list-decimal ml-4",
+        },
+      }),
+      ListItem.configure({
+        HTMLAttributes: {
+          class: "my-1",
+        },
+      }),
+    ],
+    content: value || "",
     editorProps: {
       attributes: {
         class: cn(
-          "prose dark:prose-invert prose-sm sm:prose-base focus:outline-none min-h-[150px] max-w-none",
+          "prose dark:prose-invert prose-sm sm:prose-base focus:outline-none min-h-[150px] max-w-none [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:mt-4 [&>h1]:mb-2 [&>h2]:text-xl [&>h2]:font-bold [&>h2]:mt-3 [&>h2]:mb-2",
           className
         ),
       },
@@ -53,6 +86,9 @@ export function RichTextEditor({
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
+    enableCaret: true,
+    enableInput: true,
+    immediatelyRender: false,
   });
 
   if (!editor) {
@@ -176,17 +212,49 @@ export function ReadOnlyRichTextViewer({
   className,
 }: ReadOnlyRichTextViewerProps) {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        bulletList: false,
+        orderedList: false,
+        listItem: false,
+      }),
+      Heading.configure({
+        levels: [1, 2],
+        HTMLAttributes: {
+          1: { class: "text-2xl font-bold mt-4 mb-2" },
+          2: { class: "text-xl font-bold mt-3 mb-2" },
+        },
+      }),
+      BulletList.configure({
+        HTMLAttributes: {
+          class: "list-disc ml-4",
+        },
+      }),
+      OrderedList.configure({
+        HTMLAttributes: {
+          class: "list-decimal ml-4",
+        },
+      }),
+      ListItem.configure({
+        HTMLAttributes: {
+          class: "my-1",
+        },
+      }),
+    ],
     content,
     editable: false,
     editorProps: {
       attributes: {
         class: cn(
-          "prose dark:prose-invert prose-sm sm:prose-base focus:outline-none max-w-none",
+          "prose dark:prose-invert prose-sm sm:prose-base focus:outline-none max-w-none [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:mt-4 [&>h1]:mb-2 [&>h2]:text-xl [&>h2]:font-bold [&>h2]:mt-3 [&>h2]:mb-2 [&>ul]:list-disc [&>ol]:list-decimal [&>ul]:ml-4 [&>ol]:ml-4 [&_li]:my-1",
           className
         ),
       },
     },
+    enableCaret: false,
+    enableInput: false,
+    immediatelyRender: false,
   });
 
   if (!editor) {
