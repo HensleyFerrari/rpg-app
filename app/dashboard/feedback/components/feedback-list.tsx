@@ -157,7 +157,7 @@ export default function FeedbackList({ feedbacks }: any) {
           </Badge>
         </div>
         <div className="mt-2 text-xs text-gray-500">
-          Por: {feedback.userName} •{" "}
+          Por: {feedback.userName} -{" "}
           {new Date(feedback.createdAt).toLocaleDateString()}
         </div>
       </CardContent>
