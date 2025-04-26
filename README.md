@@ -57,9 +57,8 @@ yarn install
    Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 
 ```env
-MONGODB_URI=sua_uri_do_mongodb
+MONGODB_URI=mongodb://127.0.0.1:27017/mydb
 NEXTAUTH_SECRET=seu_secret_para_autenticacao
-NEXTAUTH_URL=http://localhost:3000
 ```
 
 4. Inicie o servidor de desenvolvimento:
@@ -166,7 +165,7 @@ O aplicativo utiliza MongoDB como banco de dados principal, conectado através d
 
 - **Frontend**:
 
-  - Next.js 14
+  - Next.js 15
   - React
   - Tailwind CSS
   - Shadcn/ui
