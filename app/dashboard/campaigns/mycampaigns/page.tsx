@@ -48,7 +48,7 @@ const MyCampaigns = () => {
           <Skeleton className="h-10 w-36" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
             <div
               key={i}

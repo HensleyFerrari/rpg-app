@@ -40,6 +40,9 @@ const UserSchema = new Schema<UserDocument>(
         ref: "Campaign",
       },
     ],
+    avatarUrl: {
+      type: String,
+    },
     role: {
       type: String,
       enum: ["user", "admin"],

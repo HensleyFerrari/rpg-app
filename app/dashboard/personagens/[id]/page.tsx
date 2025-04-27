@@ -100,6 +100,9 @@ const CharacterPage = () => {
         <div className="md:col-span-1">
           <Card className="h-full">
             <CardContent className="p-4 flex flex-col items-center">
+              <h2 className="text-2xl font-bold text-center mb-4">
+                {character.name}
+              </h2>
               <div className="relative w-full aspect-square rounded-lg overflow-hidden mb-4 border-2 border-primary/20 shadow-xl">
                 {character.characterUrl ? (
                   <Image
@@ -115,9 +118,6 @@ const CharacterPage = () => {
                 )}
               </div>
               <CharacterStatusBadge status={character.status} />
-              <h2 className="text-2xl font-bold text-center mb-4">
-                {character.name}
-              </h2>
 
               {/* Quick Stats */}
               <div className="w-full grid grid-cols-2 gap-4 mt-4">

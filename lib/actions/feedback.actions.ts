@@ -98,3 +98,34 @@ export async function deleteFeedback(id: string) {
     };
   }
 }
+
+export async function updateFeedback(id: string, values: any) {
+  try {
+    await connectDB();
+
+    const feedback = await Feedback.findByIdAndUpdate(id, values, {
+      new: true,
+    });
+
+    if (!feedback) {
+      return {
+        ok: false,
+        message: "Feedback não encontrado",
+      };
+    }
+    revalidatePath("/dashboard/feedback");
+
+    return {
+      ok: true,
+      message: "Feedback atualizado com sucesso",
+      data: serializeData(feedback),
+    };
+  } catch (error: Error | unknown) {
+    console.error("Error updating feedback:", error);
+    return {
+      ok: false,
+      message:
+        error instanceof Error ? error.message : "Falha ao atualizar feedback",
+    };
+  }
+}

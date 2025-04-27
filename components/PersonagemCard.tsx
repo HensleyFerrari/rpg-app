@@ -62,7 +62,7 @@ export default function PersonagemCard({ personagem }: PersonagemCardProps) {
             </CardHeader>
 
             <CardContent className="p-0 pb-2 flex-grow">
-              <div className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-line break-words">
+              <div className="text-sm text-muted-foreground overflow-scroll max-h-36 whitespace-pre-line break-words">
                 <ReadOnlyRichTextViewer content={personagem.message} />
               </div>
             </CardContent>

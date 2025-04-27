@@ -32,12 +32,6 @@ export default async function Personagens() {
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Todos os Personagens</h1>
-        {/* <Link href="/dashboard/personagens/new">
-          <Button className="gap-2">
-            <UserPlus className="h-4 w-4" />
-            Criar Personagem
-          </Button>
-        </Link> */}
       </div>
 
       {!response.ok ? (
@@ -54,15 +48,6 @@ export default async function Personagens() {
             <h3 className="text-lg font-semibold mb-2">
               Nenhum personagem criado ainda
             </h3>
-            {/* <p className="text-muted-foreground mb-6">
-              Seja o primeiro a criar um personagem e começar uma nova aventura!
-            </p>
-            <Link href="/dashboard/personagens/new">
-              <Button size="lg" className="gap-2">
-                <UserPlus className="h-4 w-4" />
-                Criar Primeiro Personagem
-              </Button>
-            </Link> */}
           </CardContent>
         </Card>
       ) : (

@@ -332,7 +332,6 @@ export const addCharacterToBattle = async (
       };
     }
 
-    // Atualiza o personagem para adicionar a batalha
     const character = await Character.findByIdAndUpdate(characterId, {
       $addToSet: { battles: battleId },
     });
@@ -386,7 +385,6 @@ export const removeCharacterFromBattle = async (
       };
     }
 
-    // Remove character from battle
     const battle = await Battle.findByIdAndUpdate(
       battleId,
       { $pull: { characters: characterId } },
@@ -400,7 +398,6 @@ export const removeCharacterFromBattle = async (
       };
     }
 
-    // Remove battle from character's battles array
     await Character.findByIdAndUpdate(characterId, {
       $pull: { battles: battleId },
     });

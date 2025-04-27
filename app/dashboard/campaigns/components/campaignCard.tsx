@@ -72,7 +72,7 @@ const CampaignCard = ({
 
           <CardContent className="p-0 flex-grow text-center sm:text-left">
             {description ? (
-              <p className="text-muted-foreground text-sm sm:text-base line-clamp-2 sm:line-clamp-3">
+              <p className="text-muted-foreground text-sm sm:text-base overflow-scroll max-h-36 sm:line-clamp-3">
                 <ReadOnlyRichTextViewer content={description} />
               </p>
             ) : (

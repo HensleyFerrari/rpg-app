@@ -10,7 +10,7 @@ export interface CampaignDocument {
   npcs: Array<ObjectId>;
   message: string;
   active: boolean;
-  isAcepptingCharacters: boolean;
+  isAccepptingCharacters: boolean;
   createdAt: Date;
   updateAt: Date;
 }
@@ -44,7 +44,7 @@ const CampaignSchema = new Schema<CampaignDocument>(
         ref: "Character",
       },
     ],
-    isAcepptingCharacters: {
+    isAccepptingCharacters: {
       type: Boolean,
       required: true,
       default: true,
