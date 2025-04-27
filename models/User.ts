@@ -1,6 +1,4 @@
 import mongoose, { Schema, model } from "mongoose";
-import { CampaignDocument } from "./Campaign";
-import { CharacterDocument } from "./Character";
 
 export interface UserDocument {
   _id: string;
@@ -8,8 +6,6 @@ export interface UserDocument {
   password: string;
   name: string;
   avatarUrl: string;
-  campaigns: Array<CampaignDocument>;
-  characters: Array<CharacterDocument>;
   role: string;
   createdAt: Date;
   updatedAt: Date;
@@ -34,12 +30,6 @@ const UserSchema = new Schema<UserDocument>(
       type: String,
       required: [true, "Name is required"],
     },
-    campaigns: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Campaign",
-      },
-    ],
     avatarUrl: {
       type: String,
     },

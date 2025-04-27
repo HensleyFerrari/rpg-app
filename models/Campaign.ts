@@ -6,8 +6,6 @@ export interface CampaignDocument {
   owner: ObjectId;
   imageUrl: string;
   description: string;
-  characters: Array<ObjectId>;
-  npcs: Array<ObjectId>;
   message: string;
   active: boolean;
   isAccepptingCharacters: boolean;
@@ -38,23 +36,11 @@ const CampaignSchema = new Schema<CampaignDocument>(
     imageUrl: {
       type: String,
     },
-    characters: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Character",
-      },
-    ],
     isAccepptingCharacters: {
       type: Boolean,
       required: true,
       default: true,
     },
-    npcs: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "NPC",
-      },
-    ],
   },
   {
     timestamps: true,
