@@ -2,7 +2,6 @@
 
 import Damage, { DamageDocument } from "@/models/Damage";
 import { connectDB } from "../mongodb";
-import Battle from "@/models/Battle";
 import { getBattleById } from "./battle.actions";
 import { getCharacterById } from "./character.actions";
 import { revalidatePath } from "next/cache";
@@ -23,7 +22,6 @@ export const createDamage = async (damage: any) => {
     };
   }
 
-  // Verificar se o personagem está na batalha
   const characterInBattle = battleInfo.data.characters.some(
     (char: any) => char._id.toString() === damage.character
   );
@@ -42,10 +40,6 @@ export const createDamage = async (damage: any) => {
   };
   const newDamage = new Damage(payload);
   const savedDamage = await newDamage.save();
-
-  await Battle.findByIdAndUpdate(payload.battle, {
-    $push: { rounds: savedDamage._id },
-  });
 
   revalidatePath(`/dashboard/battles/${damage.battle}`);
   return {
@@ -92,11 +86,6 @@ export const deleteDamage = async (damageId: string, battleId: string) => {
   try {
     await connectDB();
     await Damage.findByIdAndDelete(damageId);
-
-    // Remove damage reference from battle rounds
-    await Battle.findByIdAndUpdate(battleId, {
-      $pull: { rounds: damageId },
-    });
 
     revalidatePath(`/dashboard/battles/${battleId}`);
     return {

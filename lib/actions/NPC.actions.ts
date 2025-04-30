@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import NPC, { NPCDocument } from "@/models/NPC";
 import { connectDB } from "../mongodb";
-import Campaign from "@/models/Campaign";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
 
@@ -65,20 +64,6 @@ export async function createNPC({
       return {
         ok: false,
         message: "Falha ao criar NPC",
-      };
-    }
-
-    // Update campaign with new NPC reference
-    const updateCampaign = await Campaign.findByIdAndUpdate(
-      campaign,
-      { $push: { npcs: npcData._id } },
-      { new: true }
-    );
-
-    if (!updateCampaign) {
-      return {
-        ok: false,
-        message: "Falha ao atualizar campanha",
       };
     }
 
@@ -292,11 +277,6 @@ export async function deleteNPC(id: string): Promise<NPCResponse> {
 
     const npc = serializeData(npcData);
     const campaignId = npc.campaign;
-
-    // Remove NPC reference from Campaign
-    await Campaign.findByIdAndUpdate(campaignId, {
-      $pull: { npcs: id },
-    });
 
     // Delete the NPC
     await NPC.findByIdAndDelete(id);

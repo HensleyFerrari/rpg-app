@@ -90,19 +90,6 @@ export async function createCharacter({
       };
     }
 
-    const updateCampaign = await Campaign.findByIdAndUpdate(
-      campaign,
-      { $push: { characters: newCharacterData._id } },
-      { new: true }
-    );
-
-    if (!updateCampaign) {
-      return {
-        ok: false,
-        message: "Falha ao atualizar campanha",
-      };
-    }
-
     const newCharacter = serializeData(newCharacterData);
 
     revalidatePath(`/dashboard/personagens/${newCharacter._id}`);
@@ -290,7 +277,6 @@ export async function updateCharacter(
       };
     }
 
-    // Validate campaign and owner IDs if they are being updated
     if (updates.campaign && !mongoose.isValidObjectId(updates.campaign)) {
       return {
         ok: false,

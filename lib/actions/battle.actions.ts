@@ -8,7 +8,6 @@ import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import Character, { CharacterDocument } from "@/models/Character";
 import { getCurrentUser } from "./user.actions";
-import Damage from "@/models/Damage";
 
 const serializeData = (data: BattleDocument[]) => {
   return JSON.parse(JSON.stringify(data));
@@ -76,14 +75,6 @@ export const getBattleById = async (id: any) => {
       .populate({
         path: "campaign",
         model: Campaign,
-      })
-      .populate({
-        path: "rounds",
-        model: Damage,
-        populate: {
-          path: "character",
-          model: Character,
-        },
       });
 
     if (!battle) {
@@ -223,18 +214,6 @@ export const deleteBattle = async (id: string) => {
       };
     }
 
-    // Remove battle reference from Campaign
-    if (battle.campaign) {
-      await Campaign.updateOne(
-        { _id: battle.campaign },
-        { $pull: { battles: id } }
-      );
-    }
-
-    // Remove battle reference from Users
-    await User.updateMany({ battles: id }, { $pull: { battles: id } });
-
-    // Delete the battle
     await Battle.findByIdAndDelete(id);
 
     revalidatePath("/dashboard/campaigns");
@@ -332,16 +311,6 @@ export const addCharacterToBattle = async (
       };
     }
 
-    const character = await Character.findByIdAndUpdate(characterId, {
-      $addToSet: { battles: battleId },
-    });
-    if (!character) {
-      return {
-        ok: false,
-        message: "Personagem não encontrado",
-      };
-    }
-
     revalidatePath(`/dashboard/battles/${battleId}`);
 
     return {
@@ -397,10 +366,6 @@ export const removeCharacterFromBattle = async (
         message: "Batalha não encontrada",
       };
     }
-
-    await Character.findByIdAndUpdate(characterId, {
-      $pull: { battles: battleId },
-    });
 
     revalidatePath(`/dashboard/battles/${battleId}`);
 

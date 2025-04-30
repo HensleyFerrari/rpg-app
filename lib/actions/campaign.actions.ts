@@ -3,12 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { connectDB } from "../mongodb";
 import Campaign, { CampaignDocument } from "@/models/Campaign";
-import {
-  findByEmail,
-  getCurrentUser,
-  updateUserCampaign,
-} from "./user.actions";
+import { findByEmail, getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
+import User from "@/models/User";
+import { getCharactersByCampaign } from "./character.actions";
 
 interface CampaignResponse {
   ok: boolean;
@@ -90,20 +88,6 @@ export const createCampaign = async ({
     // Serialize the MongoDB document
     const campaign = serializeData(campaignData);
 
-    const updatedUser = await updateUserCampaign({
-      campaign: campaign._id,
-      _id: user._id,
-    });
-
-    if (!updatedUser) {
-      // Rollback campaign creation if user update fails
-      await Campaign.findByIdAndDelete(campaign._id);
-      return {
-        ok: false,
-        message: "Erro ao atualizar usuário com a nova campanha",
-      };
-    }
-
     revalidatePath("/dashboard");
     revalidatePath("/campaigns");
 
@@ -139,20 +123,11 @@ export const getCampaignById = async (id: string) => {
       };
     }
 
-    const campaignData = await Campaign.findById(id)
-      .populate({
-        path: "owner",
-        select: "username name email _id",
-        model: "User",
-      })
-      .populate({
-        path: "characters",
-        populate: {
-          path: "owner",
-          model: "User",
-          select: "username name _id",
-        },
-      });
+    const campaignData = await Campaign.findById(id).populate({
+      path: "owner",
+      select: "username name email _id",
+      model: User,
+    });
 
     if (!campaignData) {
       return {
@@ -162,7 +137,14 @@ export const getCampaignById = async (id: string) => {
       };
     }
 
-    const campaign = serializeData(campaignData);
+    const characterData = await getCharactersByCampaign(id);
+
+    const data = {
+      ...campaignData.toObject(),
+      characters: characterData.data,
+    };
+
+    const campaign = serializeData(data);
 
     return {
       ok: true,
@@ -323,9 +305,6 @@ export const deleteCampaign = async (id: string): Promise<CampaignResponse> => {
       };
     }
 
-    // Note: You might need to also remove the campaign reference from users
-    // and delete associated characters depending on your requirements
-
     revalidatePath("/dashboard");
     revalidatePath("/campaigns");
 
@@ -392,27 +371,6 @@ export const joinCampaign = async ({
       return {
         ok: false,
         message: "Campanha não encontrada",
-      };
-    }
-
-    // Add user to campaign (this depends on your Campaign schema)
-    // If you have a players array in your Campaign model
-    // const updatedCampaign = await Campaign.findByIdAndUpdate(
-    //   campaignId,
-    //   { $addToSet: { players: userId } },
-    //   { new: true }
-    // );
-
-    // Update user's campaigns list
-    const updatedUser = await updateUserCampaign({
-      campaign: campaignId,
-      _id: userId,
-    });
-
-    if (!updatedUser) {
-      return {
-        ok: false,
-        message: "Falha ao adicionar usuário à campanha",
       };
     }
 
