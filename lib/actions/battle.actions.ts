@@ -8,6 +8,7 @@ import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import Character, { CharacterDocument } from "@/models/Character";
 import { getCurrentUser } from "./user.actions";
+import { getAllDamagesByBattleId } from "./damage.actions";
 
 const serializeData = (data: BattleDocument[]) => {
   return JSON.parse(JSON.stringify(data));
@@ -84,9 +85,23 @@ export const getBattleById = async (id: any) => {
       };
     }
 
+    const damages = await getAllDamagesByBattleId(id);
+
+    if (!damages.ok) {
+      return {
+        ok: false,
+        message: "Erro ao obter danos da batalha",
+      };
+    }
+
+    const data = {
+      ...battle.toObject(),
+      rounds: damages.data,
+    };
+
     return {
       ok: true,
-      data: serializeData(battle),
+      data: serializeData(data),
     };
   } catch (error) {
     console.error("Error getting battle:", error);
@@ -128,6 +143,47 @@ export const getBattlesByCampaign = async (campaignId: string) => {
     return {
       ok: false,
       message: "Erro ao obter batalhas",
+    };
+  }
+};
+
+export const getAllBattlesByCharacterId = async (characterId: string) => {
+  try {
+    if (!characterId) {
+      return {
+        ok: false,
+        message: "ID do personagem é obrigatório",
+      };
+    }
+
+    await connectDB();
+
+    if (!mongoose.isValidObjectId(characterId)) {
+      return {
+        ok: false,
+        message: "ID de personagem inválido",
+      };
+    }
+
+    const battles = await Battle.find({ characters: characterId });
+
+    if (battles.length === 0) {
+      return {
+        ok: false,
+        message: "Nenhuma batalha encontrada para este personagem",
+        data: [],
+      };
+    }
+
+    return {
+      ok: true,
+      data: serializeData(battles),
+    };
+  } catch (error) {
+    console.error("Error getting battles by character:", error);
+    return {
+      ok: false,
+      message: "Erro ao obter batalhas por personagem",
     };
   }
 };

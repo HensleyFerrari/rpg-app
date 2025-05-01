@@ -71,7 +71,27 @@ export const getAllDamagesByBattleId = async (battleId: string) => {
   const damages = await Damage.find({ battle: battleId })
     .populate("character")
     .sort({ createdAt: -1 });
-  return damages.map(serializeData);
+
+  if (!damages) {
+    return {
+      ok: false,
+      message: "Nenhum dano encontrado",
+    };
+  }
+
+  if (damages.length === 0) {
+    return {
+      ok: false,
+      message: "Nenhum dano encontrado",
+      data: [],
+    };
+  }
+
+  return {
+    ok: true,
+    message: "Danos encontrados com sucesso",
+    data: damages.map(serializeData),
+  };
 };
 
 export const getAllDamagesByCharacterId = async (characterId: string) => {

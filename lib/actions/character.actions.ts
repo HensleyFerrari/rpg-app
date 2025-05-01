@@ -7,7 +7,7 @@ import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
-import Battle from "@/models/Battle";
+import { getAllBattlesByCharacterId } from "./battle.actions";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
@@ -141,12 +141,25 @@ export async function getCharacterById(id: string) {
       };
     }
 
-    const character = serializeData(characterData);
+    const battles = await getAllBattlesByCharacterId(id);
+
+    if (!battles.ok) {
+      return {
+        ok: false,
+        message: "Falha ao buscar batalhas do personagem",
+        data: null,
+      };
+    }
+
+    const data = {
+      ...characterData.toObject(),
+      battles: battles.data,
+    };
 
     return {
       ok: true,
       message: "Personagem encontrado",
-      data: character,
+      data: serializeData(data),
     };
   } catch (error: any) {
     console.error("Error fetching character:", error);
@@ -217,10 +230,6 @@ export async function getCharactersByOwner(): Promise<CharacterResponse> {
         path: "campaign",
         select: "name _id",
         model: Campaign,
-      })
-      .populate({
-        path: "battles",
-        model: Battle,
       })
       .sort({ createdAt: -1 });
 
