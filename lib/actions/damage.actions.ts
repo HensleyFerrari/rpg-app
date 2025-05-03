@@ -81,7 +81,7 @@ export const getAllDamagesByBattleId = async (battleId: string) => {
 
   if (damages.length === 0) {
     return {
-      ok: false,
+      ok: true,
       message: "Nenhum dano encontrado",
       data: [],
     };

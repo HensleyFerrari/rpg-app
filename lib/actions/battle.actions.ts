@@ -169,8 +169,8 @@ export const getAllBattlesByCharacterId = async (characterId: string) => {
 
     if (battles.length === 0) {
       return {
-        ok: false,
-        message: "Nenhuma batalha encontrada para este personagem",
+        ok: true,
+        message: "Esse personagem não está em nenhuma batalha",
         data: [],
       };
     }
