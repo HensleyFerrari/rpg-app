@@ -25,6 +25,7 @@ import {
   Crown,
   UsersRound,
   Skull,
+  Cog,
 } from "lucide-react";
 import { ModeToggle } from "./theme-toggle";
 import {
@@ -35,6 +36,7 @@ import {
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const items = [
   {
@@ -45,7 +47,7 @@ const items = [
   {
     title: "Campanhas",
     icons: Crown,
-    itens: [
+    items: [
       {
         title: "Minhas Campanhas",
         url: "/dashboard/campaigns/mycampaigns",
@@ -61,17 +63,12 @@ const items = [
   {
     title: "Personagens",
     icons: UsersRound,
-    itens: [
+    items: [
       {
         title: "Meus Personagens",
         url: "/dashboard/personagens/mycharacters",
         icons: User,
       },
-      // {
-      //   title: "Criar Personagem",
-      //   url: "/dashboard/personagens/new",
-      //   icons: UserPlus,
-      // },
       {
         title: "Todos os Personagens",
         url: "/dashboard/personagens",
@@ -82,17 +79,12 @@ const items = [
   {
     title: "Batalhas",
     icons: Swords,
-    itens: [
+    items: [
       {
         title: "Minhas Batalhas",
         url: "/dashboard/battles/mybattles",
         icons: Skull,
       },
-      // {
-      //   title: "Criar Batalha",
-      //   url: "/dashboard/battles/newBattle",
-      //   icons: ShieldPlus,
-      // },
       {
         title: "Todas as Batalhas",
         url: "/dashboard/battles",
@@ -105,11 +97,17 @@ const items = [
     url: "/dashboard/feedback",
     icons: ScrollText,
   },
+  {
+    title: `Configurações`,
+    url: "/dashboard/settings",
+    icons: Cog,
+  },
 ];
 
 export function AppSidebar() {
   const [actualUser, setActualUser] = useState({
     name: "",
+    avatarUrl: "",
   });
 
   useEffect(() => {
@@ -136,7 +134,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                if (!item.itens) {
+                if (!item.items) {
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
@@ -164,7 +162,7 @@ export function AppSidebar() {
                         <CollapsibleContent>
                           <SidebarGroupContent>
                             <SidebarMenu>
-                              {item.itens.map((item) => {
+                              {item.items.map((item) => {
                                 return (
                                   <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
@@ -206,9 +204,15 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="font-semibold">
-        <span className="flex gap-2">
-          <User className="w-6 h-6" /> {actualUser?.name}
-        </span>
+        <div className="flex items-center gap-3">
+          <Avatar className="h-8 w-8 rounded-lg">
+            <AvatarImage src={actualUser?.avatarUrl} />
+            <AvatarFallback>
+              <User className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
+          <span>{actualUser?.name}</span>
+        </div>
         <span className="flex gap-2 text-xs">
           <Heart className="text-red-600 w-3 h-3 self-center" /> Hens
         </span>

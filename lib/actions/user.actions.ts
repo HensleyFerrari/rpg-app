@@ -39,3 +39,24 @@ export const getCurrentUser = async () => {
     return null;
   }
 };
+
+export async function updateAvatar(userId: string, avatarUrl: string) {
+  try {
+    await connectDB();
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { avatarUrl },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return { ok: false, message: "User not found" };
+    }
+
+    return { ok: true, data: updatedUser.avatarUrl };
+  } catch (error) {
+    console.error("Error updating avatar:", error);
+    return { ok: false, message: "Failed to update avatar" };
+  }
+}

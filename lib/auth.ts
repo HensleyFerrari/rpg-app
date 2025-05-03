@@ -28,10 +28,31 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!passwordMatch) throw new Error("Invalid email or password");
-        return user;
+
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          name: user.name,
+          avatarUrl: user.avatarUrl,
+        };
       },
     }),
   ],
+  callbacks: {
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.sub as string;
+        session.user.avatarUrl = token.avatarUrl as string;
+      }
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.avatarUrl = user.avatarUrl;
+      }
+      return token;
+    },
+  },
   session: {
     strategy: "jwt",
   },
