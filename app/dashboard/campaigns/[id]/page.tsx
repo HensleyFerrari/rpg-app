@@ -198,9 +198,20 @@ const CampaignDetail = async ({ params }: any) => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 p-2 rounded-full">
-                    <User className="h-5 w-5 text-primary" />
-                  </div>
+                  {campaign.owner?.avatarUrl ? (
+                    <div className="relative w-10 h-10 rounded-lg overflow-hidden">
+                      <Image
+                        src={campaign.owner.avatarUrl}
+                        alt={campaign.owner?.name || "Mestre"}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-primary/10 p-2 rounded-full">
+                      <User className="h-5 w-5 text-primary" />
+                    </div>
+                  )}
                   <div>
                     <p className="font-medium">
                       {campaign.owner?.name ||

@@ -125,7 +125,7 @@ export const getCampaignById = async (id: string) => {
 
     const campaignData = await Campaign.findById(id).populate({
       path: "owner",
-      select: "username name email _id",
+      select: "username name email _id avatarUrl",
       model: User,
     });
 
@@ -175,7 +175,7 @@ export const getMyCampaigns = async () => {
     }
 
     const campaignsData = await Campaign.find({ owner: user._id })
-      .populate("owner", "username name _id")
+      .populate("owner", "username name _id avatarUrl")
       .sort({
         createdAt: -1,
       });
