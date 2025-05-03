@@ -7,7 +7,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Book, Sword } from "lucide-react";
+import { Book } from "lucide-react";
 import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
 import { ReadOnlyRichTextViewer } from "./ui/rich-text-editor";
 
@@ -78,10 +78,6 @@ export default function PersonagemCard({ personagem }: PersonagemCardProps) {
               >
                 <Book className="w-3 h-3" />
                 {personagem.campaign.name}
-              </Badge>
-              <Badge variant="outline" className="flex items-center gap-1">
-                <Sword className="w-3 h-3" />
-                Batalhas: {personagem.battles.length}
               </Badge>
             </CardFooter>
           </div>

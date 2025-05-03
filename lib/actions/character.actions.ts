@@ -7,7 +7,7 @@ import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
-import Battle from "@/models/Battle";
+import { getAllBattlesByCharacterId } from "./battle.actions";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
@@ -90,19 +90,6 @@ export async function createCharacter({
       };
     }
 
-    const updateCampaign = await Campaign.findByIdAndUpdate(
-      campaign,
-      { $push: { characters: newCharacterData._id } },
-      { new: true }
-    );
-
-    if (!updateCampaign) {
-      return {
-        ok: false,
-        message: "Falha ao atualizar campanha",
-      };
-    }
-
     const newCharacter = serializeData(newCharacterData);
 
     revalidatePath(`/dashboard/personagens/${newCharacter._id}`);
@@ -154,12 +141,25 @@ export async function getCharacterById(id: string) {
       };
     }
 
-    const character = serializeData(characterData);
+    const battles = await getAllBattlesByCharacterId(id);
+
+    if (!battles.ok) {
+      return {
+        ok: false,
+        message: "Falha ao buscar batalhas do personagem",
+        data: null,
+      };
+    }
+
+    const data = {
+      ...characterData.toObject(),
+      battles: battles.data,
+    };
 
     return {
       ok: true,
       message: "Personagem encontrado",
-      data: character,
+      data: serializeData(data),
     };
   } catch (error: any) {
     console.error("Error fetching character:", error);
@@ -231,10 +231,6 @@ export async function getCharactersByOwner(): Promise<CharacterResponse> {
         select: "name _id",
         model: Campaign,
       })
-      .populate({
-        path: "battles",
-        model: Battle,
-      })
       .sort({ createdAt: -1 });
 
     const characters = serializeData(charactersData);
@@ -290,7 +286,6 @@ export async function updateCharacter(
       };
     }
 
-    // Validate campaign and owner IDs if they are being updated
     if (updates.campaign && !mongoose.isValidObjectId(updates.campaign)) {
       return {
         ok: false,

@@ -8,7 +8,7 @@ import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import Character, { CharacterDocument } from "@/models/Character";
 import { getCurrentUser } from "./user.actions";
-import Damage from "@/models/Damage";
+import { getAllDamagesByBattleId } from "./damage.actions";
 
 const serializeData = (data: BattleDocument[]) => {
   return JSON.parse(JSON.stringify(data));
@@ -76,14 +76,6 @@ export const getBattleById = async (id: any) => {
       .populate({
         path: "campaign",
         model: Campaign,
-      })
-      .populate({
-        path: "rounds",
-        model: Damage,
-        populate: {
-          path: "character",
-          model: Character,
-        },
       });
 
     if (!battle) {
@@ -93,9 +85,23 @@ export const getBattleById = async (id: any) => {
       };
     }
 
+    const damages = await getAllDamagesByBattleId(id);
+
+    if (!damages.ok) {
+      return {
+        ok: false,
+        message: "Erro ao obter danos da batalha",
+      };
+    }
+
+    const data = {
+      ...battle.toObject(),
+      rounds: damages.data,
+    };
+
     return {
       ok: true,
-      data: serializeData(battle),
+      data: serializeData(data),
     };
   } catch (error) {
     console.error("Error getting battle:", error);
@@ -137,6 +143,47 @@ export const getBattlesByCampaign = async (campaignId: string) => {
     return {
       ok: false,
       message: "Erro ao obter batalhas",
+    };
+  }
+};
+
+export const getAllBattlesByCharacterId = async (characterId: string) => {
+  try {
+    if (!characterId) {
+      return {
+        ok: false,
+        message: "ID do personagem é obrigatório",
+      };
+    }
+
+    await connectDB();
+
+    if (!mongoose.isValidObjectId(characterId)) {
+      return {
+        ok: false,
+        message: "ID de personagem inválido",
+      };
+    }
+
+    const battles = await Battle.find({ characters: characterId });
+
+    if (battles.length === 0) {
+      return {
+        ok: true,
+        message: "Esse personagem não está em nenhuma batalha",
+        data: [],
+      };
+    }
+
+    return {
+      ok: true,
+      data: serializeData(battles),
+    };
+  } catch (error) {
+    console.error("Error getting battles by character:", error);
+    return {
+      ok: false,
+      message: "Erro ao obter batalhas por personagem",
     };
   }
 };
@@ -223,18 +270,6 @@ export const deleteBattle = async (id: string) => {
       };
     }
 
-    // Remove battle reference from Campaign
-    if (battle.campaign) {
-      await Campaign.updateOne(
-        { _id: battle.campaign },
-        { $pull: { battles: id } }
-      );
-    }
-
-    // Remove battle reference from Users
-    await User.updateMany({ battles: id }, { $pull: { battles: id } });
-
-    // Delete the battle
     await Battle.findByIdAndDelete(id);
 
     revalidatePath("/dashboard/campaigns");
@@ -332,16 +367,6 @@ export const addCharacterToBattle = async (
       };
     }
 
-    const character = await Character.findByIdAndUpdate(characterId, {
-      $addToSet: { battles: battleId },
-    });
-    if (!character) {
-      return {
-        ok: false,
-        message: "Personagem não encontrado",
-      };
-    }
-
     revalidatePath(`/dashboard/battles/${battleId}`);
 
     return {
@@ -397,10 +422,6 @@ export const removeCharacterFromBattle = async (
         message: "Batalha não encontrada",
       };
     }
-
-    await Character.findByIdAndUpdate(characterId, {
-      $pull: { battles: battleId },
-    });
 
     revalidatePath(`/dashboard/battles/${battleId}`);
 

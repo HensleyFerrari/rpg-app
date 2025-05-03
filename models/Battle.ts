@@ -7,12 +7,6 @@ export interface BattleDocument {
   campaign: ObjectId;
   characters: Array<ObjectId>;
   round: number;
-  rounds: Array<{
-    damage: number;
-    isCritical: boolean;
-    character: ObjectId;
-    round: number;
-  }>;
   active: boolean;
   createdAt: Date;
   updateAt: Date;
@@ -44,12 +38,6 @@ const BattleSchema = new Schema<BattleDocument>(
       type: Number,
       default: 1,
     },
-    rounds: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Damage",
-      },
-    ],
     active: {
       type: Boolean,
       default: true,

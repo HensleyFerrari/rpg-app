@@ -131,9 +131,6 @@ const BattlesDashboard = async () => {
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Todas as Batalhas</h1>
-        {/* <Link href="/dashboard/battles/newBattle">
-          <Button>Criar nova batalha</Button>
-        </Link> */}
       </div>
 
       {battles && battles.data.length > 0 ? (
@@ -171,7 +168,7 @@ const BattlesDashboard = async () => {
           </TabsContent>
 
           <TabsContent value="inactive" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
               {inactiveBattles.length > 0 ? (
                 inactiveBattles.map((battle: any) => (
                   <BattleCard key={battle?._id} battle={battle} />
