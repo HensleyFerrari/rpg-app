@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { CharacterStatusBadge } from "../../../../components/ui/character-status-badge";
+import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
 
 // Character type definition
 type Character = {
@@ -163,10 +164,8 @@ const CharacterPage = () => {
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <User2 className="w-5 h-5" /> Biografia
                   </h3>
-                  <div
-                    className="prose dark:prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: character.message }}
-                  />
+                  <div className="prose dark:prose-invert max-w-none" />
+                  <ReadOnlyRichTextViewer content={character.message} />
                 </div>
 
                 <Separator />
