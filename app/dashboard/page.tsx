@@ -6,6 +6,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { getCurrentUser } from "@/lib/actions/user.actions";
 import {
   AlertCircle,
   Swords,
@@ -20,11 +21,17 @@ import {
   Zap,
 } from "lucide-react";
 
-const Dashboard = () => {
+const Dashboard = async () => {
+  const actualUser = await getCurrentUser();
+
   return (
     <div className="flex flex-col gap-6 p-6">
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold tracking-tight">Visão Geral</h2>
+        <div className="flex gap-2 items-center">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Olá, {actualUser.name}
+          </h2>
+        </div>
         <SectionCards />
       </div>
 

@@ -68,14 +68,6 @@ const CampaignDetail = async ({ params }: any) => {
             </Link>
             {isOwner && (
               <>
-                <Link
-                  href={`/dashboard/battles/newBattle?campaign=${campaign._id}`}
-                >
-                  <Button variant="outline" className="gap-2">
-                    <Swords className="h-4 w-4" />
-                    Nova Batalha
-                  </Button>
-                </Link>
                 <Link href={`/dashboard/campaigns/${id}/manage`}>
                   <Button variant="outline" className="gap-2">
                     <Users className="h-4 w-4" />
@@ -111,7 +103,7 @@ const CampaignDetail = async ({ params }: any) => {
                       src={campaign.imageUrl}
                       alt={campaign.name}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
@@ -147,6 +139,7 @@ const CampaignDetail = async ({ params }: any) => {
                     >
                       <Button variant="outline" size="sm">
                         <PlusCircle className="h-4 w-4" />
+                        Nova Batalha
                       </Button>
                     </Link>
                   )}
