@@ -29,7 +29,7 @@ export async function createFeedback(values: {
     const feedback = await Feedback.create({
       ...values,
       userEmail: currentUser.email,
-      userName: currentUser.name,
+      userName: currentUser.name || "Usuário Anônimo",
     });
 
     revalidatePath("/dashboard/feedback");

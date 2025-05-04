@@ -105,15 +105,17 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const [actualUser, setActualUser] = useState({
-    name: "",
-    avatarUrl: "",
-  });
+  const [actualUser, setActualUser] = useState<{
+    name?: string;
+    avatarUrl?: string;
+  }>({});
 
   useEffect(() => {
     const fetchData = async () => {
       const getUser = await getCurrentUser();
-      setActualUser(getUser);
+      if (getUser) {
+        setActualUser(getUser);
+      }
     };
 
     fetchData();
@@ -211,7 +213,7 @@ export function AppSidebar() {
               <User className="h-4 w-4" />
             </AvatarFallback>
           </Avatar>
-          <span>{actualUser?.name}</span>
+          <span>{actualUser?.name || "Usuário"}</span>
         </div>
         <span className="flex gap-2 text-xs">
           <Heart className="text-red-600 w-3 h-3 self-center" /> Hens

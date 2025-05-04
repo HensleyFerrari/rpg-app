@@ -25,15 +25,23 @@ export default function SettingsPage() {
   useEffect(() => {
     const fetchUser = async () => {
       const userData = await getCurrentUser();
-      setUser(userData);
-      setAvatarUrl(userData?.avatarUrl || "");
+      if (userData) {
+        setUser(userData);
+        setAvatarUrl(userData.avatarUrl || "");
+      } else {
+        // Redirect to login if no user is found
+        window.location.href = "/login";
+      }
     };
 
     fetchUser();
   }, []);
 
   const handleAvatarUpdate = async () => {
-    if (!user?._id) return;
+    if (!user?._id) {
+      toast.error("Usuário não autenticado");
+      return;
+    }
 
     const result = await updateAvatar(user._id, avatarUrl);
 

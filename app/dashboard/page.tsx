@@ -29,7 +29,7 @@ const Dashboard = async () => {
       <div className="space-y-6">
         <div className="flex gap-2 items-center">
           <h2 className="text-3xl font-bold tracking-tight">
-            Olá, {actualUser.name}
+            Olá{actualUser?.name ? `, ${actualUser.name}` : ""}
           </h2>
         </div>
         <SectionCards />

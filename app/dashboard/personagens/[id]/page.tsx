@@ -52,15 +52,17 @@ const CharacterPage = () => {
         const { data: getCharacter } = await getCharacterById(id);
         const actualUser = await getCurrentUser();
 
-        if (getCharacter && "owner" in getCharacter && actualUser) {
+        if (getCharacter && "owner" in getCharacter) {
           const characterData = getCharacter as unknown as Character;
-          const isOwner = characterData.owner._id === actualUser._id;
-          setIsOwner(isOwner);
+          // Only set isOwner if we have both character and user data
+          if (actualUser?._id) {
+            setIsOwner(characterData.owner._id === actualUser._id);
+          }
           setCharacter(characterData);
         }
         setLoading(false);
       } catch (error) {
-        console.error("Failed to fetch character:", error);
+        console.error("Error fetching character:", error);
         setLoading(false);
       }
     };
