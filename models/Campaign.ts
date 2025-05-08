@@ -8,10 +8,13 @@ export interface CampaignDocument {
   description: string;
   message: string;
   active: boolean;
+  attributes: [string];
+  skills: [];
   isAccepptingCharacters: boolean;
   createdAt: Date;
   updateAt: Date;
 }
+// TODO: Adicionar pericias no modelo das campanhas
 
 const CampaignSchema = new Schema<CampaignDocument>(
   {
@@ -36,6 +39,15 @@ const CampaignSchema = new Schema<CampaignDocument>(
     imageUrl: {
       type: String,
     },
+    attributes: [
+      { name: { type: String, required: [true, "Name is required"] } },
+    ],
+    skills: [
+      {
+        name: { type: String, required: true },
+        attribute: { type: String, required: true },
+      },
+    ],
     isAccepptingCharacters: {
       type: Boolean,
       required: true,
