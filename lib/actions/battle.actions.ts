@@ -440,30 +440,39 @@ export const removeCharacterFromBattle = async (
 };
 
 export const getAllBattlesByUser = async () => {
-  await connectDB();
-  const user = await getCurrentUser();
+  try {
+    await connectDB();
+    const user = await getCurrentUser();
 
-  if (!user) {
+    if (!user) {
+      return {
+        ok: false,
+        message: "Usuário não encontrado",
+      };
+    }
+
+    const battles = await Battle.find({ owner: user._id })
+      .populate({
+        path: "owner",
+        select: "name",
+        model: User,
+      })
+      .populate({
+        path: "campaign",
+        select: "name imageUrl",
+        model: Campaign,
+      });
+
+    return {
+      ok: true,
+      message: "Batalhas encontradas com sucesso",
+      data: serializeData(battles),
+    };
+  } catch (error: any) {
+    console.error("Error fetching battles:", error);
     return {
       ok: false,
-      message: "Usuário não encontrado",
+      message: error.message || "Falha ao buscar batalhas",
     };
   }
-
-  const battles = await Battle.find({ owner: user._id })
-    .populate({
-      path: "owner",
-      select: "name",
-      model: User,
-    })
-    .populate({
-      path: "campaign",
-      select: "name imageUrl",
-      model: Campaign,
-    });
-
-  return {
-    ok: true,
-    data: serializeData(battles),
-  };
 };

@@ -18,7 +18,7 @@ export interface CampaignDocument {
   active: boolean;
   attributes: Array<{ name: string; _id?: string }>; // Corrected type
   skills: Array<{ name: string; attribute: string; _id?: string }>; // Corrected type
-  isAccepptingCharacters: boolean;
+  isAcceptingCharacters: boolean;
   createdAt: Date;
   updateAt: Date;
 }
@@ -56,7 +56,7 @@ const CampaignSchema = new Schema<CampaignDocument>(
         attribute: { type: String, required: true },
       },
     ],
-    isAccepptingCharacters: {
+    isAcceptingCharacters: {
       type: Boolean,
       required: true,
       default: true,

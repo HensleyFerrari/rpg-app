@@ -89,8 +89,8 @@ const EditCampaignForm = ({ campaign }: { campaign: CampaignDocument }) => {
       description: campaign.description || "",
       imageUrl: campaign.imageUrl || "",
       isAcepptingCharacters:
-        campaign.isAccepptingCharacters !== undefined
-          ? Boolean(campaign.isAccepptingCharacters)
+        campaign.isAcceptingCharacters !== undefined
+          ? Boolean(campaign.isAcceptingCharacters)
           : true,
     },
   });
@@ -269,31 +269,37 @@ const EditCampaignForm = ({ campaign }: { campaign: CampaignDocument }) => {
 
           <div className="space-y-4 border p-4 rounded-md">
             <h3 className="text-lg font-semibold">Atributos</h3>
-            <div className="flex items-center space-x-2">
-              <Input
-                id="newAttribute"
-                placeholder="Ex: Força"
-                value={newAttributeName}
-                onChange={(e) => setNewAttributeName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddAttribute();
-                  }
-                }}
-              />
-              <Button type="button" onClick={handleAddAttribute} size="icon">
-                <PlusCircle className="h-4 w-4" />
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex-1">
+                <Input
+                  id="newAttribute"
+                  placeholder="Ex: Força"
+                  value={newAttributeName}
+                  onChange={(e) => setNewAttributeName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddAttribute();
+                    }
+                  }}
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={handleAddAttribute}
+                className="w-full sm:w-auto"
+              >
+                <PlusCircle className="h-4 w-4 mr-2" /> Adicionar Atributo
               </Button>
             </div>
             {attributes.length > 0 && (
-              <ul className="space-y-2">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4">
                 {attributes.map((attr) => (
                   <li
                     key={attr._id || attr.name}
                     className="flex items-center justify-between p-2 border rounded-md bg-secondary"
                   >
-                    <span>{attr.name}</span>
+                    <span className="font-medium">{attr.name}</span>
                     <Button
                       type="button"
                       variant="ghost"
@@ -307,7 +313,7 @@ const EditCampaignForm = ({ campaign }: { campaign: CampaignDocument }) => {
               </ul>
             )}
             {attributes.length === 0 && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mt-2">
                 Nenhum atributo adicionado.
               </p>
             )}
@@ -321,53 +327,55 @@ const EditCampaignForm = ({ campaign }: { campaign: CampaignDocument }) => {
               </p>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
-                  <div className="space-y-1 col-span-1 md:col-span-2">
-                    <Label htmlFor="newSkillName">Nome da Perícia</Label>
-                    <Input
-                      id="newSkillName"
-                      placeholder="Ex: Atletismo"
-                      value={newSkillName}
-                      onChange={(e) => setNewSkillName(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="skillAttribute">Atributo Base</Label>
-                    <Select
-                      value={selectedAttributeForSkill}
-                      onValueChange={setSelectedAttributeForSkill}
-                    >
-                      <SelectTrigger id="skillAttribute">
-                        <SelectValue placeholder="Selecione Atributo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {attributes.map((attr) => (
-                          <SelectItem
-                            key={attr._id || attr.name}
-                            value={attr.name}
-                          >
-                            {attr.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="newSkillName">Nome da Perícia</Label>
+                      <Input
+                        id="newSkillName"
+                        placeholder="Ex: Atletismo"
+                        value={newSkillName}
+                        onChange={(e) => setNewSkillName(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="skillAttribute">Atributo Base</Label>
+                      <Select
+                        value={selectedAttributeForSkill}
+                        onValueChange={setSelectedAttributeForSkill}
+                      >
+                        <SelectTrigger id="skillAttribute">
+                          <SelectValue placeholder="Selecione Atributo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {attributes.map((attr) => (
+                            <SelectItem
+                              key={attr._id || attr.name}
+                              value={attr.name}
+                            >
+                              {attr.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   <Button
                     type="button"
                     onClick={handleAddSkill}
-                    className="md:col-start-3"
+                    className="w-full sm:w-auto"
                   >
                     <PlusCircle className="h-4 w-4 mr-2" /> Adicionar Perícia
                   </Button>
                 </div>
                 {skills.length > 0 && (
-                  <ul className="space-y-2 pt-2">
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4">
                     {skills.map((skill) => (
                       <li
                         key={skill._id || skill.name}
                         className="flex items-center justify-between p-2 border rounded-md bg-secondary"
                       >
-                        <span>
+                        <span className="font-medium">
                           {skill.name} ({skill.attribute})
                         </span>
                         <Button
@@ -383,7 +391,7 @@ const EditCampaignForm = ({ campaign }: { campaign: CampaignDocument }) => {
                   </ul>
                 )}
                 {skills.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mt-2">
                     Nenhuma perícia adicionada.
                   </p>
                 )}

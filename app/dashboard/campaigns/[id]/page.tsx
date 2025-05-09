@@ -18,6 +18,7 @@ import {
   Shield,
   PlusCircle,
   ChevronRight,
+  ScrollText,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -133,7 +134,7 @@ const CampaignDetail = async ({ params }: any) => {
                     <Swords className="h-5 w-5" />
                     Batalhas
                   </CardTitle>
-                  {isOwner && battles.length > 0 && (
+                  {isOwner && (
                     <Link
                       href={`/dashboard/battles/newBattle?campaign=${campaign._id}`}
                     >
@@ -179,6 +180,90 @@ const CampaignDetail = async ({ params }: any) => {
                     Nenhuma batalha foi criada para esta campanha ainda.
                   </p>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Attributes and Skills Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                  <ScrollText className="h-5 w-5" />
+                  Atributos e Perícias
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Attributes Section */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield className="h-4 w-4 text-muted-foreground" />
+                    <h4 className="font-medium text-lg">Atributos</h4>
+                  </div>
+                  {campaign.attributes && campaign.attributes.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {campaign.attributes.map((attr: any) => (
+                        <div
+                          key={attr.name}
+                          className="flex items-center gap-2 p-3 bg-muted rounded-lg"
+                        >
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{attr.name}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground italic">
+                      Nenhum atributo definido para esta campanha.
+                    </p>
+                  )}
+                </div>
+
+                {/* Skills Section */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Swords className="h-4 w-4 text-muted-foreground" />
+                    <h4 className="font-medium text-lg">Perícias</h4>
+                  </div>
+                  {campaign.skills && campaign.skills.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {campaign.skills.map((skill: any) => (
+                        <div
+                          key={skill.name}
+                          className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                        >
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{skill.name}</p>
+                            <p className="text-sm text-muted-foreground truncate">
+                              {skill.attribute}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground italic">
+                      Nenhuma perícia definida para esta campanha.
+                    </p>
+                  )}
+                </div>
+
+                {(!campaign.attributes || campaign.attributes.length === 0) &&
+                  (!campaign.skills || campaign.skills.length === 0) && (
+                    <div className="text-center py-6">
+                      <ScrollText className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                      <p className="text-muted-foreground">
+                        Esta campanha não possui atributos ou perícias
+                        configurados.
+                      </p>
+                      {isOwner && (
+                        <Link href={`/dashboard/campaigns/${id}/edit`}>
+                          <Button variant="link" className="mt-2">
+                            Configurar atributos e perícias
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                  )}
               </CardContent>
             </Card>
           </div>
