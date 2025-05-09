@@ -3,13 +3,21 @@ import mongoose, { ObjectId, Schema, model } from "mongoose";
 export interface CampaignDocument {
   _id: string;
   name: string;
-  owner: ObjectId;
+  owner:
+    | ObjectId
+    | {
+        _id: string;
+        email: string;
+        name?: string;
+        username?: string;
+        avatarUrl?: string;
+      }; // Adjusted for populated owner
   imageUrl: string;
   description: string;
   message: string;
   active: boolean;
-  attributes: [string];
-  skills: [];
+  attributes: Array<{ name: string; _id?: string }>; // Corrected type
+  skills: Array<{ name: string; attribute: string; _id?: string }>; // Corrected type
   isAccepptingCharacters: boolean;
   createdAt: Date;
   updateAt: Date;

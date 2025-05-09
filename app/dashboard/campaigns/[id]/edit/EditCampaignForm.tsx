@@ -15,9 +15,18 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { updateCampaign } from "@/lib/actions/campaign.actions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { PlusCircle, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { CampaignDocument } from "@/models/Campaign";
 
 type FormData = {
   name: string;
@@ -26,11 +35,49 @@ type FormData = {
   isAcepptingCharacters: boolean;
 };
 
-const EditCampaignForm = ({ campaign }: any) => {
+interface Attribute {
+  name: string;
+  _id?: string;
+}
+
+interface Skill {
+  name: string;
+  attribute: string;
+  _id?: string;
+}
+
+const EditCampaignForm = ({ campaign }: { campaign: CampaignDocument }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [description, setDescription] = useState(campaign.description || "");
+
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
+
+  const [newAttributeName, setNewAttributeName] = useState("");
+  const [newSkillName, setNewSkillName] = useState("");
+  const [selectedAttributeForSkill, setSelectedAttributeForSkill] =
+    useState("");
+
+  useEffect(() => {
+    if (campaign.attributes) {
+      setAttributes(
+        campaign.attributes.map((attr, index) => ({
+          ...attr,
+          _id: `attr-${index}-${Date.now()}`,
+        }))
+      );
+    }
+    if (campaign.skills) {
+      setSkills(
+        campaign.skills.map((skill, index) => ({
+          ...skill,
+          _id: `skill-${index}-${Date.now()}`,
+        }))
+      );
+    }
+  }, [campaign]);
 
   const {
     register,
@@ -41,9 +88,82 @@ const EditCampaignForm = ({ campaign }: any) => {
       name: campaign.name || "",
       description: campaign.description || "",
       imageUrl: campaign.imageUrl || "",
-      isAcepptingCharacters: Boolean(campaign.isAcepptingCharacters),
+      isAcepptingCharacters:
+        campaign.isAccepptingCharacters !== undefined
+          ? Boolean(campaign.isAccepptingCharacters)
+          : true,
     },
   });
+
+  const handleAddAttribute = () => {
+    if (newAttributeName.trim() === "") {
+      toast.error("Erro", {
+        description: "O nome do atributo não pode ser vazio.",
+      });
+      return;
+    }
+    if (
+      attributes.find(
+        (attr) =>
+          attr.name.toLowerCase() === newAttributeName.trim().toLowerCase()
+      )
+    ) {
+      toast.error("Erro", { description: "Este atributo já existe." });
+      return;
+    }
+    setAttributes([
+      ...attributes,
+      { name: newAttributeName.trim(), _id: `attr-new-${Date.now()}` },
+    ]);
+    setNewAttributeName("");
+  };
+
+  const handleRemoveAttribute = (attributeNameToRemove: string) => {
+    setAttributes(
+      attributes.filter((attr) => attr.name !== attributeNameToRemove)
+    );
+    setSkills(
+      skills.filter((skill) => skill.attribute !== attributeNameToRemove)
+    );
+  };
+
+  const handleAddSkill = () => {
+    if (newSkillName.trim() === "") {
+      toast.error("Erro", {
+        description: "O nome da perícia não pode ser vazio.",
+      });
+      return;
+    }
+    if (!selectedAttributeForSkill) {
+      toast.error("Erro", {
+        description: "Selecione um atributo para a perícia.",
+      });
+      return;
+    }
+    if (
+      skills.find(
+        (skill) =>
+          skill.name.toLowerCase() === newSkillName.trim().toLowerCase()
+      )
+    ) {
+      toast.error("Erro", { description: "Esta perícia já existe." });
+      return;
+    }
+    setSkills([
+      ...skills,
+      {
+        name: newSkillName.trim(),
+        attribute: selectedAttributeForSkill,
+        _id: `skill-new-${Date.now()}`,
+      },
+    ]);
+    setNewSkillName("");
+    setSelectedAttributeForSkill("");
+  };
+
+  const handleRemoveSkill = (skillNameToRemove: string) => {
+    setSkills(skills.filter((skill) => skill.name !== skillNameToRemove));
+  };
 
   const onSubmit = async (data: FormData) => {
     if (!session?.user?.email) {
@@ -53,11 +173,10 @@ const EditCampaignForm = ({ campaign }: any) => {
       return;
     }
 
-    // Check if user is the owner of the campaign
     if (
       typeof campaign.owner === "object" &&
       "email" in campaign.owner &&
-      campaign.owner.email !== session.user.email
+      (campaign.owner as any).email !== session.user.email
     ) {
       toast.error("Erro", {
         description: "Você não tem permissão para editar esta campanha",
@@ -67,11 +186,19 @@ const EditCampaignForm = ({ campaign }: any) => {
 
     try {
       setIsLoading(true);
+      const finalAttributes = attributes.map(({ name }) => ({ name }));
+      const finalSkills = skills.map(({ name, attribute }) => ({
+        name,
+        attribute,
+      }));
+
       const result = await updateCampaign(campaign._id, {
         name: data.name,
         description: description,
         imageUrl: data.imageUrl,
         isAcepptingCharacters: Boolean(data.isAcepptingCharacters),
+        attributes: finalAttributes,
+        skills: finalSkills,
       });
 
       if (result.ok) {
@@ -100,11 +227,11 @@ const EditCampaignForm = ({ campaign }: any) => {
       <CardHeader>
         <CardTitle>Editar Campanha</CardTitle>
         <CardDescription>
-          Atualize os detalhes da sua campanha de RPG.
+          Atualize os detalhes da sua campanha de RPG, atributos e perícias.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="name">Nome da Campanha *</Label>
             <Input
@@ -140,25 +267,131 @@ const EditCampaignForm = ({ campaign }: any) => {
             )}
           </div>
 
-          {/* <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="isAcepptingCharacters">
-              Aceitando novos personagens
-            </Label>
-            <FormField
-              control={control}
-              name="isAcepptingCharacters"
-              render={({ field }) => (
-                <Switch
-                  id="isAcepptingCharacters"
-                  checked={field.value}
-                  {...register("isAcepptingCharacters")}
-                  onCheckedChange={field.onChange}
-                />
-              )}
-            />
-          </div> */}
+          <div className="space-y-4 border p-4 rounded-md">
+            <h3 className="text-lg font-semibold">Atributos</h3>
+            <div className="flex items-center space-x-2">
+              <Input
+                id="newAttribute"
+                placeholder="Ex: Força"
+                value={newAttributeName}
+                onChange={(e) => setNewAttributeName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddAttribute();
+                  }
+                }}
+              />
+              <Button type="button" onClick={handleAddAttribute} size="icon">
+                <PlusCircle className="h-4 w-4" />
+              </Button>
+            </div>
+            {attributes.length > 0 && (
+              <ul className="space-y-2">
+                {attributes.map((attr) => (
+                  <li
+                    key={attr._id || attr.name}
+                    className="flex items-center justify-between p-2 border rounded-md bg-secondary"
+                  >
+                    <span>{attr.name}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveAttribute(attr.name)}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {attributes.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                Nenhum atributo adicionado.
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-4 border p-4 rounded-md">
+            <h3 className="text-lg font-semibold">Perícias</h3>
+            {attributes.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Adicione atributos antes de criar perícias.
+              </p>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+                  <div className="space-y-1 col-span-1 md:col-span-2">
+                    <Label htmlFor="newSkillName">Nome da Perícia</Label>
+                    <Input
+                      id="newSkillName"
+                      placeholder="Ex: Atletismo"
+                      value={newSkillName}
+                      onChange={(e) => setNewSkillName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="skillAttribute">Atributo Base</Label>
+                    <Select
+                      value={selectedAttributeForSkill}
+                      onValueChange={setSelectedAttributeForSkill}
+                    >
+                      <SelectTrigger id="skillAttribute">
+                        <SelectValue placeholder="Selecione Atributo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {attributes.map((attr) => (
+                          <SelectItem
+                            key={attr._id || attr.name}
+                            value={attr.name}
+                          >
+                            {attr.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={handleAddSkill}
+                    className="md:col-start-3"
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" /> Adicionar Perícia
+                  </Button>
+                </div>
+                {skills.length > 0 && (
+                  <ul className="space-y-2 pt-2">
+                    {skills.map((skill) => (
+                      <li
+                        key={skill._id || skill.name}
+                        className="flex items-center justify-between p-2 border rounded-md bg-secondary"
+                      >
+                        <span>
+                          {skill.name} ({skill.attribute})
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveSkill(skill.name)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {skills.length === 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhuma perícia adicionada.
+                  </p>
+                )}
+              </>
+            )}
+          </div>
         </CardContent>
-        <CardFooter className="flex justify-between mt-4">
+        <CardFooter className="flex justify-between mt-6">
           <Button type="button" variant="outline" onClick={() => router.back()}>
             Cancelar
           </Button>

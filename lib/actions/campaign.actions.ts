@@ -42,6 +42,8 @@ type createCamp = {
   email: string;
   description?: string;
   imageUrl?: string;
+  attributes?: Array<{ name: string }>;
+  skills?: Array<{ name: string; attribute: string }>;
 };
 
 export const createCampaign = async ({
@@ -212,6 +214,8 @@ export const updateCampaign = async (
     description: string;
     imageUrl: string;
     isAcepptingCharacters: boolean;
+    attributes: Array<{ name: string }>;
+    skills: Array<{ name: string; attribute: string }>;
   }>
 ): Promise<CampaignResponse> => {
   try {
