@@ -62,7 +62,7 @@ export default async function Personagens() {
               </span>
             </div>
             {aliveCharacters.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {aliveCharacters.map((personagem) => (
                   <PersonagemCard
                     key={personagem._id}
