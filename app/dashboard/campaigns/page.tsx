@@ -36,8 +36,6 @@ const CampaignsPage = async () => {
               name={campaign.name}
               description={campaign.description}
               imageUrl={campaign.imageUrl}
-              owner={campaign.owner}
-              createdAt={campaign.createdAt}
             />
           ))}
         </div>
