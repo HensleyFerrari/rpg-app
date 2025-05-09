@@ -25,7 +25,7 @@ const MyBattles = async () => {
         </Button>
       </div>
 
-      {battles && battles.data.length > 0 ? (
+      {battles && battles?.data?.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {battles.data.map((battle: any) => (
             <BattleCard
