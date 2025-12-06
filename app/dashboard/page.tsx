@@ -36,7 +36,7 @@ const Dashboard = async () => {
       </div>
 
       {/* Notice about placeholder data */}
-      <div className="rounded-lg border bg-card p-4 text-card-foreground">
+      <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
         <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
           <AlertCircle className="h-5 w-5" />
           <p className="text-sm">

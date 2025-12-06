@@ -58,6 +58,15 @@ export default function FeedbackForm() {
     <Card className="p-4">
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-2">
+          <div className="space-y-2">
+            <Label htmlFor="title">Título</Label>
+            <Input
+              id="title"
+              name="title"
+              placeholder="Digite o título do seu feedback"
+              required
+            />
+          </div>
           <Label htmlFor="type">Tipo de Feedback</Label>
           <Select name="type" required>
             <SelectTrigger>
@@ -88,16 +97,6 @@ export default function FeedbackForm() {
               <SelectItem value="outros">Outros</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="title">Título</Label>
-          <Input
-            id="title"
-            name="title"
-            placeholder="Digite o título do seu feedback"
-            required
-          />
         </div>
 
         <div className="space-y-2">
