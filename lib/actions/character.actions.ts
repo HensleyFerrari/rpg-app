@@ -8,6 +8,7 @@ import Campaign from "@/models/Campaign";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
 import { getAllBattlesByCharacterId } from "./battle.actions";
+import { triggerBattleUpdate } from "../pusher";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
@@ -498,9 +499,17 @@ export async function updateCharacterStatus(
       };
     }
 
-    // Trigger update for battles involving this character?
+    // Trigger update for battles involving this character
+    const battles = await getAllBattlesByCharacterId(characterId);
+    if (battles.ok && battles.data) {
+      const activeBattles = battles.data.filter((b: any) => b.active);
+      await Promise.all(
+        activeBattles.map((battle: any) => triggerBattleUpdate(battle._id))
+      );
+    }
+    
     // Use revalidatePath for the battle page
-    revalidatePath(`/dashboard/battles/[id]`); // Ideally we would need the battle ID here, but this generic revalidate might not work as intended for a specific path parameter.
+    // revalidatePath(`/dashboard/battles/[id]`); // Ideally we would need the battle ID here, but this generic revalidate might not work as intended for a specific path parameter.
     // Better to revalidate strictly where needed or rely on client state updates.
     // For now, let's return data and let client handle UI or broader revalidation.
 

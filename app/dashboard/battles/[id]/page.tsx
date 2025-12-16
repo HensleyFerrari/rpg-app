@@ -104,24 +104,24 @@ const BattlePage = () => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    const fetchBattle = async () => {
-      try {
-        const battle = await getBattleById(id as string);
-        if (battle.ok) {
-          setBattle(battle.data);
-          const user = await getCurrentUser();
-          setCurrentUser(user);
-        } else {
-          console.error(battle.message);
-        }
-      } catch (error) {
-        console.error("Error fetching battle:", error);
-      } finally {
-        setLoading(false);
+  const fetchBattle = async () => {
+    try {
+      const battle = await getBattleById(id as string);
+      if (battle.ok) {
+        setBattle(battle.data);
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } else {
+        console.error(battle.message);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching battle:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchBattle();
 
     // Pusher setup
@@ -131,8 +131,9 @@ const BattlePage = () => {
 
     const channel = pusher.subscribe(`battle-${id}`);
 
-    channel.bind("battle-updated", (data: Battle) => {
-      setBattle(data);
+    channel.bind("battle-updated", () => {
+      console.log("Received battle update signal, refetching...");
+      fetchBattle();
     });
 
     return () => {
@@ -140,6 +141,24 @@ const BattlePage = () => {
       channel.unsubscribe();
     };
   }, [id]);
+
+  useEffect(() => {
+    const handleBattleUpdate = (event: CustomEvent<Battle>) => {
+      setBattle(event.detail);
+    };
+
+    window.addEventListener(
+      "battleUpdated",
+      handleBattleUpdate as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "battleUpdated",
+        handleBattleUpdate as EventListener
+      );
+    };
+  }, []);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {

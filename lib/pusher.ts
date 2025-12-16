@@ -12,10 +12,14 @@ export const pusherServer = new Pusher({
 
 export const triggerBattleUpdate = async (battleId: string) => {
   try {
-    const battle = await getBattleById(battleId);
-    if (battle.ok && battle.data) {
-      await pusherServer.trigger(`battle-${battleId}`, "battle-updated", battle.data);
-    }
+    // Send a lightweight update signal instead of the full battle object
+    // to avoid hitting the 10KB payload limit of Pusher
+    const payload = {
+      _id: battleId,
+      timestamp: Date.now(),
+    };
+    console.log(`Triggering update signal for battle ${battleId}`);
+    await pusherServer.trigger(`battle-${battleId}`, "battle-updated", payload);
   } catch (error) {
     console.error("Error triggering battle update:", error);
   }
