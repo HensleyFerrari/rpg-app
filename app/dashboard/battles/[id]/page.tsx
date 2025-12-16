@@ -35,8 +35,6 @@ import {
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
-import AddCharacterModal from "./components/addCharacter";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,6 +44,12 @@ import {
 import ChangeRound from "./components/changeRound";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { updateCharacterStatus } from "@/lib/actions/character.actions";
+import { toast } from "sonner";
+import { Skull, Heart } from "lucide-react";
+import AddCharacterModal from "./components/addCharacter";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Define type for User object
 interface User {
@@ -70,6 +74,8 @@ interface Battle {
     _id: string;
     name: string;
     active: boolean;
+    status: string;
+    alignment?: "ally" | "enemy";
   }>;
   active: boolean;
   round: number;
@@ -330,156 +336,362 @@ const BattlePage = () => {
                 </div>
               </div>
             </div>
+            
+            <Tabs defaultValue="history" className="w-full">
+              <div className="flex items-center justify-between mb-4">
+                <TabsList>
+                  <TabsTrigger value="history">Histórico</TabsTrigger>
+                  <TabsTrigger value="characters">Personagens</TabsTrigger>
+                </TabsList>
+              </div>
 
-            {/* Battle Statistics */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <Card className="bg-card/50">
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-2">
-                    <Shield className="h-6 w-6 mx-auto text-muted-foreground" />
-                    <h3 className="text-sm font-medium text-muted-foreground">
-                      Rodada Atual
-                    </h3>
-                    <div className="text-2xl font-bold">
-                      {battle?.round || 0}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <TabsContent value="history" className="space-y-6">
+                {/* Battle Statistics */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Card className="bg-card/50">
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <Shield className="h-6 w-6 mx-auto text-muted-foreground" />
+                        <h3 className="text-sm font-medium text-muted-foreground">
+                          Rodada Atual
+                        </h3>
+                        <div className="text-2xl font-bold">
+                          {battle?.round || 0}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-              <Card className="bg-card/50">
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-2">
-                    <Zap className="h-6 w-6 mx-auto text-muted-foreground" />
-                    <h3 className="text-sm font-medium text-muted-foreground">
-                      Dano Total
-                    </h3>
-                    <div className="text-2xl font-bold">
-                      {battle?.rounds?.reduce(
-                        (acc, round) => acc + (round.damage || 0),
-                        0
-                      ) || 0}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  <Card className="bg-card/50">
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <Zap className="h-6 w-6 mx-auto text-muted-foreground" />
+                        <h3 className="text-sm font-medium text-muted-foreground">
+                          Dano Total
+                        </h3>
+                        <div className="text-2xl font-bold">
+                          {battle?.rounds?.reduce(
+                            (acc, round) => acc + (round.damage || 0),
+                            0
+                          ) || 0}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-              <Card className="bg-card/50">
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-2">
-                    <Users className="h-6 w-6 mx-auto text-muted-foreground" />
-                    <h3 className="text-sm font-medium text-muted-foreground">
-                      Personagens Ativos
-                    </h3>
-                    <div className="text-2xl font-bold">
-                      {battle?.characters?.filter((char) => char).length || 0}/
-                      {battle?.characters?.length || 0}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  <Card className="bg-card/50">
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <Users className="h-6 w-6 mx-auto text-muted-foreground" />
+                        <h3 className="text-sm font-medium text-muted-foreground">
+                          Personagens Ativos
+                        </h3>
+                        <div className="text-2xl font-bold">
+                          {battle?.characters?.filter((char) => char).length ||
+                            0}
+                          /{battle?.characters?.length || 0}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-              <Card className="bg-card/50">
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-2">
-                    <Crown className="h-6 w-6 mx-auto text-muted-foreground" />
-                    <h3 className="text-sm font-medium text-muted-foreground">
-                      Maior Dano <br />
-                      {battle?.rounds?.length > 0 && (
-                        <span className="text-xs text-muted-foreground">
-                          {" "}
-                          ({battle?.rounds[0]?.character.name})
-                        </span>
-                      )}
-                    </h3>
-                    <div className="text-2xl font-bold">
-                      {battle?.rounds?.length > 0
-                        ? Math.max(
-                            ...(battle?.rounds?.map(
-                              (round) => round.damage || 0
-                            ) || [0])
-                          )
-                        : 0}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {battle?.active && (
-              <div className="flex flex-col sm:flex-row gap-4 mb-4 sm:gap-6">
-                <div className="flex-1">
-                  {battle.characters.some((char) => char) && <NewDamage />}
+                  <Card className="bg-card/50">
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <Crown className="h-6 w-6 mx-auto text-muted-foreground" />
+                        <h3 className="text-sm font-medium text-muted-foreground">
+                          Maior Dano <br />
+                          {battle?.rounds?.length > 0 && (
+                            <span className="text-xs text-muted-foreground">
+                              {" "}
+                              (
+                              {
+                                battle.rounds.reduce((max, round) =>
+                                  (round.damage || 0) > (max.damage || 0)
+                                    ? round
+                                    : max
+                                ).character.name
+                              }
+                              )
+                            </span>
+                          )}
+                        </h3>
+                        <div className="text-2xl font-bold">
+                          {battle?.rounds?.length > 0
+                            ? Math.max(
+                                ...(battle?.rounds?.map(
+                                  (round) => round.damage || 0
+                                ) || [0])
+                              )
+                            : 0}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-                {currentUser?._id === battle?.owner?._id && (
-                  <div className="flex-1">
-                    <AddCharacterModal />
+
+                {battle?.active && (
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                    <div className="flex-1">
+                      {battle.characters.some((char) => char) && <NewDamage />}
+                    </div>
+                    {currentUser?._id === battle?.owner?._id && (
+                      <div className="flex-1">
+                        <AddCharacterModal />
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-            )}
 
-            <div className="border rounded-lg p-3 sm:p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <History className="h-5 w-5 text-muted-foreground" />
-                <h3 className="text-lg font-medium">Histórico de turnos</h3>
-              </div>
-              {battle?.rounds && battle.rounds.length > 0 ? (
-                <div className="space-y-2">
-                  {battle.rounds.map((round, index) => (
-                    <div
-                      key={index}
-                      className="p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-                    >
-                      <div className="grid grid-cols-3 gap-4 text-sm items-center">
-                        <span className="font-medium flex items-center gap-2">
-                          <Target className="h-4 w-4 text-muted-foreground" />
-                          Turno {round.round}
-                        </span>
-                        <span
-                          className={cn(
-                            "truncate flex items-center gap-2",
-                            round.character.alignment === "enemy" && "text-red-500"
-                          )}
+                <div className="border rounded-lg p-3 sm:p-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <History className="h-5 w-5 text-muted-foreground" />
+                    <h3 className="text-lg font-medium">Histórico de turnos</h3>
+                  </div>
+                  {battle?.rounds && battle.rounds.length > 0 ? (
+                    <div className="space-y-2">
+                      {battle.rounds.map((round, index) => (
+                        <div
+                          key={index}
+                          className="p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
                         >
-                          <UsersIcon className="h-4 w-4 text-muted-foreground" />
-                          {round.character.name}
-                          {round.target && (
-                            <>
-                              <span className="text-muted-foreground">➔</span>
-                              {round.target.name}
-                            </>
-                          )}
-                        </span>
-                        <span className="text-right flex items-center justify-end gap-2">
-                          <SwordsIcon className="h-4 w-4 text-muted-foreground" />
-                          {round.isCritical ? (
-                            <span className="font-bold text-amber-500">
-                              {round.damage}
+                          <div className="grid grid-cols-3 gap-4 text-sm items-center">
+                            <span className="font-medium flex items-center gap-2">
+                              <Target className="h-4 w-4 text-muted-foreground" />
+                              Turno {round.round}
                             </span>
-                          ) : (
-                            round.damage
-                          )}
-                          {round.isCritical && (
-                            <Badge
-                              variant="outline"
-                              className="text-xs ml-1 text-amber-500"
+                            <span
+                              className={cn(
+                                "truncate flex items-center gap-2",
+                                round.character.alignment === "enemy" &&
+                                  "text-red-500"
+                              )}
                             >
-                              Crítico
-                            </Badge>
-                          )}
-                        </span>
-                      </div>
+                              <UsersIcon className="h-4 w-4 text-muted-foreground" />
+                              {round.character.name}
+                              {round.target && (
+                                <>
+                                  <span className="text-muted-foreground">
+                                    ➔
+                                  </span>
+                                  {round.target.name}
+                                </>
+                              )}
+                            </span>
+                            <span className="text-right flex items-center justify-end gap-2">
+                              <SwordsIcon className="h-4 w-4 text-muted-foreground" />
+                              {round.isCritical ? (
+                                <span className="font-bold text-amber-500">
+                                  {round.damage}
+                                </span>
+                              ) : (
+                                round.damage
+                              )}
+                              {round.isCritical && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs ml-1 text-amber-500"
+                                >
+                                  Crítico
+                                </Badge>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  ) : (
+                    <div className="p-8 text-center border rounded-lg bg-muted/20">
+                      <p className="text-sm text-muted-foreground flex flex-col items-center gap-2">
+                        <History className="h-8 w-8 opacity-50" />
+                        Nenhum turno registrado ainda.
+                      </p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <History className="h-4 w-4" />
-                  Nenhum turno registrado ainda.
-                </p>
-              )}
-            </div>
+              </TabsContent>
+
+              <TabsContent value="characters">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Allies */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-blue-500" />
+                      Aliados
+                    </h3>
+                    <div className="space-y-3">
+                      {battle.characters
+                        .filter(
+                          (char) =>
+                            !char.alignment || char.alignment === "ally"
+                        )
+                        .map((char) => (
+                          <div
+                            key={char._id}
+                            className="flex items-center justify-between p-3 border rounded-lg bg-card/50"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={cn(
+                                  "h-2 w-2 rounded-full",
+                                  char.status === "dead"
+                                    ? "bg-red-500"
+                                    : "bg-green-500"
+                                )}
+                              />
+                              <span
+                                className={cn(
+                                  "font-medium",
+                                  char.status === "dead" &&
+                                    "line-through text-muted-foreground"
+                                )}
+                              >
+                                {char.name}
+                              </span>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={async () => {
+                                const newStatus =
+                                  char.status === "alive" ? "dead" : "alive";
+                                const result = await updateCharacterStatus(
+                                  char._id,
+                                  newStatus
+                                );
+                                if (result.ok) {
+                                  toast.success(
+                                    `Status de ${
+                                      char.name
+                                    } atualizado para ${
+                                      newStatus === "alive" ? "Vivo" : "Morto"
+                                    }`
+                                  );
+                                  setBattle((prev) =>
+                                    prev
+                                      ? {
+                                          ...prev,
+                                          characters: prev.characters.map(
+                                            (c) =>
+                                              c._id === char._id
+                                                ? { ...c, status: newStatus }
+                                                : c
+                                          ),
+                                        }
+                                      : null
+                                  );
+                                } else {
+                                  toast.error("Erro ao atualizar status");
+                                }
+                              }}
+                            >
+                              {char.status === "alive" ? (
+                                <Skull className="h-4 w-4 text-red-500" />
+                              ) : (
+                                <Heart className="h-4 w-4 text-green-500" />
+                              )}
+                            </Button>
+                          </div>
+                        ))}
+                      {battle.characters.filter(
+                        (char) => !char.alignment || char.alignment === "ally"
+                      ).length === 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          Nenhum aliado.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Enemies */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <Swords className="h-5 w-5 text-red-500" />
+                      Inimigos
+                    </h3>
+                    <div className="space-y-3">
+                      {battle.characters
+                        .filter((char) => char.alignment === "enemy")
+                        .map((char) => (
+                          <div
+                            key={char._id}
+                            className="flex items-center justify-between p-3 border rounded-lg bg-card/50"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={cn(
+                                  "h-2 w-2 rounded-full",
+                                  char.status === "dead"
+                                    ? "bg-red-500"
+                                    : "bg-green-500"
+                                )}
+                              />
+                              <span
+                                className={cn(
+                                  "font-medium",
+                                  char.status === "dead" &&
+                                    "line-through text-muted-foreground"
+                                )}
+                              >
+                                {char.name}
+                              </span>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={async () => {
+                                const newStatus =
+                                  char.status === "alive" ? "dead" : "alive";
+                                const result = await updateCharacterStatus(
+                                  char._id,
+                                  newStatus
+                                );
+                                if (result.ok) {
+                                  toast.success(
+                                    `Status de ${
+                                      char.name
+                                    } atualizado para ${
+                                      newStatus === "alive" ? "Vivo" : "Morto"
+                                    }`
+                                  );
+                                  setBattle((prev) =>
+                                    prev
+                                      ? {
+                                          ...prev,
+                                          characters: prev.characters.map(
+                                            (c) =>
+                                              c._id === char._id
+                                                ? { ...c, status: newStatus }
+                                                : c
+                                          ),
+                                        }
+                                      : null
+                                  );
+                                } else {
+                                  toast.error("Erro ao atualizar status");
+                                }
+                              }}
+                            >
+                              {char.status === "alive" ? (
+                                <Skull className="h-4 w-4 text-red-500" />
+                              ) : (
+                                <Heart className="h-4 w-4 text-green-500" />
+                              )}
+                            </Button>
+                          </div>
+                        ))}
+                      {battle.characters.filter(
+                        (char) => char.alignment === "enemy"
+                      ).length === 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          Nenhum inimigo.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
 
           <CardFooter className="flex flex-col sm:flex-row justify-between border-t pt-4 px-3 sm:px-6 gap-2">

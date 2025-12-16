@@ -47,7 +47,6 @@ const formSchema = z.object({
   target: z.string().optional(),
   damage: z.number().min(1, { message: "Damage must be at least 1" }),
   isCritical: z.boolean().default(false),
-  round: z.number().min(1, { message: "Round must be at least 1" }),
 });
 
 interface DamagePayload {
@@ -87,7 +86,7 @@ const NewDamage = () => {
       target: "none",
       damage: 0,
       isCritical: false,
-      round: 1,
+      isCritical: false,
     },
   });
 
@@ -159,7 +158,7 @@ const NewDamage = () => {
         target: data.target === "none" ? undefined : data.target,
         damage: data.damage,
         isCritical: data.isCritical,
-        round: data.round,
+        round: battle.data.round,
       };
 
       const created = await createDamage(payload);
@@ -296,25 +295,7 @@ const NewDamage = () => {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="round"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Round</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(parseInt(e.target.value) || 1)
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+
               </div>
 
               <FormField

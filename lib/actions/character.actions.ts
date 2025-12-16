@@ -463,3 +463,56 @@ export const getCharactersByActualUserAndCampaign = async (
 
   return serializeData(characters);
 };
+export async function updateCharacterStatus(
+  characterId: string,
+  status: "alive" | "dead"
+): Promise<CharacterResponse> {
+  try {
+    if (!characterId) {
+      return {
+        ok: false,
+        message: "ID do personagem é obrigatório",
+      };
+    }
+
+    await connectDB();
+
+    if (!mongoose.isValidObjectId(characterId)) {
+      return {
+        ok: false,
+        message: "ID de personagem inválido",
+      };
+    }
+
+    const updatedCharacter = await Character.findByIdAndUpdate(
+      characterId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedCharacter) {
+      return {
+        ok: false,
+        message: "Personagem não encontrado",
+      };
+    }
+
+    // Trigger update for battles involving this character?
+    // Use revalidatePath for the battle page
+    revalidatePath(`/dashboard/battles/[id]`); // Ideally we would need the battle ID here, but this generic revalidate might not work as intended for a specific path parameter.
+    // Better to revalidate strictly where needed or rely on client state updates.
+    // For now, let's return data and let client handle UI or broader revalidation.
+
+    return {
+      ok: true,
+      message: "Status atualizado com sucesso",
+      data: serializeData(updatedCharacter),
+    };
+  } catch (error: any) {
+    console.error("Error updating character status:", error);
+    return {
+      ok: false,
+      message: error.message || "Falha ao atualizar status",
+    };
+  }
+}
