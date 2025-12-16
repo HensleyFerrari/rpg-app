@@ -44,6 +44,7 @@ import { Plus } from "lucide-react";
 // Form validation schema
 const formSchema = z.object({
   character: z.string().min(1, { message: "Character is required" }),
+  target: z.string().optional(),
   damage: z.number().min(1, { message: "Damage must be at least 1" }),
   isCritical: z.boolean().default(false),
   round: z.number().min(1, { message: "Round must be at least 1" }),
@@ -54,6 +55,7 @@ interface DamagePayload {
   campaign: string;
   owner: string;
   character: string;
+  target?: string;
   damage: number;
   isCritical: boolean;
   round: number;
@@ -72,7 +74,8 @@ interface Character {
 
 const NewDamage = () => {
   const { id } = useParams<{ id: string }>();
-  const [characters, setCharacters] = useState([]);
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [allBattleCharacters, setAllBattleCharacters] = useState<Character[]>([]);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userHasCharacter, setUserHasCharacter] = useState(false);
@@ -81,6 +84,7 @@ const NewDamage = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       character: "",
+      target: "none",
       damage: 0,
       isCritical: false,
       round: 1,
@@ -91,6 +95,10 @@ const NewDamage = () => {
     const fetchData = async () => {
       const user = await getCurrentUser();
       const battle = await getBattleById(id as string);
+
+      if (battle.data && battle.data.characters) {
+          setAllBattleCharacters(battle.data.characters);
+      }
 
       if (user._id === battle.data.owner._id) {
         const characters = await getCharactersByCampaign(
@@ -148,6 +156,7 @@ const NewDamage = () => {
         campaign: battle.data.campaign._id,
         owner: battle.data.owner._id,
         character: data.character,
+        target: data.target === "none" ? undefined : data.target,
         damage: data.damage,
         isCritical: data.isCritical,
         round: data.round,
@@ -207,73 +216,106 @@ const NewDamage = () => {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="character"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Personagem</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a character" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {characters.map((character: Character) => (
-                          <SelectItem key={character._id} value={character._id}>
-                            {character.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="character"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Atacante</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {characters.map((character: Character) => (
+                              <SelectItem key={character._id} value={character._id}>
+                                {character.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="damage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dano</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="target"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Alvo</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Nenhum" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="none">Nenhum</SelectItem>
+                            {allBattleCharacters.map((character: Character) => (
+                              <SelectItem key={character._id} value={character._id}>
+                                {character.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="round"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Round</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 1)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="damage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dano</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="round"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Round</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value) || 1)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+              </div>
 
               <FormField
                 control={form.control}

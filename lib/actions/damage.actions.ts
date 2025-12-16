@@ -41,6 +41,7 @@ export const createDamage = async (damage: any) => {
     ...damage,
     owner: characterInfo.data.owner._id,
     campaign: characterInfo.data.campaign._id,
+    target: damage.target || null,
   };
   const newDamage = new Damage(payload);
   const savedDamage = await newDamage.save();
@@ -59,6 +60,7 @@ export const getAllDamagesByCampaignId = async (campaignId: string) => {
   const damages = await Damage.find({ campaign: campaignId })
     .populate("character")
     .populate("battle")
+    .populate("target")
     .sort({ createdAt: -1 });
   return damages.map(serializeData);
 };
@@ -75,6 +77,7 @@ export const getAllDamagesByBattleId = async (battleId: string) => {
   await connectDB();
   const damages = await Damage.find({ battle: battleId })
     .populate("character")
+    .populate("target")
     .sort({ createdAt: -1 });
 
   if (!damages) {

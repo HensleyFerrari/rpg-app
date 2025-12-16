@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   CalendarIcon,
@@ -79,11 +80,17 @@ interface Battle {
     isCritical: boolean;
     character: {
       name: string;
+      alignment?: "ally" | "enemy";
+    };
+    target?: {
+      name: string;
     };
   }>;
   createdAt: string;
   updatedAt: string;
 }
+
+
 
 const BattlePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -429,9 +436,20 @@ const BattlePage = () => {
                           <Target className="h-4 w-4 text-muted-foreground" />
                           Turno {round.round}
                         </span>
-                        <span className="truncate flex items-center gap-2">
+                        <span
+                          className={cn(
+                            "truncate flex items-center gap-2",
+                            round.character.alignment === "enemy" && "text-red-500"
+                          )}
+                        >
                           <UsersIcon className="h-4 w-4 text-muted-foreground" />
                           {round.character.name}
+                          {round.target && (
+                            <>
+                              <span className="text-muted-foreground">➔</span>
+                              {round.target.name}
+                            </>
+                          )}
                         </span>
                         <span className="text-right flex items-center justify-end gap-2">
                           <SwordsIcon className="h-4 w-4 text-muted-foreground" />

@@ -474,3 +474,68 @@ export const getAllBattlesByUser = async () => {
     data: serializeData(battles),
   };
 };
+
+export const createQuickCharacters = async (
+  battleId: string,
+  names: string[],
+  alignment: "ally" | "enemy" = "ally"
+) => {
+  try {
+    if (!battleId) {
+      return {
+        ok: false,
+        message: "ID da batalha é obrigatório",
+      };
+    }
+
+    if (!names || names.length === 0) {
+      return {
+        ok: false,
+        message: "Nomes dos personagens são obrigatórios",
+      };
+    }
+
+    await connectDB();
+
+    const battle = await Battle.findById(battleId);
+
+    if (!battle) {
+      return {
+        ok: false,
+        message: "Batalha não encontrada",
+      };
+    }
+
+    const charactersToCreate = names.map((name) => ({
+      name,
+      owner: battle.owner,
+      campaign: battle.campaign,
+      status: "alive",
+      alignment,
+    }));
+
+    const createdCharacters = await Character.insertMany(charactersToCreate);
+    const characterIds = createdCharacters.map((char) => char._id);
+
+    const updatedBattle = await Battle.findByIdAndUpdate(
+      battleId,
+      { $addToSet: { characters: { $each: characterIds } } },
+      { new: true }
+    );
+
+    await triggerBattleUpdate(battleId);
+    revalidatePath(`/dashboard/battles/${battleId}`);
+
+    return {
+      ok: true,
+      data: serializeData(updatedBattle),
+      message: `${createdCharacters.length} personagens criados e adicionados com sucesso`,
+    };
+  } catch (error) {
+    console.error("Error creating quick characters:", error);
+    return {
+      ok: false,
+      message: "Erro ao criar personagens rápidos",
+    };
+  }
+};
