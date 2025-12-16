@@ -7,9 +7,10 @@ import { Separator } from "@/components/ui/separator";
 export default async function Personagens() {
   const response = await getAllCharacters();
   const characters = response.ok ? (response.data as any[]) || [] : [];
+  const filteredCharacters = characters.filter((char) => !char.isNpc);
 
   // Map CharacterDocument to Personagem type
-  const personagens = characters.map((char) => ({
+  const personagens = filteredCharacters.map((char) => ({
     _id: char._id.toString(),
     name: char.name,
     owner: char.owner.toString(),

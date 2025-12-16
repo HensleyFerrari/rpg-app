@@ -9,6 +9,7 @@ export interface CharacterDocument {
   message: string;
   status: string;
   alignment: string;
+  isNpc: boolean;
   createdAt: Date;
   updateAt: Date;
 }
@@ -41,6 +42,10 @@ const CharacterSchema = new Schema<CharacterDocument>(
       type: String,
       enum: ["alive", "dead"],
       default: "alive",
+    },
+    isNpc: {
+      type: Boolean,
+      default: false,
     },
     alignment: {
       type: String,

@@ -303,40 +303,7 @@ const BattlePage = () => {
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {/* Battle Info Cards */}
-              <div className="flex items-center space-x-2 p-3 sm:p-4 bg-muted rounded-lg">
-                <UsersIcon className="h-5 w-5 opacity-70 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">Mestre</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {battle.owner.name}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2 p-3 sm:p-4 bg-muted rounded-lg">
-                <LayersIcon className="h-5 w-5 opacity-70 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">Campanha</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {battle.campaign.name}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2 p-3 sm:p-4 bg-muted rounded-lg">
-                <SwordsIcon className="h-5 w-5 opacity-70 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">Personagens</p>
-                  <p className="text-xs text-muted-foreground">
-                    {battle.characters.length || "Sem personagens"}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
+          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">            
             <Tabs defaultValue="history" className="w-full">
               <div className="flex items-center justify-between mb-4">
                 <TabsList>
@@ -347,7 +314,7 @@ const BattlePage = () => {
 
               <TabsContent value="history" className="space-y-6">
                 {/* Battle Statistics */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                   <Card className="bg-card/50">
                     <CardContent className="pt-6">
                       <div className="text-center space-y-2">
@@ -382,22 +349,6 @@ const BattlePage = () => {
                   <Card className="bg-card/50">
                     <CardContent className="pt-6">
                       <div className="text-center space-y-2">
-                        <Users className="h-6 w-6 mx-auto text-muted-foreground" />
-                        <h3 className="text-sm font-medium text-muted-foreground">
-                          Personagens Ativos
-                        </h3>
-                        <div className="text-2xl font-bold">
-                          {battle?.characters?.filter((char) => char).length ||
-                            0}
-                          /{battle?.characters?.length || 0}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-card/50">
-                    <CardContent className="pt-6">
-                      <div className="text-center space-y-2">
                         <Crown className="h-6 w-6 mx-auto text-muted-foreground" />
                         <h3 className="text-sm font-medium text-muted-foreground">
                           Maior Dano <br />
@@ -424,6 +375,60 @@ const BattlePage = () => {
                                 ) || [0])
                               )
                             : 0}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-card/50">
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <Swords className="h-6 w-6 mx-auto text-blue-500" />
+                        <h3 className="text-sm font-medium text-muted-foreground">
+                          Dano Médio (Aliados)
+                        </h3>
+                        <div className="text-2xl font-bold">
+                          {(() => {
+                            const allyRounds =
+                              battle?.rounds?.filter(
+                                (r) =>
+                                  !r.character.alignment ||
+                                  r.character.alignment === "ally"
+                              ) || [];
+                            const totalDamage = allyRounds.reduce(
+                              (acc, r) => acc + (r.damage || 0),
+                              0
+                            );
+                            return allyRounds.length > 0
+                              ? (totalDamage / allyRounds.length).toFixed(1)
+                              : 0;
+                          })()}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-card/50">
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <Swords className="h-6 w-6 mx-auto text-red-500" />
+                        <h3 className="text-sm font-medium text-muted-foreground">
+                          Dano Médio (Inimigos)
+                        </h3>
+                        <div className="text-2xl font-bold">
+                          {(() => {
+                            const enemyRounds =
+                              battle?.rounds?.filter(
+                                (r) => r.character.alignment === "enemy"
+                              ) || [];
+                            const totalDamage = enemyRounds.reduce(
+                              (acc, r) => acc + (r.damage || 0),
+                              0
+                            );
+                            return enemyRounds.length > 0
+                              ? (totalDamage / enemyRounds.length).toFixed(1)
+                              : 0;
+                          })()}
                         </div>
                       </div>
                     </CardContent>
@@ -692,6 +697,39 @@ const BattlePage = () => {
                 </div>
               </TabsContent>
             </Tabs>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {/* Battle Info Cards */}
+              <div className="flex items-center space-x-2 p-3 sm:p-4 bg-muted rounded-lg">
+                <UsersIcon className="h-5 w-5 opacity-70 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">Mestre</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {battle.owner.name}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2 p-3 sm:p-4 bg-muted rounded-lg">
+                <LayersIcon className="h-5 w-5 opacity-70 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">Campanha</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {battle.campaign.name}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2 p-3 sm:p-4 bg-muted rounded-lg">
+                <SwordsIcon className="h-5 w-5 opacity-70 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">Personagens</p>
+                  <p className="text-xs text-muted-foreground">
+                    {battle.characters.length || "Sem personagens"}
+                  </p>
+                </div>
+              </div>
+            </div>
           </CardContent>
 
           <CardFooter className="flex flex-col sm:flex-row justify-between border-t pt-4 px-3 sm:px-6 gap-2">

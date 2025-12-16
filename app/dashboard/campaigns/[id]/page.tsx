@@ -226,14 +226,16 @@ const CampaignDetail = async ({ params }: any) => {
                     Personagens
                   </CardTitle>
                   <Badge variant="outline" className="font-mono">
-                    {campaign.characters.length || 0}
+                    {campaign.characters?.filter((c: any) => !c.isNpc).length || 0}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                {campaign.characters.length > 0 ? (
+                {campaign.characters?.filter((c: any) => !c.isNpc).length > 0 ? (
                   <div className="divide-y">
-                    {campaign.characters.map((character: any) => (
+                    {campaign.characters
+                      .filter((c: any) => !c.isNpc)
+                      .map((character: any) => (
                       <Link
                         key={character._id}
                         href={`/dashboard/personagens/${character._id}`}

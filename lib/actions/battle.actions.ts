@@ -512,6 +512,7 @@ export const createQuickCharacters = async (
       campaign: battle.campaign,
       status: "alive",
       alignment,
+      isNpc: true,
     }));
 
     const createdCharacters = await Character.insertMany(charactersToCreate);
