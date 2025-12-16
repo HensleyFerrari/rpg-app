@@ -75,6 +75,7 @@ interface Battle {
     active: boolean;
     status: string;
     alignment?: "ally" | "enemy";
+    owner: string;
   }>;
   active: boolean;
   round: number;
@@ -576,6 +577,17 @@ const BattlePage = () => {
                               variant="ghost"
                               size="sm"
                               onClick={async () => {
+                                // Double check if user has permission
+                                if (
+                                  currentUser?._id !== battle.owner._id &&
+                                  currentUser?._id !== char.owner
+                                ) {
+                                  toast.error(
+                                    "Você não tem permissão para alterar o status deste personagem"
+                                  );
+                                  return;
+                                }
+
                                 const newStatus =
                                   char.status === "alive" ? "dead" : "alive";
                                 const result = await updateCharacterStatus(
@@ -607,6 +619,10 @@ const BattlePage = () => {
                                   toast.error("Erro ao atualizar status");
                                 }
                               }}
+                              disabled={
+                                currentUser?._id !== battle.owner._id &&
+                                currentUser?._id !== char.owner
+                              }
                             >
                               {char.status === "alive" ? (
                                 <Skull className="h-4 w-4 text-red-500" />
@@ -663,6 +679,15 @@ const BattlePage = () => {
                               variant="ghost"
                               size="sm"
                               onClick={async () => {
+                                if (
+                                  currentUser?._id !== battle.owner._id &&
+                                  currentUser?._id !== char.owner
+                                ) {
+                                  toast.error(
+                                    "Você não tem permissão para alterar o status deste personagem"
+                                  );
+                                  return;
+                                }
                                 const newStatus =
                                   char.status === "alive" ? "dead" : "alive";
                                 const result = await updateCharacterStatus(
@@ -694,6 +719,10 @@ const BattlePage = () => {
                                   toast.error("Erro ao atualizar status");
                                 }
                               }}
+                              disabled={
+                                currentUser?._id !== battle.owner._id &&
+                                currentUser?._id !== char.owner
+                              }
                             >
                               {char.status === "alive" ? (
                                 <Skull className="h-4 w-4 text-red-500" />
