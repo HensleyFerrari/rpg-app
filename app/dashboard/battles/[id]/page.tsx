@@ -48,7 +48,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { updateCharacterStatus } from "@/lib/actions/character.actions";
 import { toast } from "sonner";
 import { Skull, Heart } from "lucide-react";
-import AddCharacterModal from "./components/addCharacter";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Define type for User object
@@ -461,7 +460,7 @@ const BattlePage = () => {
                     </div>
                     {currentUser?._id === battle?.owner?._id && (
                       <div className="flex-1">
-                        <AddCharacterModal />
+                        {/* AddCharacterModal moved to manage page */}
                       </div>
                     )}
                   </div>
