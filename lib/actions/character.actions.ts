@@ -20,6 +20,7 @@ interface CharacterParams {
   characterUrl?: string;
   message?: string;
   status: string;
+  isNpc?: boolean;
 }
 
 interface CharacterResponse {
