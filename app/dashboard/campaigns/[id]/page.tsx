@@ -133,7 +133,7 @@ const CampaignDetail = async ({ params }: any) => {
                     <Swords className="h-5 w-5" />
                     Batalhas
                   </CardTitle>
-                  {isOwner && battles.length > 0 && (
+                  {isOwner && (
                     <Link
                       href={`/dashboard/battles/newBattle?campaign=${campaign._id}`}
                     >

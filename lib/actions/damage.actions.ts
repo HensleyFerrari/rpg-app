@@ -10,6 +10,10 @@ const serializeData = (data: DamageDocument) => {
   return JSON.parse(JSON.stringify(data));
 };
 
+import { triggerBattleUpdate } from "../pusher";
+
+// ... existing code ...
+
 export const createDamage = async (damage: any) => {
   await connectDB();
   const characterInfo = await getCharacterById(damage.character);
@@ -41,6 +45,7 @@ export const createDamage = async (damage: any) => {
   const newDamage = new Damage(payload);
   const savedDamage = await newDamage.save();
 
+  await triggerBattleUpdate(damage.battle);
   revalidatePath(`/dashboard/battles/${damage.battle}`);
   return {
     ok: true,
@@ -107,6 +112,7 @@ export const deleteDamage = async (damageId: string, battleId: string) => {
     await connectDB();
     await Damage.findByIdAndDelete(damageId);
 
+    await triggerBattleUpdate(battleId);
     revalidatePath(`/dashboard/battles/${battleId}`);
     return {
       ok: true,

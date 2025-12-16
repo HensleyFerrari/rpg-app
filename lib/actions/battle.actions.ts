@@ -188,6 +188,10 @@ export const getAllBattlesByCharacterId = async (characterId: string) => {
   }
 };
 
+import { triggerBattleUpdate } from "../pusher";
+
+// ... existing code ...
+
 export const updateBattle = async (
   id: string,
   battleParams: Partial<BattleDocument>
@@ -227,6 +231,7 @@ export const updateBattle = async (
       };
     }
 
+    await triggerBattleUpdate(id);
     revalidatePath(`/dashboard/battles/${id}`);
 
     return {
@@ -367,6 +372,7 @@ export const addCharacterToBattle = async (
       };
     }
 
+    await triggerBattleUpdate(battleId);
     revalidatePath(`/dashboard/battles/${battleId}`);
 
     return {
@@ -423,6 +429,7 @@ export const removeCharacterFromBattle = async (
       };
     }
 
+    await triggerBattleUpdate(battleId);
     revalidatePath(`/dashboard/battles/${battleId}`);
 
     return {

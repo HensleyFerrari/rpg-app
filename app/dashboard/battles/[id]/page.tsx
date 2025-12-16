@@ -1,5 +1,7 @@
 "use client";
 
+import Pusher from "pusher-js";
+
 import { getBattleById } from "@/lib/actions/battle.actions";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -109,21 +111,20 @@ const BattlePage = () => {
 
     fetchBattle();
 
-    // Adicionar listener para atualização da batalha
-    const handleBattleUpdate = (event: CustomEvent<Battle>) => {
-      setBattle(event.detail);
-    };
+    // Pusher setup
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+    });
 
-    window.addEventListener(
-      "battleUpdated",
-      handleBattleUpdate as EventListener
-    );
+    const channel = pusher.subscribe(`battle-${id}`);
+
+    channel.bind("battle-updated", (data: Battle) => {
+      setBattle(data);
+    });
 
     return () => {
-      window.removeEventListener(
-        "battleUpdated",
-        handleBattleUpdate as EventListener
-      );
+      channel.unbind_all();
+      channel.unsubscribe();
     };
   }, [id]);
 
