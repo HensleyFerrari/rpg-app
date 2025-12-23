@@ -5,6 +5,7 @@ export interface DamageDocument {
   owner: ObjectId;
   campaign: ObjectId;
   battle: ObjectId;
+  type: "damage" | "heal";
   damage: number;
   isCritical: boolean;
   character: ObjectId;
@@ -34,6 +35,11 @@ const DamageSchema = new Schema<DamageDocument>(
     damage: {
       type: Number,
       required: [true, "Damage is required"],
+    },
+    type: {
+      type: String,
+      enum: ["damage", "heal"],
+      default: "damage",
     },
     isCritical: {
       type: Boolean,

@@ -50,7 +50,7 @@ export const createDamage = async (damage: any) => {
   revalidatePath(`/dashboard/battles/${damage.battle}`);
   return {
     ok: true,
-    message: "Dano registrado com sucesso",
+    message: "Ação registrada com sucesso",
     data: serializeData(savedDamage),
   };
 };

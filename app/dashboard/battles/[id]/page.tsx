@@ -79,9 +79,10 @@ interface Battle {
   }>;
   active: boolean;
   round: number;
-  rounds: Array<{
+    rounds: Array<{
     _id: string;
     damage: number;
+    type?: "damage" | "heal";
     round: number;
     isCritical: boolean;
     character: {
@@ -357,7 +358,26 @@ const BattlePage = () => {
                         </h3>
                         <div className="text-2xl font-bold">
                           {battle?.rounds?.reduce(
-                            (acc, round) => acc + (round.damage || 0),
+                            (acc, round) =>
+                              acc + (round.type !== "heal" ? round.damage : 0),
+                            0
+                          ) || 0}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-card/50 border-green-500/20">
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-2">
+                        <Heart className="h-6 w-6 mx-auto text-green-500" />
+                        <h3 className="text-sm font-medium text-muted-foreground">
+                          Cura Total
+                        </h3>
+                        <div className="text-2xl font-bold text-green-500">
+                          {battle?.rounds?.reduce(
+                            (acc, round) =>
+                              acc + (round.type === "heal" ? round.damage : 0),
                             0
                           ) || 0}
                         </div>
@@ -371,29 +391,34 @@ const BattlePage = () => {
                         <Crown className="h-6 w-6 mx-auto text-muted-foreground" />
                         <h3 className="text-sm font-medium text-muted-foreground">
                           Maior Dano <br />
-                          {battle?.rounds?.length > 0 && (
+                          {battle?.rounds?.filter((r) => r.type !== "heal")
+                            .length > 0 && (
                             <span className="text-xs text-muted-foreground">
                               {" "}
                               (
                               {
-                                battle.rounds.reduce((max, round) =>
-                                  (round.damage || 0) > (max.damage || 0)
-                                    ? round
-                                    : max
-                                ).character.name
+                                battle.rounds
+                                  .filter((r) => r.type !== "heal")
+                                  .reduce((max, round) =>
+                                    (round.damage || 0) > (max.damage || 0)
+                                      ? round
+                                      : max
+                                  ).character.name
                               }
                               )
                             </span>
                           )}
                         </h3>
                         <div className="text-2xl font-bold">
-                          {battle?.rounds?.length > 0
-                            ? Math.max(
-                                ...(battle?.rounds?.map(
-                                  (round) => round.damage || 0
-                                ) || [0])
-                              )
-                            : 0}
+                          {(() => {
+                            const damageRounds =
+                              battle?.rounds?.filter(
+                                (r) => r.type !== "heal"
+                              ) || [];
+                            return damageRounds.length > 0
+                              ? Math.max(...damageRounds.map((r) => r.damage))
+                              : 0;
+                          })()}
                         </div>
                       </div>
                     </CardContent>
@@ -411,8 +436,9 @@ const BattlePage = () => {
                             const allyRounds =
                               battle?.rounds?.filter(
                                 (r) =>
-                                  !r.character.alignment ||
-                                  r.character.alignment === "ally"
+                                  r.type !== "heal" &&
+                                  (!r.character.alignment ||
+                                    r.character.alignment === "ally")
                               ) || [];
                             const totalDamage = allyRounds.reduce(
                               (acc, r) => acc + (r.damage || 0),
@@ -438,7 +464,9 @@ const BattlePage = () => {
                           {(() => {
                             const enemyRounds =
                               battle?.rounds?.filter(
-                                (r) => r.character.alignment === "enemy"
+                                (r) =>
+                                  r.type !== "heal" &&
+                                  r.character.alignment === "enemy"
                               ) || [];
                             const totalDamage = enemyRounds.reduce(
                               (acc, r) => acc + (r.damage || 0),
@@ -503,18 +531,40 @@ const BattlePage = () => {
                               )}
                             </span>
                             <span className="text-right flex items-center justify-end gap-2">
-                              <SwordsIcon className="h-4 w-4 text-muted-foreground" />
+                              {round.type === "heal" ? (
+                                <Heart className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <SwordsIcon className="h-4 w-4 text-muted-foreground" />
+                              )}
                               {round.isCritical ? (
-                                <span className="font-bold text-amber-500">
+                                <span
+                                  className={cn(
+                                    "font-bold",
+                                    round.type === "heal"
+                                      ? "text-green-500"
+                                      : "text-amber-500"
+                                  )}
+                                >
                                   {round.damage}
                                 </span>
                               ) : (
-                                round.damage
+                                <span
+                                  className={cn(
+                                    round.type === "heal" && "text-green-500"
+                                  )}
+                                >
+                                  {round.damage}
+                                </span>
                               )}
                               {round.isCritical && (
                                 <Badge
                                   variant="outline"
-                                  className="text-xs ml-1 text-amber-500"
+                                  className={cn(
+                                    "text-xs ml-1",
+                                    round.type === "heal"
+                                      ? "text-green-500 border-green-500"
+                                      : "text-amber-500 border-amber-500"
+                                  )}
                                 >
                                   Crítico
                                 </Badge>
