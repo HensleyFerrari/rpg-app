@@ -98,6 +98,11 @@ const items = [
     icons: ScrollText,
   },
   {
+    title: "Sistemas RPG",
+    url: "/dashboard/systems",
+    icons: Book,
+  },
+  {
     title: `Configurações`,
     url: "/dashboard/settings",
     icons: Cog,
