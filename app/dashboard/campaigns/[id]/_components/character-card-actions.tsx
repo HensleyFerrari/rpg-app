@@ -46,6 +46,7 @@ export function CharacterCardActions({
       }
     } catch (error) {
       toast.error("Erro ao atualizar personagem");
+      console.log(error)
     } finally {
       setIsLoading(false);
     }

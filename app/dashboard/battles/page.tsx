@@ -22,6 +22,8 @@ import {
 import { MoreVertical } from "lucide-react";
 import ChangeRound from "./[id]/components/changeRound";
 
+export const dynamic = 'force-dynamic';
+
 const BattlesDashboard = async () => {
   const battles = await getAllBattles();
   const currentUser = await getCurrentUser();

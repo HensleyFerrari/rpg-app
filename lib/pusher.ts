@@ -1,6 +1,5 @@
 
 import Pusher from "pusher";
-import { getBattleById } from "./actions/battle.actions";
 
 export const pusherServer = new Pusher({
   appId: process.env.PUSHER_APP_ID!,

@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+export const dynamic = 'force-dynamic';
+
 const MyCharacters = async () => {
   const response = await getCharactersByOwner();
   const characters = response.ok ? (response.data as any[]) || [] : [];
