@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { User2, Swords, Edit, Book } from "lucide-react";
+import { User2, Swords, Edit, Book, Shield, Calendar, VenetianMask } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +15,7 @@ import Link from "next/link";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { CharacterStatusBadge } from "../../../../components/ui/character-status-badge";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
+import { Badge } from "@/components/ui/badge";
 
 // Character type definition
 type Character = {
@@ -23,6 +24,7 @@ type Character = {
   owner: {
     _id: string;
     name: string;
+    username: string; // Ensure we match populate
   };
   campaign: {
     _id: string;
@@ -37,6 +39,8 @@ type Character = {
   }>;
   createdAt: string;
   updatedAt: string;
+  isNpc: boolean;
+  alignment: "ally" | "enemy";
 };
 
 const CharacterPage = () => {
@@ -90,6 +94,14 @@ const CharacterPage = () => {
     );
   }
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       <Breadcrumb
@@ -103,9 +115,16 @@ const CharacterPage = () => {
         <div className="md:col-span-1">
           <Card className="h-full">
             <CardContent className="p-4 flex flex-col items-center">
-              <h2 className="text-2xl font-bold text-center mb-4">
-                {character.name}
-              </h2>
+              <div className="flex flex-col items-center text-center mb-4">
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  {character.name}
+                </h2>
+                {character.isNpc && (
+                   <Badge variant="secondary" className="mt-2">
+                     <VenetianMask className="w-3 h-3 mr-1" /> NPC
+                   </Badge>
+                )}
+              </div>
               <div className="relative w-full aspect-square rounded-lg overflow-hidden mb-4 border-2 border-primary/20 shadow-xl">
                 {character.characterUrl ? (
                   <Image
@@ -172,11 +191,38 @@ const CharacterPage = () => {
 
                 <Separator />
 
-                <div>
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Book className="w-5 h-5" /> Campanha
-                  </h3>
-                  <p>{character.campaign.name}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div>
+                    <h3 className="text-lg font-semibold flex items-center gap-2 mb-1">
+                      <Book className="w-5 h-5" /> Campanha
+                    </h3>
+                    <p className="pl-7">{character.campaign.name}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold flex items-center gap-2 mb-1">
+                      <Shield className="w-5 h-5" /> Alinhamento
+                    </h3>
+                    <p className="pl-7 capitalize">
+                        {character.alignment === 'ally' ? 'Aliado' : 
+                         character.alignment === 'enemy' ? 'Inimigo' : 
+                         character.alignment || 'Desconhecido'}
+                    </p>
+                  </div>
+
+                  <div>
+                     <h3 className="text-lg font-semibold flex items-center gap-2 mb-1">
+                      <User2 className="w-5 h-5" /> Criado por
+                    </h3>
+                    <p className="pl-7">{character.owner.name || character.owner.username}</p>
+                  </div>
+
+                  <div>
+                     <h3 className="text-lg font-semibold flex items-center gap-2 mb-1">
+                      <Calendar className="w-5 h-5" /> Data de Criação
+                    </h3>
+                    <p className="pl-7">{formatDate(character.createdAt)}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

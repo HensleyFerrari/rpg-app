@@ -21,6 +21,8 @@ import {
   Zap,
 } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 const Dashboard = async () => {
   const actualUser = await getCurrentUser();
 

@@ -8,6 +8,7 @@ export interface DamageDocument {
   damage: number;
   isCritical: boolean;
   character: ObjectId;
+  target?: ObjectId;
   round: number;
   createdAt: Date;
   updateAt: Date;
@@ -42,6 +43,11 @@ const DamageSchema = new Schema<DamageDocument>(
       type: Schema.Types.ObjectId,
       ref: "Character",
       required: true,
+    },
+    target: {
+      type: Schema.Types.ObjectId,
+      ref: "Character",
+      required: false,
     },
     round: {
       type: Number,

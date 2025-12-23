@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCampaignById } from "@/lib/actions/campaign.actions";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { getBattlesByCampaign } from "@/lib/actions/battle.actions";
@@ -24,6 +25,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
+import { CharacterCardActions } from "./_components/character-card-actions";
 
 const CampaignDetail = async ({ params }: any) => {
   const { id } = params;
@@ -46,6 +48,9 @@ const CampaignDetail = async ({ params }: any) => {
     : "Data desconhecida";
 
   const isOwner = currentUser?._id.toString() === campaign.owner?._id;
+
+  const characters = campaign.characters?.filter((c: any) => !c.isNpc) || [];
+  const npcs = campaign.characters?.filter((c: any) => c.isNpc) || [];
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
@@ -84,48 +89,266 @@ const CampaignDetail = async ({ params }: any) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main content */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader className="space-y-4">
-                <div>
-                  <CardTitle className="text-3xl font-bold">
-                    {campaign.name}
-                  </CardTitle>
-                  <CardDescription className="flex items-center gap-2 text-sm mt-2">
-                    <Calendar className="h-4 w-4" /> Criada em {formattedDate}
-                  </CardDescription>
-                </div>
-                {campaign.imageUrl && (
-                  <div className="relative w-full aspect-video rounded-lg overflow-hidden">
-                    <Image
-                      src={campaign.imageUrl}
-                      alt={campaign.name}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </div>
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="prose max-w-none dark:prose-invert">
-                  <h3 className="text-xl font-semibold mb-4">Descrição</h3>
-                  {campaign.description ? (
-                    <p className="text-muted-foreground">
-                      <ReadOnlyRichTextViewer content={campaign.description} />
-                    </p>
-                  ) : (
-                    <p className="text-muted-foreground/60 italic">
-                      Esta campanha não possui uma descrição.
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Battles Section */}
+
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="flex flex-wrap h-auto w-full justify-start gap-2 bg-transparent p-0 mb-6">
+            <TabsTrigger 
+              value="overview"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
+            >
+              Visão Geral
+            </TabsTrigger>
+            <TabsTrigger 
+              value="characters"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
+            >
+              Personagens ({characters.length})
+            </TabsTrigger>
+            <TabsTrigger 
+              value="npcs"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
+            >
+              NPCs ({npcs.length})
+            </TabsTrigger>
+            <TabsTrigger 
+              value="battles"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
+            >
+              Batalhas ({battles.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* Same overview content */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <Card>
+                  <CardHeader className="space-y-4">
+                    <div>
+                      <CardTitle className="text-3xl font-bold">
+                        {campaign.name}
+                      </CardTitle>
+                      <CardDescription className="flex items-center gap-2 text-sm mt-2">
+                        <Calendar className="h-4 w-4" /> Criada em {formattedDate}
+                      </CardDescription>
+                    </div>
+                    {campaign.imageUrl && (
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                        <Image
+                          src={campaign.imageUrl}
+                          alt={campaign.name}
+                          fill
+                          className="object-contain"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose max-w-none dark:prose-invert">
+                      <h3 className="text-xl font-semibold mb-4">Descrição</h3>
+                      {campaign.description ? (
+                        <p className="text-muted-foreground">
+                          <ReadOnlyRichTextViewer content={campaign.description} />
+                        </p>
+                      ) : (
+                        <p className="text-muted-foreground/60 italic">
+                          Esta campanha não possui uma descrição.
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold">Mestre</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-3">
+                      {campaign.owner?.avatarUrl ? (
+                        <div className="relative w-10 h-10 rounded-lg overflow-hidden">
+                          <Image
+                            src={campaign.owner.avatarUrl}
+                            alt={campaign.owner?.name || "Mestre"}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="bg-primary/10 p-2 rounded-full">
+                          <User className="h-5 w-5 text-primary" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-medium">
+                          {campaign.owner?.name ||
+                            campaign.owner?.username ||
+                            "Mestre"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Mestre da campanha
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="characters" className="mt-6">
+            {characters.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {characters.map((character: any) => (
+                  <Card key={character._id} className="h-full hover:bg-muted/50 transition-colors relative group">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-start justify-between">
+                          <Link href={`/dashboard/personagens/${character._id}`} className="flex items-center gap-3 flex-1 min-w-0">
+                            {character.characterUrl ? (
+                              <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
+                                <Image
+                                  src={character.characterUrl}
+                                  alt={character.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                                <Users className="h-6 w-6 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <CardTitle className="text-base font-bold line-clamp-1">{character.name}</CardTitle>
+                              <CardDescription className="line-clamp-1">
+                                {character.class && <span>{character.class} • </span>}
+                                Nível {character.level || 1}
+                              </CardDescription>
+                            </div>
+                          </Link>
+                          <div className="ml-2">
+                            <CharacterCardActions 
+                                characterId={character._id}
+                                isNpc={false}
+                                isOwner={isOwner}
+                                characterName={character.name}
+                            />
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <Link href={`/dashboard/personagens/${character._id}`}>
+                          <div className="flex items-center justify-between mt-2">
+                             <Badge
+                                variant={
+                                  character.status === "alive"
+                                    ? "default"
+                                    : "destructive"
+                                }
+                                className="text-xs"
+                              >
+                                {character.status === "alive" ? "Vivo" : "Morto"}
+                              </Badge>
+                             <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                {character.owner?.name || character.owner?.username || "Jogador"}
+                             </span>
+                          </div>
+                        </Link>
+                      </CardContent>
+                    </Card>
+                ))}
+              </div>
+            ) : (
+               <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+                  <Users className="h-12 w-12 mb-4 opacity-20" />
+                  <p>Nenhum personagem (jogador) nesta campanha.</p>
+                  <Link href={`/dashboard/personagens/new?campaign=${campaign._id}`} className="mt-4">
+                     <Button variant="outline">Criar Personagem</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="npcs" className="mt-6">
+             {npcs.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {npcs.map((npc: any) => (
+                  <Card key={npc._id} className="h-full hover:bg-muted/50 transition-colors">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-start justify-between">
+                            <Link href={`/dashboard/personagens/${npc._id}`} className="flex items-center gap-3 flex-1 min-w-0">
+                                {npc.characterUrl ? (
+                                  <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
+                                    <Image
+                                      src={npc.characterUrl}
+                                      alt={npc.name}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                                    <Users className="h-6 w-6 text-muted-foreground" />
+                                  </div>
+                                )}
+                                <div className="min-w-0">
+                                  <CardTitle className="text-base font-bold line-clamp-1">{npc.name}</CardTitle>
+                                  <CardDescription className="line-clamp-1">
+                                    {npc.race && <span>{npc.race} • </span>}
+                                    NPC
+                                  </CardDescription>
+                                </div>
+                            </Link>
+                            <div className="ml-2">
+                                <CharacterCardActions 
+                                    characterId={npc._id}
+                                    isNpc={true}
+                                    isOwner={isOwner}
+                                    characterName={npc.name}
+                                />
+                            </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                         <Link href={`/dashboard/personagens/${npc._id}`}>
+                             <div className="flex items-center justify-between mt-2">
+                                 <Badge
+                                  variant={
+                                    npc.status === "alive"
+                                      ? "default"
+                                      : "destructive"
+                                  }
+                                  className="text-xs"
+                                >
+                                  {npc.status === "alive" ? "Vivo" : "Morto"}
+                                </Badge>
+                             </div>
+                         </Link>
+                      </CardContent>
+                    </Card>
+                ))}
+              </div>
+             ) : (
+               <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+                  <Users className="h-12 w-12 mb-4 opacity-20" />
+                  <p>Nenhum NPC nesta campanha.</p>
+                   <Link href={`/dashboard/personagens/new?campaign=${campaign._id}&isNpc=true`} className="mt-4">
+                     <Button variant="outline">Criar NPC</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+             )}
+          </TabsContent>
+
+          <TabsContent value="battles" className="mt-6">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -133,7 +356,7 @@ const CampaignDetail = async ({ params }: any) => {
                     <Swords className="h-5 w-5" />
                     Batalhas
                   </CardTitle>
-                  {isOwner && battles.length > 0 && (
+                  {isOwner && (
                     <Link
                       href={`/dashboard/battles/newBattle?campaign=${campaign._id}`}
                     >
@@ -152,10 +375,12 @@ const CampaignDetail = async ({ params }: any) => {
                       <Link
                         key={battle._id}
                         href={`/dashboard/battles/${battle._id}`}
-                        className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <Shield className="h-4 w-4 text-muted-foreground" />
+                          <div className="bg-primary/10 p-2 rounded-full">
+                             <Shield className="h-4 w-4 text-primary" />
+                          </div>
                           <div>
                             <p className="font-medium">{battle.name}</p>
                             <p className="text-sm text-muted-foreground">
@@ -181,125 +406,12 @@ const CampaignDetail = async ({ params }: any) => {
                 )}
               </CardContent>
             </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">Mestre</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  {campaign.owner?.avatarUrl ? (
-                    <div className="relative w-10 h-10 rounded-lg overflow-hidden">
-                      <Image
-                        src={campaign.owner.avatarUrl}
-                        alt={campaign.owner?.name || "Mestre"}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="bg-primary/10 p-2 rounded-full">
-                      <User className="h-5 w-5 text-primary" />
-                    </div>
-                  )}
-                  <div>
-                    <p className="font-medium">
-                      {campaign.owner?.name ||
-                        campaign.owner?.username ||
-                        "Mestre"}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Mestre da campanha
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-semibold">
-                    Personagens
-                  </CardTitle>
-                  <Badge variant="outline" className="font-mono">
-                    {campaign.characters.length || 0}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {campaign.characters.length > 0 ? (
-                  <div className="divide-y">
-                    {campaign.characters.map((character: any) => (
-                      <Link
-                        key={character._id}
-                        href={`/dashboard/personagens/${character._id}`}
-                        className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors"
-                      >
-                        {character.characterUrl ? (
-                          <div className="relative w-12 h-12 rounded-md overflow-hidden">
-                            <Image
-                              src={character.characterUrl}
-                              alt={character.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center">
-                            <Users className="h-6 w-6 text-muted-foreground" />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">
-                            {character.name}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <Badge
-                              variant={
-                                character.status === "alive"
-                                  ? "default"
-                                  : "destructive"
-                              }
-                              className="text-xs"
-                            >
-                              {character.status === "alive" ? "Vivo" : "Morto"}
-                            </Badge>
-                            <p className="text-sm text-muted-foreground truncate">
-                              {character.owner?.name ||
-                                character.owner?.username ||
-                                "Jogador"}
-                            </p>
-                          </div>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="px-4 py-8 text-center">
-                    <p className="text-muted-foreground italic">
-                      Nenhum personagem adicionado ainda.
-                    </p>
-                    <Link
-                      href={`/dashboard/personagens/new?campaign=${campaign._id}`}
-                    >
-                      <Button variant="link" className="mt-2">
-                        Adicionar personagem
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
 };
+
 
 export default CampaignDetail;

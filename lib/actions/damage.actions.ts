@@ -10,6 +10,10 @@ const serializeData = (data: DamageDocument) => {
   return JSON.parse(JSON.stringify(data));
 };
 
+import { triggerBattleUpdate } from "../pusher";
+
+// ... existing code ...
+
 export const createDamage = async (damage: any) => {
   await connectDB();
   const characterInfo = await getCharacterById(damage.character);
@@ -37,10 +41,12 @@ export const createDamage = async (damage: any) => {
     ...damage,
     owner: characterInfo.data.owner._id,
     campaign: characterInfo.data.campaign._id,
+    target: damage.target || null,
   };
   const newDamage = new Damage(payload);
   const savedDamage = await newDamage.save();
 
+  await triggerBattleUpdate(damage.battle);
   revalidatePath(`/dashboard/battles/${damage.battle}`);
   return {
     ok: true,
@@ -54,6 +60,7 @@ export const getAllDamagesByCampaignId = async (campaignId: string) => {
   const damages = await Damage.find({ campaign: campaignId })
     .populate("character")
     .populate("battle")
+    .populate("target")
     .sort({ createdAt: -1 });
   return damages.map(serializeData);
 };
@@ -70,6 +77,7 @@ export const getAllDamagesByBattleId = async (battleId: string) => {
   await connectDB();
   const damages = await Damage.find({ battle: battleId })
     .populate("character")
+    .populate("target")
     .sort({ createdAt: -1 });
 
   if (!damages) {
@@ -107,6 +115,7 @@ export const deleteDamage = async (damageId: string, battleId: string) => {
     await connectDB();
     await Damage.findByIdAndDelete(damageId);
 
+    await triggerBattleUpdate(battleId);
     revalidatePath(`/dashboard/battles/${battleId}`);
     return {
       ok: true,

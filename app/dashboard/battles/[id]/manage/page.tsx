@@ -64,6 +64,8 @@ type Battle = {
   }>;
 };
 
+import AddCharacterModal from "../components/addCharacter";
+
 const ManageBattlePage = () => {
   const { id } = useParams<{ id: string }>();
   const [battle, setBattle] = useState<Battle | null>(null);
@@ -151,7 +153,7 @@ const ManageBattlePage = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 max-w-5xl">
         <Card>
           <CardHeader className="space-y-4">
             <div className="flex items-center gap-3">
@@ -192,7 +194,7 @@ const ManageBattlePage = () => {
 
   if (!battle || !isOwner) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 max-w-5xl">
         <Card className="w-full">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Shield className="h-12 w-12 text-muted-foreground mb-4" />
@@ -215,7 +217,7 @@ const ManageBattlePage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 max-w-5xl space-y-6">
       <Breadcrumb
         items={[
           { label: "Dashboard", href: "/dashboard" },
@@ -225,155 +227,216 @@ const ManageBattlePage = () => {
         ]}
       />
 
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Gerenciar Danos - {battle.name}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Gerenciar Batalha</h1>
         <Link href={`/dashboard/battles/${id}`}>
           <Button variant="outline" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Voltar
+            Voltar para Batalha
           </Button>
         </Link>
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Personagens na Batalha</h2>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-muted/50">
-                <TableHead className="font-semibold">Nome</TableHead>
-                <TableHead className="text-right font-semibold">
-                  Ações
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {battle.characters.map((character) => (
-                <TableRow key={character._id} className="hover:bg-muted/50">
-                  <TableCell className="font-medium">
-                    {character.name}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="gap-2"
-                          onClick={() => setCharacterToRemove(character._id)}
-                        >
-                          <UserMinus className="h-4 w-4" />
-                          Remover
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Confirmar remoção</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Tem certeza que deseja remover este personagem da
-                            batalha? Esta ação não pode ser desfeita.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel
-                            onClick={() => setCharacterToRemove(null)}
-                          >
-                            Cancelar
-                          </AlertDialogCancel>
-                          <AlertDialogAction onClick={handleRemoveCharacter}>
-                            Confirmar
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {battle.characters.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={2}
-                    className="text-center text-muted-foreground h-24"
-                  >
-                    <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    Nenhum personagem na batalha
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-muted/50">
-              <TableHead className="font-semibold">Round</TableHead>
-              <TableHead className="font-semibold">Personagem</TableHead>
-              <TableHead className="font-semibold">Dano</TableHead>
-              <TableHead className="font-semibold">Crítico</TableHead>
-              <TableHead className="text-right font-semibold">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {battle.rounds.map((round) => (
-              <TableRow key={round._id} className="hover:bg-muted/50">
-                <TableCell>{round.round}</TableCell>
-                <TableCell className="font-medium">
-                  {round.character.name}
-                </TableCell>
-                <TableCell>{round.damage}</TableCell>
-                <TableCell>{round.isCritical ? "Sim" : "Não"}</TableCell>
-                <TableCell className="text-right">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="gap-2"
-                        onClick={() => setDamageToDelete(round._id)}
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div className="flex flex-col space-y-1.5">
+              <h2 className="text-xl font-semibold leading-none tracking-tight">
+                Personagens
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Gerencie os personagens participantes desta batalha
+              </p>
+            </div>
+            <AddCharacterModal />
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-muted/50">
+                    <TableHead className="font-semibold">Nome</TableHead>
+                    <TableHead className="text-right font-semibold">
+                      Ações
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {battle.characters.map((character) => (
+                    <TableRow key={character._id} className="hover:bg-muted/50">
+                      <TableCell className="font-medium">
+                        {character.name}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              <UserMinus className="h-4 w-4" />
+                              <span className="sr-only">Remover</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Confirmar remoção
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tem certeza que deseja remover este personagem
+                                da batalha? Esta ação não pode ser desfeita.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel
+                                onClick={() => setCharacterToRemove(null)}
+                              >
+                                Cancelar
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleRemoveCharacter}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Remover
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {battle.characters.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={2}
+                        className="text-center text-muted-foreground h-32"
                       >
-                        <Trash2 className="h-4 w-4" />
-                        Deletar
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Tem certeza que deseja excluir este dano? Esta ação
-                          não pode ser desfeita.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel
-                          onClick={() => setDamageToDelete(null)}
-                        >
-                          Cancelar
-                        </AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteDamage}>
-                          Confirmar
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </TableCell>
-              </TableRow>
-            ))}
-            {battle.rounds.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-center text-muted-foreground h-24"
-                >
-                  <Swords className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  Nenhum dano registrado
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Users className="h-8 w-8 opacity-20" />
+                          <p>Nenhum personagem na batalha</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col space-y-1.5">
+              <h2 className="text-xl font-semibold leading-none tracking-tight">
+                Histórico de Danos
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Visualize e gerencie o histórico de danos e eventos da batalha
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-muted/50">
+                    <TableHead className="font-semibold w-[100px]">
+                      Round
+                    </TableHead>
+                    <TableHead className="font-semibold">Personagem</TableHead>
+                    <TableHead className="font-semibold text-center w-[100px]">
+                      Dano
+                    </TableHead>
+                    <TableHead className="font-semibold text-center w-[100px]">
+                      Crítico
+                    </TableHead>
+                    <TableHead className="text-right font-semibold w-[100px]">
+                      Ações
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {battle.rounds.map((round) => (
+                    <TableRow key={round._id} className="hover:bg-muted/50">
+                      <TableCell>
+                        <span className="inline-flex items-center justify-center rounded-full bg-muted w-6 h-6 text-xs font-medium">
+                          {round.round}
+                        </span>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {round.character.name}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {round.damage}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {round.isCritical ? (
+                          <span className="text-amber-500 font-bold">Sim</span>
+                        ) : (
+                          <span className="text-muted-foreground">Não</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-muted-foreground hover:text-destructive"
+                              onClick={() => setDamageToDelete(round._id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Deletar</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Confirmar exclusão
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tem certeza que deseja excluir este dano? Esta
+                                ação não pode ser desfeita.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel
+                                onClick={() => setDamageToDelete(null)}
+                              >
+                                Cancelar
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleDeleteDamage}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Excluir
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {battle.rounds.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="text-center text-muted-foreground h-32"
+                      >
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Swords className="h-8 w-8 opacity-20" />
+                          <p>Nenhum dano registrado</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
