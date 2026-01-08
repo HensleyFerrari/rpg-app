@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -18,14 +16,11 @@ import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  MoreVertical, 
   Swords, 
   History, 
   Plus, 
   Calendar, 
-  User, 
   RotateCcw,
-  LayoutDashboard,
   Search,
   Trophy,
   ChevronRight,

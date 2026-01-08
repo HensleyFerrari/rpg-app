@@ -56,7 +56,7 @@ export async function getSystemById(id: string) {
     await connectDB();
     const system = await RPGSystem.findById(id);
     return serializeData(system);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -109,7 +109,7 @@ export async function deleteSystem(systemId: string) {
         
         revalidatePath("/dashboard/systems");
         return { success: true };
-    } catch (error) {
+    } catch {
         return { error: "Failed to delete" };
     }
 }

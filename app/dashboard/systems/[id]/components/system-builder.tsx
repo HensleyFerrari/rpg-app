@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash, Edit, Save, ArrowLeft } from "lucide-react";
+import { Plus, Trash, Edit, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,7 +14,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -517,6 +516,10 @@ function AbilityForm({ initialData, onSubmit, onCancel }: {
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="a_formula" className="text-right">Rolagem</Label>
                     <Input id="a_formula" value={rollFormula} onChange={(e) => setRollFormula(e.target.value)} className="col-span-3" placeholder="Ex: 3d3 + 5" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                     <Label htmlFor="a_cost" className="text-right">Custo</Label>
+                     <Input id="a_cost" value={cost} onChange={(e) => setCost(e.target.value)} className="col-span-3" placeholder="Ex: 1 PM" />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                      <Label htmlFor="a_desc" className="text-right">Descrição</Label>
