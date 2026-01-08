@@ -1,21 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { User2, Swords, Edit, Book, Shield, Calendar, VenetianMask } from "lucide-react";
+import { 
+  User2, 
+  Swords, 
+  Edit, 
+  Book, 
+  Shield, 
+  Calendar, 
+  VenetianMask, 
+  ArrowLeft,
+  Trash2,
+  Clock,
+  User
+} from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { getCharacterById } from "@/lib/actions/character.actions";
+import { getCharacterById, deleteCharacter } from "@/lib/actions/character.actions";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
-import { CharacterStatusBadge } from "../../../../components/ui/character-status-badge";
+import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 // Character type definition
 type Character = {
@@ -24,7 +37,7 @@ type Character = {
   owner: {
     _id: string;
     name: string;
-    username: string; // Ensure we match populate
+    username: string;
   };
   campaign: {
     _id: string;
@@ -45,6 +58,7 @@ type Character = {
 
 const CharacterPage = () => {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +72,6 @@ const CharacterPage = () => {
 
         if (getCharacter && "owner" in getCharacter) {
           const characterData = getCharacter as unknown as Character;
-          // Only set isOwner if we have both character and user data
           if (actualUser?._id) {
             setIsOwner(characterData.owner._id === actualUser._id);
           }
@@ -68,18 +81,39 @@ const CharacterPage = () => {
       } catch (error) {
         console.error("Error fetching character:", error);
         setLoading(false);
+        toast.error("Erro ao carregar personagem");
       }
     };
 
     fetchCharacter();
   }, [id]);
 
+  const handleDelete = async () => {
+    if (!confirm("Tem certeza que deseja excluir este personagem?")) return;
+    
+    try {
+      const response = await deleteCharacter(id);
+      if (response.ok) {
+        toast.success("Personagem excluído com sucesso");
+        router.push("/dashboard/personagens/mycharacters");
+      } else {
+        toast.error(response.message);
+      }
+    } catch (err) {
+      toast.error("Erro ao excluir personagem");
+    }
+  };
+
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="space-y-2">
-          <Skeleton className="h-10 w-1/4" />
-          <Skeleton className="h-96 w-full" />
+      <div className="container mx-auto p-4 space-y-6">
+        <Skeleton className="h-4 w-1/4" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Skeleton className="h-[500px] md:col-span-1" />
+          <div className="md:col-span-2 space-y-6">
+            <Skeleton className="h-32" />
+            <Skeleton className="h-64" />
+          </div>
         </div>
       </div>
     );
@@ -87,9 +121,12 @@ const CharacterPage = () => {
 
   if (!character) {
     return (
-      <div className="p-6">
+      <div className="container mx-auto p-8 text-center space-y-4">
         <h1 className="text-3xl font-bold">Personagem não encontrado</h1>
-        <p>Não foi possível encontrar os detalhes deste personagem.</p>
+        <p className="text-muted-foreground">Não foi possível encontrar os detalhes deste personagem.</p>
+        <Link href="/dashboard/personagens">
+          <Button variant="outline">Voltar para lista</Button>
+        </Link>
       </div>
     );
   }
@@ -103,130 +140,149 @@ const CharacterPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: "/dashboard" },
-          { label: "Personagens", href: "/dashboard/personagens" },
-          { label: character.name },
-        ]}
-      />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
-          <Card className="h-full">
-            <CardContent className="p-4 flex flex-col items-center">
-              <div className="flex flex-col items-center text-center mb-4">
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  {character.name}
-                </h2>
-                {character.isNpc && (
-                   <Badge variant="secondary" className="mt-2">
-                     <VenetianMask className="w-3 h-3 mr-1" /> NPC
-                   </Badge>
-                )}
-              </div>
-              <div className="relative w-full aspect-square rounded-lg overflow-hidden mb-4 border-2 border-primary/20 shadow-xl">
+    <div className="container max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <Breadcrumb
+            items={[
+              { label: "Dashboard", href: "/dashboard" },
+              { label: "Personagens", href: "/dashboard/personagens" },
+              { label: character.name },
+            ]}
+          />
+          <h1 className="text-4xl font-extrabold tracking-tight mt-2 flex items-center gap-3">
+            {character.name}
+            {character.isNpc && (
+                <Badge variant="outline" className="text-xs uppercase px-2 py-0 border-primary/30 text-primary">NPC</Badge>
+            )}
+          </h1>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {isOwner && (
+            <>
+              <Link href={`/dashboard/personagens/${id}/edit`}>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Edit className="w-4 h-4" /> Editar
+                </Button>
+              </Link>
+              <Button variant="destructive" size="sm" className="gap-2" onClick={handleDelete}>
+                <Trash2 className="w-4 h-4" /> Excluir
+              </Button>
+            </>
+          )}
+          <Button variant="ghost" size="sm" className="gap-2" onClick={() => router.back()}>
+            <ArrowLeft className="w-4 h-4" /> Voltar
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        {/* Left Column: Image and Status */}
+        <div className="md:col-span-4 space-y-6">
+          <Card className="overflow-hidden border-none shadow-lg ring-1 ring-border">
+            <CardContent className="p-0">
+              <div className="relative aspect-[3/4] w-full">
                 {character.characterUrl ? (
                   <Image
                     src={character.characterUrl}
                     alt={character.name}
                     fill
-                    className="object-cover rounded-md"
+                    className="object-cover transition-transform hover:scale-105 duration-500"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <User2 className="w-20 h-20 text-gray-400" />
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <User2 className="w-24 h-24 text-muted-foreground/30" />
                   </div>
                 )}
-              </div>
-              <CharacterStatusBadge status={character.status} />
-
-              {/* Quick Stats */}
-              <div className="w-full grid grid-cols-2 gap-4 mt-4">
-                <div className="text-center p-3 bg-secondary rounded-lg">
-                  <p className="text-2xl font-bold flex items-center justify-center gap-2">
-                    <Swords className="w-5 h-5" />
-                    {character.battles?.length || 0}
-                  </p>
-                  <p className="text-sm">Batalhas</p>
+                <div className="absolute top-4 left-4">
+                  <CharacterStatusBadge status={character.status} />
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-md ring-1 ring-border">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Status Rápido</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4 pt-2">
+              <div className="flex flex-col items-center justify-center p-4 bg-primary/5 rounded-xl border border-primary/10">
+                <Swords className="w-5 h-5 text-primary mb-2" />
+                <span className="text-2xl font-bold">{character.battles?.length || 0}</span>
+                <span className="text-xs text-muted-foreground">Batalhas</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-4 bg-secondary/30 rounded-xl border border-border/50">
+                <Shield className="w-5 h-5 text-secondary-foreground mb-2" />
+                <span className="text-sm font-semibold capitalize">
+                   {character.alignment === 'ally' ? 'Aliado' : 
+                    character.alignment === 'enemy' ? 'Inimigo' : 'Neutro'}
+                </span>
+                <span className="text-xs text-muted-foreground">Alinhamento</span>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="md:col-span-2">
-          <div className="space-y-6">
-            {/* Options Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  <span>Opções</span>
-                  {isOwner && (
-                    <div className="flex gap-2">
-                      <Link href={`/dashboard/personagens/${id}/edit`}>
-                        <Button variant="outline">
-                          <Edit className="w-4 h-4 mr-2" /> Editar Personagem
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-
-            {/* Details Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Detalhes do Personagem</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <User2 className="w-5 h-5" /> Biografia
-                  </h3>
-                  <div className="prose dark:prose-invert max-w-none" />
-                  <ReadOnlyRichTextViewer content={character.message} />
+        {/* Right Column: Details and Biography */}
+        <div className="md:col-span-8 space-y-8">
+          {/* Main Info Card */}
+          <Card className="border-none shadow-md ring-1 ring-border">
+            <CardHeader>
+              <div className="flex items-center gap-2 text-primary">
+                <Book className="w-5 h-5" />
+                <CardTitle>Visão Geral</CardTitle>
+              </div>
+              <CardDescription>Informações fundamentais desta ficha.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground flex items-center gap-2">
+                    <Book className="w-3 h-3" /> Campanha
+                  </p>
+                  <p className="font-semibold text-lg">{character.campaign.name}</p>
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground flex items-center gap-2">
+                    <User className="w-3 h-3" /> Criador por
+                  </p>
+                  <p className="font-semibold text-lg">{character.owner.name || character.owner.username}</p>
                 </div>
 
-                <Separator />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <div>
-                    <h3 className="text-lg font-semibold flex items-center gap-2 mb-1">
-                      <Book className="w-5 h-5" /> Campanha
-                    </h3>
-                    <p className="pl-7">{character.campaign.name}</p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-semibold flex items-center gap-2 mb-1">
-                      <Shield className="w-5 h-5" /> Alinhamento
-                    </h3>
-                    <p className="pl-7 capitalize">
-                        {character.alignment === 'ally' ? 'Aliado' : 
-                         character.alignment === 'enemy' ? 'Inimigo' : 
-                         character.alignment || 'Desconhecido'}
-                    </p>
-                  </div>
-
-                  <div>
-                     <h3 className="text-lg font-semibold flex items-center gap-2 mb-1">
-                      <User2 className="w-5 h-5" /> Criado por
-                    </h3>
-                    <p className="pl-7">{character.owner.name || character.owner.username}</p>
-                  </div>
-
-                  <div>
-                     <h3 className="text-lg font-semibold flex items-center gap-2 mb-1">
-                      <Calendar className="w-5 h-5" /> Data de Criação
-                    </h3>
-                    <p className="pl-7">{formatDate(character.createdAt)}</p>
-                  </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground flex items-center gap-2">
+                    <Calendar className="w-3 h-3" /> Criado em
+                  </p>
+                  <p className="font-semibold">{formatDate(character.createdAt)}</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground flex items-center gap-2">
+                    <Clock className="w-3 h-3" /> Última atualização
+                  </p>
+                  <p className="font-semibold">{formatDate(character.updatedAt)}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Biography Card */}
+          <Card className="border-none shadow-md ring-1 ring-border">
+            <CardHeader>
+              <div className="flex items-center gap-2 text-primary">
+                <User2 className="w-5 h-5" />
+                <CardTitle>História e Descrição</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="prose dark:prose-invert max-w-none">
+              <Separator className="mb-6 opacity-30" />
+              <div className="rounded-lg bg-muted/30 p-4 border border-border/50">
+                <ReadOnlyRichTextViewer content={character.message} />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
