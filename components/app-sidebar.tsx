@@ -14,7 +14,16 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 import {
   ChevronDown,
   Book,
@@ -116,6 +125,7 @@ const items = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { state } = useSidebar();
   const [actualUser, setActualUser] = useState<{
     name?: string;
     avatarUrl?: string;
@@ -160,8 +170,11 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-white/10 bg-background/60 backdrop-blur-xl">
-      <SidebarHeader className="p-4">
+    <Sidebar collapsible="icon" className="border-r border-white/10 bg-background/60 backdrop-blur-xl shrink-0">
+      <SidebarHeader className={cn(
+        "transition-all duration-200",
+        state === "collapsed" ? "p-2" : "p-4"
+      )}>
         <div className="flex items-center gap-2 px-2 overflow-hidden">
           <div className="flex flex-col truncate group-data-[collapsible=icon]:hidden">
             <span className="text-lg font-bold tracking-tight">
@@ -174,7 +187,10 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-2">
+      <SidebarContent className={cn(
+        "transition-all duration-200",
+        state === "collapsed" ? "px-1" : "px-2"
+      )}>
         <SidebarGroup>
           <SidebarMenu>
             {items.map((item) => {
@@ -197,6 +213,46 @@ export function AppSidebar() {
                         <span className="font-medium">{item.title}</span>
                       </a>
                     </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              }
+
+              if (item.items && state === "collapsed") {
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton 
+                          tooltip={item.title}
+                          className={cn(
+                            "transition-all duration-200",
+                            isActive && "text-blue-500 bg-blue-500/10"
+                          )}
+                        >
+                          {item.icons && <item.icons className={cn("h-4 w-4", isActive && "text-blue-500")} />}
+                        </SidebarMenuButton>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="right" align="start" className="w-56 bg-background/95 backdrop-blur-xl border-white/10">
+                        <DropdownMenuLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 px-3 py-2">
+                          {item.title}
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-white/10" />
+                        {item.items.map((subItem) => (
+                          <DropdownMenuItem key={subItem.title} asChild>
+                            <a 
+                              href={subItem.url}
+                              className={cn(
+                                "flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors",
+                                pathname === subItem.url ? "text-blue-500 bg-blue-500/10" : "hover:bg-white/5"
+                              )}
+                            >
+                              {subItem.icons && <subItem.icons className="h-4 w-4" />}
+                              <span className="font-medium">{subItem.title}</span>
+                            </a>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </SidebarMenuItem>
                 );
               }
@@ -252,31 +308,82 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-white/5 bg-white/5 p-4 backdrop-blur-sm overflow-hidden">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9 shrink-0 border border-blue-500/20 ring-2 ring-blue-500/10">
-                <AvatarImage src={actualUser?.avatarUrl} />
-                <AvatarFallback className="bg-blue-50 text-blue-600 dark:bg-blue-950/30">
-                  <User className="h-5 w-5" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col truncate group-data-[collapsible=icon]:hidden">
-                <span className="text-sm font-semibold truncate max-w-[120px]">
-                  {actualUser?.name || "Usuário"}
-                </span>
-                <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                  Mestre <Crown className="h-2 w-2 text-yellow-500" />
-                </span>
+      <SidebarFooter className={cn(
+        "border-t border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden transition-all duration-200",
+        state === "collapsed" ? "p-2" : "p-4"
+      )}>
+        {state === "collapsed" ? (
+          <div className="flex flex-col items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="group relative outline-none">
+                  <Avatar className="h-9 w-9 shrink-0 border border-blue-500/20 ring-2 ring-blue-500/10 transition-transform group-hover:scale-105">
+                    <AvatarImage src={actualUser?.avatarUrl} />
+                    <AvatarFallback className="bg-blue-50 text-blue-600 dark:bg-blue-950/30">
+                      <User className="h-5 w-5" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background bg-green-500" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="end" className="w-56 bg-background/95 backdrop-blur-xl border-white/10">
+                <DropdownMenuLabel className="flex flex-col gap-1 px-3 py-2">
+                  <span className="text-sm font-semibold">{actualUser?.name || "Usuário"}</span>
+                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                    Mestre <Crown className="h-2 w-2 text-yellow-500" />
+                  </span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem asChild>
+                  <a href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2 cursor-pointer">
+                    <Cog className="h-4 w-4" />
+                    <span>Configurações</span>
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex items-center justify-between px-3 py-2 cursor-pointer" onSelect={(e) => e.preventDefault()}>
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-4 w-4" />
+                    <span>Tema</span>
+                  </div>
+                  <ModeToggle />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem 
+                  className="flex items-center gap-3 px-3 py-2 text-red-500 focus:text-red-500 focus:bg-red-500/10 cursor-pointer"
+                  onSelect={() => {
+                    signOut({ redirect: false }).then(() => {
+                      window.location.href = "/";
+                    });
+                  }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 overflow-hidden">
+                <Avatar className="h-9 w-9 shrink-0 border border-blue-500/20 ring-2 ring-blue-500/10">
+                  <AvatarImage src={actualUser?.avatarUrl} />
+                  <AvatarFallback className="bg-blue-50 text-blue-600 dark:bg-blue-950/30">
+                    <User className="h-5 w-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col truncate">
+                  <span className="text-sm font-semibold truncate max-w-[120px]">
+                    {actualUser?.name || "Usuário"}
+                  </span>
+                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                    Mestre <Crown className="h-2 w-2 text-yellow-500" />
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="group-data-[collapsible=icon]:hidden">
               <ModeToggle />
             </div>
-          </div>
 
-          <div className="flex gap-2">
             <SidebarMenuButton
               tooltip="Sair"
               className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-500/10 transition-colors"
@@ -287,16 +394,16 @@ export function AppSidebar() {
               }}
             >
               <LogOut className="h-4 w-4" />
-              <span className="font-medium group-data-[collapsible=icon]:hidden">Sair</span>
+              <span className="font-medium">Sair</span>
             </SidebarMenuButton>
-          </div>
 
-          <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-muted-foreground/60 group-data-[collapsible=icon]:hidden">
-            <span>Feito com</span>
-            <Heart className="h-3 w-3 text-red-500 animate-pulse" />
-            <span>por Hens</span>
+            <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-muted-foreground/60">
+              <span>Feito com</span>
+              <Heart className="h-3 w-3 text-red-500 animate-pulse" />
+              <span>por Hens</span>
+            </div>
           </div>
-        </div>
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
