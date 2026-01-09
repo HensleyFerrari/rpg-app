@@ -56,6 +56,7 @@ const MyCharacters = () => {
         toast.error(response.message);
       }
     } catch (err) {
+      console.log(err)
       toast.error("Erro ao excluir personagem");
     }
   };
@@ -72,9 +73,6 @@ const MyCharacters = () => {
   const renderCharacterSection = (list: any[], type: "pc" | "npc") => {
     const alive = list.filter((char) => char.status === "alive");
     const dead = list.filter((char) => char.status === "dead");
-    const emptyMessage = type === "pc" 
-      ? "Todos os seus personagens morreram! É hora de começar uma nova aventura." 
-      : "Todos os seus NPCs morreram!";
 
     if (list.length === 0) {
       return (

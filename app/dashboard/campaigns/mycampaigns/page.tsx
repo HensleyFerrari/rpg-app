@@ -2,12 +2,20 @@
 
 import { getMyCampaigns } from "@/lib/actions/campaign.actions";
 import { useEffect, useState } from "react";
-import CampaignCard from "../components/campaignCard";
 import { CampaignDocument } from "@/models/Campaign";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, Dice4, ScrollText } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface CampaignResponse {
   ok: boolean;
@@ -48,21 +56,45 @@ const MyCampaigns = () => {
           <Skeleton className="h-10 w-36" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="flex flex-col space-y-3 p-6 rounded-lg border"
-            >
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-              <div className="flex gap-2 items-center">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <Skeleton className="h-4 w-24" />
-              </div>
-              <Skeleton className="h-24 w-full" />
-            </div>
-          ))}
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[80px]">Imagem</TableHead>
+                <TableHead>Campanha</TableHead>
+                <TableHead>Mestre</TableHead>
+                <TableHead className="hidden md:table-cell">Criada em</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[1, 2, 3].map((i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <Skeleton className="h-12 w-12 rounded-sm" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-2">
+                       <Skeleton className="h-4 w-[200px]" />
+                       <Skeleton className="h-3 w-[150px]" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                     <div className="flex items-center gap-2">
+                        <Skeleton className="h-6 w-6 rounded-full" />
+                        <Skeleton className="h-4 w-24" />
+                     </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Skeleton className="h-8 w-16 ml-auto" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
     );
@@ -83,18 +115,76 @@ const MyCampaigns = () => {
       {!campaignsResponse?.ok ? (
         <div>Ocorreu um erro: {campaignsResponse?.message}</div>
       ) : campaignsResponse.data && campaignsResponse.data.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6 mt-6">
-          {campaignsResponse.data.map((campaign: any) => (
-            <CampaignCard
-              key={campaign._id}
-              id={campaign._id.toString()}
-              name={campaign.name}
-              description={campaign.description}
-              imageUrl={campaign.imageUrl || ""}
-              owner={campaign.owner}
-              createdAt={campaign.createdAt?.toString() || ""}
-            />
-          ))}
+        <div className="rounded-md border mt-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[80px]">Imagem</TableHead>
+                <TableHead>Campanha</TableHead>
+                <TableHead>Mestre</TableHead>
+                <TableHead className="hidden md:table-cell">Criada em</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {campaignsResponse.data.map((campaign: any) => (
+                <TableRow key={campaign._id.toString()}>
+                  <TableCell>
+                    <Avatar className="h-12 w-12 rounded-sm">
+                      <AvatarImage
+                        src={campaign.imageUrl || ""}
+                        className="object-cover"
+                        alt={campaign.name}
+                      />
+                      <AvatarFallback className="rounded-sm">
+                        {campaign.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="font-semibold">{campaign.name}</span>
+                       <div className="text-xs text-muted-foreground line-clamp-1 max-w-[200px] md:max-w-xs">
+                          {campaign.description ? (
+                             campaign.description.replace(/<[^>]*>?/gm, '') 
+                          ) : (
+                             "Sem descrição"
+                          )}
+                       </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                       <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-[10px]">
+                            {campaign.owner?.name?.substring(0, 2).toUpperCase() || "??"}
+                          </AvatarFallback>
+                       </Avatar>
+                      <span className="text-sm text-muted-foreground">
+                        {campaign.owner?.name || campaign.owner?.username || "Você"}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-muted-foreground">
+                    {campaign.createdAt
+                      ? new Date(campaign.createdAt).toLocaleDateString("pt-BR", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link href={`/dashboard/campaigns/${campaign._id}`}>
+                      <Button variant="ghost" size="sm">
+                        Visualizar
+                      </Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center gap-6 py-16 text-center">

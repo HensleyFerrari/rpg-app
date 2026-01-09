@@ -10,7 +10,6 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Book, User2, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
 import { Button } from "@/components/ui/button";

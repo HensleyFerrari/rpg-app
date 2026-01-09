@@ -105,24 +105,24 @@ const BattlePage = () => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  const fetchBattle = async () => {
-    try {
-      const battle = await getBattleById(id as string);
-      if (battle.ok) {
-        setBattle(battle.data);
-        const user = await getCurrentUser();
-        setCurrentUser(user);
-      } else {
-        console.error(battle.message);
-      }
-    } catch (error) {
-      console.error("Error fetching battle:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchBattle = async () => {
+      try {
+        const battle = await getBattleById(id as string);
+        if (battle.ok) {
+          setBattle(battle.data);
+          const user = await getCurrentUser();
+          setCurrentUser(user);
+        } else {
+          console.error(battle.message);
+        }
+      } catch (error) {
+        console.error("Error fetching battle:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchBattle();
 
     // Pusher setup

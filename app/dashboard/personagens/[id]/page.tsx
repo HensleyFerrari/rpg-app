@@ -10,7 +10,6 @@ import {
   Book, 
   Shield, 
   Calendar, 
-  VenetianMask, 
   ArrowLeft,
   Trash2,
   Clock,
@@ -100,6 +99,7 @@ const CharacterPage = () => {
         toast.error(response.message);
       }
     } catch (err) {
+      console.log(err)
       toast.error("Erro ao excluir personagem");
     }
   };

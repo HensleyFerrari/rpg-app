@@ -54,7 +54,7 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
   <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
     {/* Table Header - Desktop Only */}
     <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-      <div className="col-span-4">Batalha / Campanha</div>
+      <div className="col-span-4">Batalha</div>
       <div className="col-span-2">Mestre</div>
       <div className="col-span-2">Status</div>
       <div className="col-span-1 text-center">Turno</div>
