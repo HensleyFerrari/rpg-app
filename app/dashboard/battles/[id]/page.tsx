@@ -360,16 +360,61 @@ const BattlePage = () => {
                       <Card className="bg-card/50 shadow-sm border-none">
                         <CardContent className="p-3">
                           <div className="flex items-center gap-3">
-                            <div className="p-2 bg-amber-500/10 rounded-lg">
-                              <Zap className="h-4 w-4 text-amber-500" />
+                            <div className="p-2 bg-blue-500/10 rounded-lg">
+                              <Zap className="h-4 w-4 text-blue-500" />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Dano Total</p>
+                              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Dano Aliado</p>
                               <p className="text-lg font-bold leading-tight">
                                 {battle?.rounds?.reduce(
-                                  (acc, round) => acc + (round.type !== "heal" ? round.damage : 0),
+                                  (acc, round) => acc + (round.type !== "heal" && (!round.character?.alignment || round.character.alignment === "ally") ? round.damage : 0),
                                   0
                                 ) || 0}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-card/50 shadow-sm border-none">
+                        <CardContent className="p-3">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-red-500/10 rounded-lg">
+                              <Zap className="h-4 w-4 text-red-500" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Dano Inimigo</p>
+                              <p className="text-lg font-bold leading-tight">
+                                {battle?.rounds?.reduce(
+                                  (acc, round) => acc + (round.type !== "heal" && round.character?.alignment === "enemy" ? round.damage : 0),
+                                  0
+                                ) || 0}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-card/50 shadow-sm border-none">
+                        <CardContent className="p-3">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-amber-500/10 rounded-lg">
+                              <Swords className="h-4 w-4 text-amber-500" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Maior Dano (Turno)</p>
+                              <p className="text-lg font-bold leading-tight">
+                                {(() => {
+                                  const damageRounds = battle?.rounds?.filter((r) => r.type !== "heal") || [];
+                                  if (damageRounds.length === 0) return 0;
+                                  
+                                  const damagePerRound = damageRounds.reduce((acc, round) => {
+                                    acc[round.round] = (acc[round.round] || 0) + round.damage;
+                                    return acc;
+                                  }, {} as Record<number, number>);
+                                  
+                                  return Math.max(...Object.values(damagePerRound));
+                                })()}
                               </p>
                             </div>
                           </div>

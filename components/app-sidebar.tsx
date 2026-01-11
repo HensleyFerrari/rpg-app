@@ -178,7 +178,7 @@ export function AppSidebar() {
             <span className="text-lg font-bold tracking-tight">
               Dr.PG
               <span className="ml-1 text-xs font-medium text-blue-500/80 uppercase tracking-widest">
-                alpha
+                beta
               </span>
             </span>
           </div>
@@ -373,9 +373,6 @@ export function AppSidebar() {
                 <div className="flex flex-col truncate">
                   <span className="text-sm font-semibold truncate max-w-[120px]">
                     {actualUser?.name || "Usuário"}
-                  </span>
-                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                    Mestre <Crown className="h-2 w-2 text-yellow-500" />
                   </span>
                 </div>
               </div>
