@@ -9,6 +9,7 @@ import {
   getCharacterById,
   updateCharacter,
 } from "@/lib/actions/character.actions";
+import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -71,6 +72,17 @@ const CharacterEdit = () => {
 
         if (response.ok && response.data) {
           const character = response.data as any;
+          const actualUser = await getCurrentUser();
+
+          const isCharacterOwner = character.owner._id === actualUser?._id;
+          const isCampaignOwner = character.campaign.owner._id === actualUser?._id;
+
+          if (!isCharacterOwner && !isCampaignOwner) {
+            toast.error("Você não tem permissão para editar este personagem");
+            router.push(`/dashboard/personagens/${id}`);
+            return;
+          }
+
           form.reset({
             name: character.name,
             characterUrl: character.characterUrl || "",
