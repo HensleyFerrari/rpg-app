@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { getCampaignById } from "@/lib/actions/campaign.actions";
+import { getCampaignById, getMyCampaigns } from "@/lib/actions/campaign.actions";
 import {
   Select,
   SelectContent,
@@ -51,7 +51,7 @@ const BattleForm = () => {
   const searchParams = useSearchParams();
   const campaignId = searchParams.get("campaign");
   const [isLoading, setIsLoading] = useState(false);
-  const [campaign, setCampaign] = useState<any>(null);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
 
   const form = useForm<zod.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,25 +62,26 @@ const BattleForm = () => {
   });
 
   useEffect(() => {
-    const fetchCampaign = async () => {
+    const fetchData = async () => {
       try {
+        const { data: myCampaigns } = await getMyCampaigns();
+        if (myCampaigns) {
+          setCampaigns(myCampaigns);
+        }
+
         if (campaignId) {
-          const { data: campaignData } = await getCampaignById(campaignId);
-          setCampaign(campaignData);
           form.setValue("campaign", campaignId);
-        } else {
-          router.push("/dashboard/battles");
         }
       } catch (error) {
-        console.error("Erro ao buscar campanha:", error);
+        console.error("Erro ao buscar dados:", error);
         toast.error("Erro", {
-          description: "Não foi possível carregar a campanha.",
+          description: "Não foi possível carregar as campanhas.",
         });
       }
     };
 
-    fetchCampaign();
-  }, [campaignId, form, router]);
+    fetchData();
+  }, [campaignId, form]);
 
   const onSubmit = async (values: zod.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -143,7 +144,6 @@ const BattleForm = () => {
               <Select
                 onValueChange={field.onChange}
                 value={field.value}
-                disabled={!!campaignId}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -151,10 +151,12 @@ const BattleForm = () => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {campaign ? (
-                    <SelectItem value={campaign._id}>
-                      {campaign.name}
-                    </SelectItem>
+                  {campaigns && campaigns.length > 0 ? (
+                    campaigns.map((camp) => (
+                      <SelectItem key={camp._id} value={camp._id}>
+                        {camp.name}
+                      </SelectItem>
+                    ))
                   ) : (
                     <SelectItem value="no-campaigns" disabled>
                       Nenhuma campanha disponível
