@@ -16,7 +16,7 @@ import { createCampaign } from "@/lib/actions/campaign.actions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 
@@ -35,6 +35,7 @@ const CreateCampaign = () => {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<FormData>({
     defaultValues: {
       name: "",
@@ -115,10 +116,16 @@ const CreateCampaign = () => {
 
             <div className="space-y-2">
               <Label htmlFor="description">Descrição</Label>
-              <RichTextEditor
-                value={""}
-                onChange={() => {}}
-                placeholder="Descreva sua campanha..."
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <RichTextEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Descreva sua campanha..."
+                  />
+                )}
               />
             </div>
 

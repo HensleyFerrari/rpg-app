@@ -16,7 +16,7 @@ import { updateCampaign } from "@/lib/actions/campaign.actions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 
 type FormData = {
@@ -30,12 +30,12 @@ const EditCampaignForm = ({ campaign }: any) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
-  const [description, setDescription] = useState(campaign.description || "");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<FormData>({
     defaultValues: {
       name: campaign.name || "",
@@ -69,7 +69,7 @@ const EditCampaignForm = ({ campaign }: any) => {
       setIsLoading(true);
       const result = await updateCampaign(campaign._id, {
         name: data.name,
-        description: description,
+        description: data.description,
         imageUrl: data.imageUrl,
         isAcepptingCharacters: Boolean(data.isAcepptingCharacters),
       });
@@ -121,10 +121,16 @@ const EditCampaignForm = ({ campaign }: any) => {
 
           <div className="space-y-2">
             <Label htmlFor="description">Descrição</Label>
-            <RichTextEditor
-              value={description}
-              onChange={setDescription}
-              placeholder="Descreva sua campanha..."
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <RichTextEditor
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Descreva sua campanha..."
+                />
+              )}
             />
           </div>
 
