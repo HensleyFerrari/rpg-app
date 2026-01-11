@@ -516,7 +516,12 @@ const BattlePage = () => {
                           {battle.rounds.map((round, index) => (
                             <div
                               key={index}
-                              className="p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                              className={cn(
+                                "p-3 rounded-lg hover:bg-muted/80 transition-colors",
+                                round.description?.startsWith("[TURNO_ALTERADO]") 
+                                  ? "bg-blue-500/10 border border-blue-500/20" 
+                                  : "bg-muted"
+                              )}
                             >
                               <div className="grid grid-cols-3 gap-4 text-sm items-center min-w-0">
                                 <span className="font-medium flex items-center gap-2 shrink-0">
@@ -524,9 +529,20 @@ const BattlePage = () => {
                                   Turno {round.round}
                                 </span>
                                 {round.type === "other" ? (
-                                  <span className="col-span-2 italic text-muted-foreground flex items-start gap-2 break-all whitespace-pre-wrap min-w-0">
-                                    <MessageSquare className="h-4 w-4 shrink-0 mt-0.5" />
-                                    <span className="flex-1 min-w-0">{round.description}</span>
+                                  <span className={cn(
+                                    "col-span-2 flex items-start gap-2 break-all whitespace-pre-wrap min-w-0",
+                                    round.description?.startsWith("[TURNO_ALTERADO]") 
+                                      ? "text-blue-600 dark:text-blue-400 font-semibold" 
+                                      : "italic text-muted-foreground"
+                                  )}>
+                                    {round.description?.startsWith("[TURNO_ALTERADO]") ? (
+                                      <History className="h-4 w-4 shrink-0 mt-0.5" />
+                                    ) : (
+                                      <MessageSquare className="h-4 w-4 shrink-0 mt-0.5" />
+                                    )}
+                                    <span className="flex-1 min-w-0">
+                                      {round.description?.replace("[TURNO_ALTERADO] ", "").replace("[TURNO_ALTERADO]", "")}
+                                    </span>
                                   </span>
                                 ) : (
                                   <>
