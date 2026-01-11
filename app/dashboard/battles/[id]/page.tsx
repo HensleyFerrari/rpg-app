@@ -518,15 +518,15 @@ const BattlePage = () => {
                               key={index}
                               className="p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
                             >
-                              <div className="grid grid-cols-3 gap-4 text-sm items-center">
-                                <span className="font-medium flex items-center gap-2">
+                              <div className="grid grid-cols-3 gap-4 text-sm items-center min-w-0">
+                                <span className="font-medium flex items-center gap-2 shrink-0">
                                   <Target className="h-4 w-4 text-muted-foreground" />
                                   Turno {round.round}
                                 </span>
                                 {round.type === "other" ? (
-                                  <span className="col-span-2 italic text-muted-foreground flex items-center gap-2">
-                                    <MessageSquare className="h-4 w-4" />
-                                    {round.description}
+                                  <span className="col-span-2 italic text-muted-foreground flex items-start gap-2 break-all whitespace-pre-wrap min-w-0">
+                                    <MessageSquare className="h-4 w-4 shrink-0 mt-0.5" />
+                                    <span className="flex-1 min-w-0">{round.description}</span>
                                   </span>
                                 ) : (
                                   <>
