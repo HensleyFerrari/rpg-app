@@ -32,6 +32,7 @@ import {
   Swords,
   ScrollText,
   CalendarDays,
+  MessageSquare,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
@@ -82,10 +83,11 @@ interface Battle {
     rounds: Array<{
     _id: string;
     damage: number;
-    type?: "damage" | "heal";
+    type?: "damage" | "heal" | "other";
+    description?: string;
     round: number;
     isCritical: boolean;
-    character: {
+    character?: {
       name: string;
       alignment?: "ally" | "enemy";
     };
@@ -412,9 +414,9 @@ const BattlePage = () => {
                                   <span className="text-[10px] text-muted-foreground truncate max-w-[80px]">
                                     ({
                                       battle.rounds
-                                        .filter((r) => r.type !== "heal")
+                                        .filter((r) => r.type !== "heal" && r.character)
                                         .reduce((max, round) => (round.damage || 0) > (max.damage || 0) ? round : max)
-                                        .character.name
+                                        .character?.name || "N/A"
                                     })
                                   </span>
                                 )}
@@ -434,7 +436,11 @@ const BattlePage = () => {
                               <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Média Aliada</p>
                               <p className="text-lg font-bold leading-tight">
                                 {(() => {
-                                  const allyRounds = battle?.rounds?.filter((r) => r.type !== "heal" && (!r.character.alignment || r.character.alignment === "ally")) || [];
+                                  const allyRounds = battle?.rounds?.filter((r) => 
+                                    r.type !== "heal" && 
+                                    r.character && 
+                                    (!r.character.alignment || r.character.alignment === "ally")
+                                  ) || [];
                                   const totalDamage = allyRounds.reduce((acc, r) => acc + (r.damage || 0), 0);
                                   return allyRounds.length > 0 ? (totalDamage / allyRounds.length).toFixed(1) : 0;
                                 })()}
@@ -454,7 +460,10 @@ const BattlePage = () => {
                               <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Média Inimiga</p>
                               <p className="text-lg font-bold leading-tight">
                                 {(() => {
-                                  const enemyRounds = battle?.rounds?.filter((r) => r.type !== "heal" && r.character.alignment === "enemy") || [];
+                                  const enemyRounds = battle?.rounds?.filter((r) => 
+                                    r.type !== "heal" && 
+                                    r.character?.alignment === "enemy"
+                                  ) || [];
                                   const totalDamage = enemyRounds.reduce((acc, r) => acc + (r.damage || 0), 0);
                                   return enemyRounds.length > 0 ? (totalDamage / enemyRounds.length).toFixed(1) : 0;
                                 })()}
@@ -514,64 +523,73 @@ const BattlePage = () => {
                                   <Target className="h-4 w-4 text-muted-foreground" />
                                   Turno {round.round}
                                 </span>
-                                <span
-                                  className={cn(
-                                    "truncate flex items-center gap-2",
-                                    round.character.alignment === "enemy" &&
-                                      "text-red-500"
-                                  )}
-                                >
-                                  <UsersIcon className="h-4 w-4 text-muted-foreground" />
-                                  {round.character.name}
-                                  {round.target && (
-                                    <>
-                                      <span className="text-muted-foreground">
-                                        ➔
-                                      </span>
-                                      {round.target.name}
-                                    </>
-                                  )}
-                                </span>
-                                <span className="text-right flex items-center justify-end gap-2">
-                                  {round.type === "heal" ? (
-                                    <Heart className="h-4 w-4 text-green-500" />
-                                  ) : (
-                                    <SwordsIcon className="h-4 w-4 text-muted-foreground" />
-                                  )}
-                                  {round.isCritical ? (
+                                {round.type === "other" ? (
+                                  <span className="col-span-2 italic text-muted-foreground flex items-center gap-2">
+                                    <MessageSquare className="h-4 w-4" />
+                                    {round.description}
+                                  </span>
+                                ) : (
+                                  <>
                                     <span
                                       className={cn(
-                                        "font-bold",
-                                        round.type === "heal"
-                                          ? "text-green-500"
-                                          : "text-amber-500"
+                                        "truncate flex items-center gap-2",
+                                        round.character?.alignment === "enemy" &&
+                                          "text-red-500"
                                       )}
                                     >
-                                      {round.damage}
+                                      <UsersIcon className="h-4 w-4 text-muted-foreground" />
+                                      {round.character?.name || "Evento"}
+                                      {round.target && (
+                                        <>
+                                          <span className="text-muted-foreground">
+                                            ➔
+                                          </span>
+                                          {round.target.name}
+                                        </>
+                                      )}
                                     </span>
-                                  ) : (
-                                    <span
-                                      className={cn(
-                                        round.type === "heal" && "text-green-500"
+                                    <span className="text-right flex items-center justify-end gap-2">
+                                      {round.type === "heal" ? (
+                                        <Heart className="h-4 w-4 text-green-500" />
+                                      ) : (
+                                        <SwordsIcon className="h-4 w-4 text-muted-foreground" />
                                       )}
-                                    >
-                                      {round.damage}
+                                      {round.isCritical ? (
+                                        <span
+                                          className={cn(
+                                            "font-bold",
+                                            round.type === "heal"
+                                              ? "text-green-500"
+                                              : "text-amber-500"
+                                          )}
+                                        >
+                                          {round.damage}
+                                        </span>
+                                      ) : (
+                                        <span
+                                          className={cn(
+                                            round.type === "heal" && "text-green-500"
+                                          )}
+                                        >
+                                          {round.damage}
+                                        </span>
+                                      )}
+                                      {round.isCritical && (
+                                        <Badge
+                                          variant="outline"
+                                          className={cn(
+                                            "text-xs ml-1",
+                                            round.type === "heal"
+                                              ? "text-green-500 border-green-500"
+                                              : "text-amber-500 border-amber-500"
+                                          )}
+                                        >
+                                          Crítico
+                                        </Badge>
+                                      )}
                                     </span>
-                                  )}
-                                  {round.isCritical && (
-                                    <Badge
-                                      variant="outline"
-                                      className={cn(
-                                        "text-xs ml-1",
-                                        round.type === "heal"
-                                          ? "text-green-500 border-green-500"
-                                          : "text-amber-500 border-amber-500"
-                                      )}
-                                    >
-                                      Crítico
-                                    </Badge>
-                                  )}
-                                </span>
+                                  </>
+                                )}
                               </div>
                             </div>
                           ))}

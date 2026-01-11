@@ -39,25 +39,45 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, Swords, Heart, MessageSquare } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Form validation schema
 const formSchema = z.object({
-  character: z.string().min(1, { message: "Character is required" }),
+  character: z.string().optional(),
   target: z.string().optional(),
-  type: z.enum(["damage", "heal"]).default("damage"),
-  damage: z.number().min(1, { message: "Value must be at least 1" }),
+  type: z.enum(["damage", "heal", "other"]).default("damage"),
+  damage: z.number().min(0).optional(),
+  description: z.string().optional(),
   isCritical: z.boolean().default(false),
+}).refine((data) => {
+  if (data.type !== "other" && !data.character) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Personagem é obrigatório para esta ação",
+  path: ["character"],
+}).refine((data) => {
+  if (data.type === "other" && !data.description) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Descrição é obrigatória para este tipo de ação",
+  path: ["description"],
 });
 
 interface DamagePayload {
   battle: string;
   campaign: string;
   owner: string;
-  character: string;
+  character?: string;
   target?: string;
-  type: "damage" | "heal";
-  damage: number;
+  type: "damage" | "heal" | "other";
+  damage?: number;
+  description?: string;
   isCritical: boolean;
   round: number;
 }
@@ -86,8 +106,9 @@ const NewDamage = () => {
     defaultValues: {
       character: "",
       target: "none",
-      type: "damage" as "damage" | "heal",
+      type: "damage" as "damage" | "heal" | "other",
       damage: 0,
+      description: "",
       isCritical: false,
     },
   });
@@ -156,11 +177,12 @@ const NewDamage = () => {
         battle: id as string,
         campaign: battle.data.campaign._id,
         owner: battle.data.owner._id,
-        character: data.character,
-        target: data.target === "none" ? undefined : data.target,
+        character: data.type === "other" ? undefined : data.character,
+        target: data.type === "other" || data.target === "none" ? undefined : data.target,
         type: data.type,
-        damage: data.damage,
-        isCritical: data.isCritical,
+        damage: data.type === "other" ? 0 : data.damage,
+        description: data.type === "other" ? data.description : undefined,
+        isCritical: data.type === "other" ? false : data.isCritical,
         round: battle.data.round,
       };
 
@@ -217,21 +239,52 @@ const NewDamage = () => {
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Tipo de Ação</FormLabel>
+                    <FormControl>
+                      <Tabs
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="w-full"
+                      >
+                        <TabsList className="grid w-full grid-cols-3">
+                          <TabsTrigger value="damage" className="flex items-center gap-2">
+                            <Swords className="h-4 w-4" /> Dano
+                          </TabsTrigger>
+                          <TabsTrigger value="heal" className="flex items-center gap-2">
+                            <Heart className="h-4 w-4" /> Cura
+                          </TabsTrigger>
+                          <TabsTrigger value="other" className="flex items-center gap-2">
+                            <MessageSquare className="h-4 w-4" /> Evento
+                          </TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-4">
+                {form.watch("type") !== "other" && (
                   <FormField
                     control={form.control}
                     name="character"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Atacante</FormLabel>
+                        <FormLabel>Quem está agindo?</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecione..." />
+                              <SelectValue placeholder="Selecione um personagem..." />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -246,112 +299,111 @@ const NewDamage = () => {
                       </FormItem>
                     )}
                   />
+                )}
 
-                  <FormField
-                    control={form.control}
-                    name="target"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Alvo</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
+                {form.watch("type") !== "other" ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="damage"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {form.watch("type") === "damage" ? "Valor do Dano" : "Valor da Cura"}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value) || 0)
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="target"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Alvo</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Nenhum" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="none">Nenhum</SelectItem>
+                                {allBattleCharacters.map((character: Character) => (
+                                  <SelectItem key={character._id} value={character._id}>
+                                    {character.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="isCritical"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Nenhum" />
-                            </SelectTrigger>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="none">Nenhum</SelectItem>
-                            {allBattleCharacters.map((character: Character) => (
-                              <SelectItem key={character._id} value={character._id}>
-                                {character.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Ação Crítica</FormLabel>
+                            <FormDescription>
+                              Dobre o efeito da ação.
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                ) : (
                   <FormField
                     control={form.control}
-                    name="damage"
+                    name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
-                          {form.watch("type") === "damage" ? "Dano" : "Cura"}
-                        </FormLabel>
+                        <FormLabel>Descrição do Evento</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(parseInt(e.target.value))
-                            }
+                          <Textarea 
+                            placeholder="Ex: A tempestade se intensifica, todos rolam com desvantagem..." 
+                            className="min-h-[100px] resize-none"
+                            {...field} 
                           />
                         </FormControl>
+                        <FormDescription>
+                          Descreva o evento narrativo para o histórico.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tipo de Ação</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o tipo..." />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="damage">Dano</SelectItem>
-                            <SelectItem value="heal">Cura</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-
+                )}
               </div>
 
-              <FormField
-                control={form.control}
-                name="isCritical"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Dano Crítico</FormLabel>
-                      <FormDescription>
-                        Marque essa opção se o dano for crítico.
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Registrando..." : "Registrar Ação"}
+              <DialogFooter className="pt-4">
+                <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+                  {isSubmitting ? "Registrando..." : "Confirmar Ação"}
                 </Button>
               </DialogFooter>
             </form>
