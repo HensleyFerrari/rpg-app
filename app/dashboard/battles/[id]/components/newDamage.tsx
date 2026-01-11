@@ -45,7 +45,8 @@ import { Plus } from "lucide-react";
 const formSchema = z.object({
   character: z.string().min(1, { message: "Character is required" }),
   target: z.string().optional(),
-  damage: z.number().min(1, { message: "Damage must be at least 1" }),
+  type: z.enum(["damage", "heal"]).default("damage"),
+  damage: z.number().min(1, { message: "Value must be at least 1" }),
   isCritical: z.boolean().default(false),
 });
 
@@ -55,6 +56,7 @@ interface DamagePayload {
   owner: string;
   character: string;
   target?: string;
+  type: "damage" | "heal";
   damage: number;
   isCritical: boolean;
   round: number;
@@ -84,8 +86,8 @@ const NewDamage = () => {
     defaultValues: {
       character: "",
       target: "none",
+      type: "damage" as "damage" | "heal",
       damage: 0,
-      isCritical: false,
       isCritical: false,
     },
   });
@@ -156,6 +158,7 @@ const NewDamage = () => {
         owner: battle.data.owner._id,
         character: data.character,
         target: data.target === "none" ? undefined : data.target,
+        type: data.type,
         damage: data.damage,
         isCritical: data.isCritical,
         round: battle.data.round,
@@ -198,18 +201,18 @@ const NewDamage = () => {
             disabled={!userHasCharacter}
             title={
               !userHasCharacter
-                ? "Você precisa ter um personagem ativo na batalha para registrar dano"
+                ? "Você precisa ter um personagem ativo na batalha para registrar ação"
                 : ""
             }
           >
-            <Plus /> Dano
+            <Plus /> Ação
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Registre um novo dano</DialogTitle>
+            <DialogTitle>Registre uma nova ação</DialogTitle>
             <DialogDescription>
-              Adicione um novo dano a batalha.
+              Adicione um novo dano ou cura à batalha.
             </DialogDescription>
           </DialogHeader>
 
@@ -280,7 +283,9 @@ const NewDamage = () => {
                     name="damage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Dano</FormLabel>
+                        <FormLabel>
+                          {form.watch("type") === "damage" ? "Dano" : "Cura"}
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -290,6 +295,31 @@ const NewDamage = () => {
                             }
                           />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de Ação</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o tipo..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="damage">Dano</SelectItem>
+                            <SelectItem value="heal">Cura</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -321,7 +351,7 @@ const NewDamage = () => {
 
               <DialogFooter>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Registrando..." : "Registrar Dano"}
+                  {isSubmitting ? "Registrando..." : "Registrar Ação"}
                 </Button>
               </DialogFooter>
             </form>
