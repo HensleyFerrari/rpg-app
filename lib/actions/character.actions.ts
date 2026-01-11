@@ -22,6 +22,7 @@ interface CharacterParams {
   message?: string;
   status: string;
   isNpc?: boolean;
+  alignment?: "ally" | "enemy";
 }
 
 interface CharacterResponse {
@@ -37,6 +38,8 @@ export async function createCharacter({
   characterUrl = "",
   message = "",
   status,
+  isNpc = false,
+  alignment = "ally",
 }: CharacterParams) {
   try {
     if (!name || !owner || !campaign) {
@@ -70,6 +73,8 @@ export async function createCharacter({
       characterUrl,
       message,
       status,
+      isNpc,
+      alignment,
     });
 
     if (!newCharacterData) {

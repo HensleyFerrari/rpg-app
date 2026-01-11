@@ -41,6 +41,8 @@ const characterFormSchema = z.object({
   characterUrl: z.string().optional(),
   message: z.string().optional(),
   status: z.enum(["alive", "dead"]).default("alive"),
+  isNpc: z.boolean().default(false),
+  alignment: z.enum(["ally", "enemy"]).default("ally"),
 });
 
 type CharacterFormValues = z.infer<typeof characterFormSchema>;
@@ -57,6 +59,7 @@ const CharacterForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const campaignFromUrl = searchParams.get("campaign");
+  const isNpcFromUrl = searchParams.get("isNpc") === "true";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(true);
@@ -68,6 +71,8 @@ const CharacterForm = () => {
     characterUrl: "",
     message: "",
     status: "alive",
+    isNpc: isNpcFromUrl,
+    alignment: "ally",
   };
 
   const form = useForm<CharacterFormValues>({
@@ -111,6 +116,8 @@ const CharacterForm = () => {
         characterUrl: values.characterUrl || "",
         message: values.message,
         status: values.status,
+        isNpc: values.isNpc,
+        alignment: values.alignment,
       });
       if (response.ok) {
         toast.success("Sucesso!", {
@@ -238,7 +245,7 @@ const CharacterForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o status" />
@@ -255,8 +262,31 @@ const CharacterForm = () => {
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="alignment"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Alinhamento / Lado</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o alinhamento" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="ally">Aliado</SelectItem>
+                  <SelectItem value="enemy">Inimigo</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>Define se é um aliado ou um inimigo na batalha.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Criando..." : "Criar Personagem"}
+          {isSubmitting ? "Criando..." : isNpcFromUrl ? "Criar NPC" : "Criar Personagem"}
         </Button>
       </form>
     </Form>
@@ -265,19 +295,24 @@ const CharacterForm = () => {
 
 // Main page component with Suspense boundary
 const NewCharacter = () => {
+  const searchParams = useSearchParams();
+  const isNpcFromUrl = searchParams.get("isNpc") === "true";
+
   return (
     <div className="container mx-auto py-10">
       <Breadcrumb
         items={[
           { label: "Dashboard", href: "/dashboard" },
           { label: "Personagens", href: "/dashboard/personagens" },
-          { label: "Novo Personagem" },
+          { label: isNpcFromUrl ? "Novo NPC" : "Novo Personagem" },
         ]}
       />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Criar Novo Personagem</h1>
+        <h1 className="text-3xl font-bold">
+          {isNpcFromUrl ? "Criar Novo NPC" : "Criar Novo Personagem"}
+        </h1>
         <p className="text-muted-foreground">
-          Preencha os dados para criar um novo personagem
+          Preencha os dados para criar um(a) {isNpcFromUrl ? "novo(a) NPC" : "novo(a) personagem"}
         </p>
       </div>
 
