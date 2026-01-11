@@ -45,7 +45,7 @@ interface Battle {
 }
 
 const StatCard = ({ title, value, icon: Icon, description, colorClass }: any) => (
-  <Card className="overflow-hidden border-none shadow-md bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+  <Card className="overflow-hidden border-none shadow-md bg-card/50 backdrop-blur-sm">
     <div className={`h-1 w-full ${colorClass}`} />
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium">{title}</CardTitle>
@@ -105,9 +105,9 @@ const MyBattlesDashboard = () => {
   const totalInactive = battles.filter((b) => !b.active).length;
 
   const BattleList = ({ battles }: { battles: Battle[] }) => (
-    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+    <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
       {/* Table Header - Desktop */}
-      <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+      <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-muted/50 border-b border-border text-xs font-semibold text-muted-foreground uppercase tracking-wider">
         <div className="col-span-5">Batalha / Campanha</div>
         <div className="col-span-2">Status</div>
         <div className="col-span-1 text-center">Turno</div>
@@ -115,15 +115,15 @@ const MyBattlesDashboard = () => {
         <div className="col-span-2 text-right">Ações</div>
       </div>
 
-      <div className="divide-y divide-slate-200 dark:divide-slate-800">
+      <div className="divide-y divide-border">
         {battles.map((battle) => (
           <div 
             key={battle._id} 
-            className="group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors items-center"
+            className="group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors items-center"
           >
             {/* Battle / Campaign */}
             <div className="col-span-5 flex items-center gap-4">
-              <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
+              <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
                 {battle.campaign?.imageUrl ? (
                   <Image
                     src={battle.campaign.imageUrl}
@@ -139,9 +139,11 @@ const MyBattlesDashboard = () => {
                 )}
               </div>
               <div className="min-w-0">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                  {battle.name || "Sem Nome"}
-                </h3>
+                <Link href={`/dashboard/battles/${battle._id}`}>
+                  <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">
+                    {battle.name || "Sem Nome"}
+                  </h3>
+                </Link>
                 <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                   {battle.campaign?.name || "Sem Campanha"}
                 </p>
@@ -152,7 +154,7 @@ const MyBattlesDashboard = () => {
             <div className="col-span-2">
               <Badge 
                 variant={battle.active ? "default" : "secondary"}
-                className={`${battle.active ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800" : "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"} text-[10px] sm:text-xs font-medium border px-2 py-0.5 rounded-full`}
+                className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] sm:text-xs font-medium border px-2 py-0.5 rounded-full`}
               >
                 {battle.active ? (
                   <span className="flex items-center gap-1.5">
@@ -184,7 +186,7 @@ const MyBattlesDashboard = () => {
               <Button variant="outline" size="sm" className="h-8 text-xs px-3 rounded-lg hidden sm:flex" asChild>
                 <Link href={`/dashboard/battles/${battle._id}`}>Painel</Link>
               </Button>
-              <Button variant="default" size="sm" className="h-8 text-xs px-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm" asChild>
+              <Button variant="default" size="sm" className="h-8 text-xs px-3 bg-primary hover:bg-primary/90 rounded-lg shadow-sm" asChild>
                 <Link href={`/dashboard/battles/${battle._id}/edit`}>Gerenciar</Link>
               </Button>
               <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg md:hidden" asChild>
@@ -219,14 +221,14 @@ const MyBattlesDashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2">
-            <Trophy className="h-8 w-8 text-indigo-600" />
+            <Trophy className="h-8 w-8 text-primary" />
             Minhas Batalhas
           </h1>
           <p className="text-muted-foreground">
             Batalhas criadas por você, {userName}.
           </p>
         </div>
-        <Button className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20" asChild>
+        <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20" asChild>
           <Link href="/dashboard/battles/newBattle" className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Nova Batalha
@@ -263,11 +265,11 @@ const MyBattlesDashboard = () => {
       <div className="space-y-6">
         <Tabs defaultValue="active" className="w-full">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-            <TabsList className="bg-slate-100 dark:bg-slate-800 p-1">
-              <TabsTrigger value="active" className="px-6 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 shadow-sm">
+            <TabsList className="bg-muted p-1">
+              <TabsTrigger value="active" className="px-6 data-[state=active]:bg-card shadow-sm">
                 Ativas ({activeBattles.length})
               </TabsTrigger>
-              <TabsTrigger value="inactive" className="px-6 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 shadow-sm">
+              <TabsTrigger value="inactive" className="px-6 data-[state=active]:bg-card shadow-sm">
                 Arquivadas ({inactiveBattles.length})
               </TabsTrigger>
             </TabsList>
@@ -279,7 +281,7 @@ const MyBattlesDashboard = () => {
                 placeholder="Filtrar suas batalhas..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm"
+                className="w-full bg-card border border-border rounded-lg py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm"
               />
             </div>
           </div>
