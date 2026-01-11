@@ -9,6 +9,7 @@ import Campaign from "@/models/Campaign";
 import Character, { CharacterDocument } from "@/models/Character";
 import { getCurrentUser } from "./user.actions";
 import { getAllDamagesByBattleId } from "./damage.actions";
+import { triggerBattleUpdate } from "../pusher";
 
 const serializeData = (data: BattleDocument[]) => {
   return JSON.parse(JSON.stringify(data));
@@ -187,10 +188,6 @@ export const getAllBattlesByCharacterId = async (characterId: string) => {
     };
   }
 };
-
-import { triggerBattleUpdate } from "../pusher";
-
-// ... existing code ...
 
 export const updateBattle = async (
   id: string,

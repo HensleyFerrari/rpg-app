@@ -16,7 +16,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { 
   MoreVertical, 
@@ -32,7 +31,7 @@ import {
   ChevronRight,
   Shield
 } from "lucide-react";
-import ChangeRound from "./[id]/components/changeRound";
+
 
 const StatCard = ({ title, value, icon: Icon, description, colorClass }: any) => (
   <Card className="overflow-hidden border-none shadow-md bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
@@ -147,22 +146,6 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <div className="px-2 py-1.5">
-                    <ChangeRound
-                      battleId={battle._id}
-                      currentRound={battle.round}
-                      advance={true}
-                    />
-                  </div>
-                  <DropdownMenuSeparator />
-                  <div className="px-2 py-1.5">
-                    <ChangeRound
-                      battleId={battle._id}
-                      currentRound={battle.round}
-                      advance={false}
-                    />
-                  </div>
-                  <DropdownMenuSeparator />
                   <Link href={`/dashboard/battles/${battle._id}/edit`}>
                     <div className="px-2 py-1.5 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer">
                       Editar Batalha
