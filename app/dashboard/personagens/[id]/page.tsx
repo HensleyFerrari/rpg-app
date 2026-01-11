@@ -171,9 +171,9 @@ const CharacterPage = () => {
               </Button>
             </>
           )}
-          <Button variant="ghost" size="sm" className="gap-2" onClick={() => router.back()}>
+          {/* <Button variant="ghost" size="sm" className="gap-2" onClick={() => router.back()}>
             <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          </Button> */}
         </div>
       </div>
 

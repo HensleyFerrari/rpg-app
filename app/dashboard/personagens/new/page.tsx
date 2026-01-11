@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createCharacter } from "@/lib/actions/character.actions";
-import { getCampaignById } from "@/lib/actions/campaign.actions";
+import { getCampaigns } from "@/lib/actions/campaign.actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -82,17 +82,13 @@ const CharacterForm = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        if (!campaignFromUrl) {
-          router.push("/dashboard/personagens/");
-          return;
-        }
-        const campaignsData = await getCampaignById(campaignFromUrl);
-        if (campaignsData.ok && campaignsData.data) {
-          const campaign = Array.isArray(campaignsData.data)
-            ? campaignsData.data[0]
-            : campaignsData.data;
-          setCampaigns([campaign]);
-          form.setValue("campaign", campaign._id);
+        const campaignsData = await getCampaigns();
+        if (campaignsData) {
+          setCampaigns(campaignsData);
+          
+          if (campaignFromUrl) {
+            form.setValue("campaign", campaignFromUrl);
+          }
         }
       } catch (error) {
         console.error("Erro ao buscar campanhas:", error);
@@ -103,7 +99,7 @@ const CharacterForm = () => {
     };
 
     fetchCampaigns();
-  }, [campaignFromUrl, form, router]);
+  }, [campaignFromUrl, form]);
 
   async function onSubmit(values: CharacterFormValues) {
     setIsSubmitting(true);
@@ -162,7 +158,7 @@ const CharacterForm = () => {
               <Select
                 onValueChange={field.onChange}
                 defaultValue={field.value}
-                disabled={!!campaignFromUrl}
+                value={field.value}
               >
                 <FormControl>
                   <SelectTrigger>
