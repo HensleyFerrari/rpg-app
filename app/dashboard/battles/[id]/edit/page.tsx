@@ -145,7 +145,7 @@ const EditBattle = () => {
               </div>
 
               <div className="grid w-full gap-2">
-                <Label htmlFor="active">Stauts da batalha</Label>
+                <Label htmlFor="active">Status da batalha</Label>
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="active"

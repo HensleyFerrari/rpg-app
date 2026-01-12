@@ -22,6 +22,7 @@ interface CharacterParams {
   message?: string;
   status: string;
   isNpc?: boolean;
+  alignment?: "ally" | "enemy";
 }
 
 interface CharacterResponse {
@@ -37,6 +38,8 @@ export async function createCharacter({
   characterUrl = "",
   message = "",
   status,
+  isNpc = false,
+  alignment = "ally",
 }: CharacterParams) {
   try {
     if (!name || !owner || !campaign) {
@@ -70,6 +73,8 @@ export async function createCharacter({
       characterUrl,
       message,
       status,
+      isNpc,
+      alignment,
     });
 
     if (!newCharacterData) {
@@ -133,7 +138,14 @@ export async function getCharacterById(id: string) {
 
     const characterData = await Character.findById(id)
       .populate("owner", "username name _id")
-      .populate("campaign", "name _id");
+      .populate({
+        path: "campaign",
+        select: "name _id owner",
+        populate: {
+          path: "owner",
+          select: "_id name username"
+        }
+      });
 
     if (!characterData) {
       return {
@@ -295,11 +307,21 @@ export async function updateCharacter(
       };
     }
 
-    if (updates.owner && !mongoose.isValidObjectId(updates.owner)) {
-      return {
-        ok: false,
-        message: "ID de proprietário inválido",
-      };
+    const actualUser = await getCurrentUser();
+    if (!actualUser) {
+      return { ok: false, message: "Usuário não autenticado" };
+    }
+
+    const characterToUpdate = await Character.findById(id).populate("campaign");
+    if (!characterToUpdate) {
+      return { ok: false, message: "Personagem não encontrado" };
+    }
+
+    const isCharacterOwner = characterToUpdate.owner.toString() === actualUser._id.toString();
+    const isCampaignOwner = characterToUpdate.campaign.owner.toString() === actualUser._id.toString();
+
+    if (!isCharacterOwner && !isCampaignOwner) {
+      return { ok: false, message: "Você não tem permissão para editar este personagem" };
     }
 
     const updatedCharacterData = await Character.findByIdAndUpdate(
@@ -356,8 +378,28 @@ export async function deleteCharacter(id: string): Promise<CharacterResponse> {
       };
     }
 
-    // First get the character to know its campaign for revalidation
-    const characterData = await Character.findById(id);
+    const actualUser = await getCurrentUser();
+    if (!actualUser) {
+      return { ok: false, message: "Usuário não autenticado" };
+    }
+
+    // First get the character to know its campaign for revalidation and permission check
+    const characterData = await Character.findById(id).populate("campaign");
+
+    if (!characterData) {
+      return {
+        ok: false,
+        message: "Personagem não encontrado",
+        data: null,
+      };
+    }
+
+    const isCharacterOwner = characterData.owner.toString() === actualUser._id.toString();
+    const isCampaignOwner = characterData.campaign.owner.toString() === actualUser._id.toString();
+
+    if (!isCharacterOwner && !isCampaignOwner) {
+      return { ok: false, message: "Você não tem permissão para excluir este personagem" };
+    }
 
     if (!characterData) {
       return {

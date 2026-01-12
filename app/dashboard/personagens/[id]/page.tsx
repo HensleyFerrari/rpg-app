@@ -41,6 +41,11 @@ type Character = {
   campaign: {
     _id: string;
     name: string;
+    owner: {
+      _id: string;
+      name: string;
+      username: string;
+    };
   };
   characterUrl: string;
   message: string;
@@ -61,7 +66,7 @@ const CharacterPage = () => {
   const id = params.id as string;
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isOwner, setIsOwner] = useState(false);
+  const [hasEditPermission, setHasEditPermission] = useState(false);
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -72,7 +77,9 @@ const CharacterPage = () => {
         if (getCharacter && "owner" in getCharacter) {
           const characterData = getCharacter as unknown as Character;
           if (actualUser?._id) {
-            setIsOwner(characterData.owner._id === actualUser._id);
+            const isCharacterOwner = characterData.owner._id === actualUser._id;
+            const isCampaignOwner = characterData.campaign.owner._id === actualUser._id;
+            setHasEditPermission(isCharacterOwner || isCampaignOwner);
           }
           setCharacter(characterData);
         }
@@ -159,7 +166,7 @@ const CharacterPage = () => {
         </div>
         
         <div className="flex items-center gap-2">
-          {isOwner && (
+          {hasEditPermission && (
             <>
               <Link href={`/dashboard/personagens/${id}/edit`}>
                 <Button variant="outline" size="sm" className="gap-2">
@@ -171,9 +178,9 @@ const CharacterPage = () => {
               </Button>
             </>
           )}
-          <Button variant="ghost" size="sm" className="gap-2" onClick={() => router.back()}>
+          {/* <Button variant="ghost" size="sm" className="gap-2" onClick={() => router.back()}>
             <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          </Button> */}
         </div>
       </div>
 

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { getBattleById, updateBattle } from "@/lib/actions/battle.actions";
+import { createDamage } from "@/lib/actions/damage.actions";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 
@@ -30,10 +31,17 @@ const ChangeRound = ({
 
       if (response.ok) {
         toast.success(advance ? "Turno avançado!" : "Turno anterior!");
-        // Busca os dados atualizados da batalha
+        
+        await createDamage({
+          battle: battleId,
+          type: "other",
+          description: `[TURNO_ALTERADO] Turno ${newRound}`,
+          round: newRound,
+          isCritical: false,
+        });
+
         const updatedBattle = await getBattleById(battleId);
         if (updatedBattle.ok) {
-          // Dispara um evento customizado com os dados atualizados
           window.dispatchEvent(
             new CustomEvent("battleUpdated", { detail: updatedBattle.data })
           );

@@ -1,153 +1,211 @@
 "use client";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { Dice6, Users, Swords, Scroll, ArrowRight } from "lucide-react";
+import { Dice6, Users, Swords, Scroll, ArrowRight, Github } from "lucide-react";
 
 export default function Home() {
   const { status } = useSession();
   const router = useRouter();
 
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/dashboard");
+    }
+  }, [status, router]);
+
   const features = [
     {
       icon: <Dice6 className="h-8 w-8 text-primary" />,
       title: "Gerenciamento de Campanhas",
-      description: "Crie e gerencie suas campanhas de RPG com facilidade.",
+      description: "Crie e gerencie suas campanhas de RPG com total controle e organização.",
     },
     {
       icon: <Users className="h-8 w-8 text-primary" />,
-      title: "Personagens",
-      description: "Desenvolva personagens únicos e mantenha seu histórico.",
+      title: "Criação de Personagens",
+      description: "Construa personagens detalhados e mantenha suas fichas sempre atualizadas.",
     },
     {
       icon: <Swords className="h-8 w-8 text-primary" />,
-      title: "Sistema de Batalhas",
-      description: "Sistema intuitivo para gerenciar combates e encontros.",
+      title: "Combate Inteligente",
+      description: "Sistema ágil para gerenciar turnos, vida e ações durante as sessões.",
     },
     {
       icon: <Scroll className="h-8 w-8 text-primary" />,
-      title: "Histórias Épicas",
-      description: "Crie narrativas memoráveis para suas aventuras.",
+      title: "Crônicas Vivas",
+      description: "Mantenha o histórico de suas aventuras e personagens em um só lugar.",
     },
   ];
 
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <Dice6 className="h-12 w-12 text-primary animate-spin" />
+          <p className="text-muted-foreground font-medium">Carregando aventura...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[#020817] text-slate-50 overflow-hidden relative">
+      {/* Background Orbs */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+
+      {/* Navigation - Transparent and blurry */}
+      <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/20 backdrop-blur-xl">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
+              <Dice6 className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">RPG<span className="text-primary italic">Forge</span></span>
+          </div>
+          <div className="flex items-center gap-4">
+             <Link href="/login">
+                <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-white/5">
+                  Entrar
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+                  Cadastrar
+                </Button>
+              </Link>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
-      <section className="relative px-4 py-20 md:py-32 bg-background">
-        <div className="container mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Seu RPG de Mesa,
-            <span className="text-primary"> Digital</span>
+      <section className="relative px-4 pt-32 pb-20 md:pt-48 md:pb-32 flex items-center justify-center overflow-hidden">
+        <div className="container mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-primary mb-8 backdrop-blur-sm animate-fade-in">
+             <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+             Novo: Gerenciamento de Combates Redesenhado
+          </div>
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 leading-tight">
+            Forje suas Lendas<br />no Mundo Digital
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Gerencie suas campanhas, personagens e batalhas de RPG em um só
-            lugar. Uma ferramenta completa para mestres e jogadores.
+          <p className="text-lg md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+            A plataforma definitiva para organizar suas campanhas de RPG. 
+            Mestres e jogadores conectados em uma experiência premium e intuitiva.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {status === "authenticated" ? (
-              <Button
-                size="lg"
-                onClick={() => {
-                  signOut({ redirect: false }).then(() => {
-                    router.push("/");
-                  });
-                }}
-              >
-                Sair
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <Link href="/register" className="w-full sm:w-auto">
+              <Button size="lg" className="h-14 px-10 text-lg font-semibold w-full bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/40 group transition-all duration-300">
+                Começar Minha Jornada
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-            ) : (
-              <>
-                <Link href="/register">
-                  <Button size="lg" className="w-full sm:w-auto">
-                    Começar Agora
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto"
-                  >
-                    Entrar
-                  </Button>
-                </Link>
-              </>
-            )}
+            </Link>
+             <Link href="/login" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-semibold w-full border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white transition-all duration-300">
+                Ver Demonstração
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-4 bg-muted/50">
-        <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Recursos Principais
-          </h2>
+      {/* Features Section - Glass Cards */}
+      <section className="py-24 px-4 relative">
+        <div className="container mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">Tudo o que você precisa</h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">Ferramentas poderosas para elevar o nível das suas sessões de RPG.</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <Card
+              <div
                 key={index}
-                className="p-6 hover:shadow-lg transition-shadow"
+                className="group p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm transition-all duration-500 hover:bg-white/[0.08] hover:border-primary/50 hover:-translate-y-2"
               >
-                <div className="mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </Card>
+                <div className="mb-6 p-3 rounded-xl bg-primary/10 w-fit group-hover:scale-110 transition-transform duration-500">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-white group-hover:text-primary transition-colors">{feature.title}</h3>
+                <p className="text-slate-400 leading-relaxed text-sm md:text-base">{feature.description}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section className="py-20 px-4 bg-background">
+      {/* Statistics Section - Interactive & Modern */}
+      <section className="py-24 px-4 bg-gradient-to-b from-transparent to-black/40">
         <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Nossa Comunidade em Números
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">15.7K</div>
-              <p className="text-muted-foreground">Personagens Criados</p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">8.3K</div>
-              <p className="text-muted-foreground">Campanhas Ativas</p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">42.9K</div>
-              <p className="text-muted-foreground">Batalhas Realizadas</p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">1.2M</div>
-              <p className="text-muted-foreground">Dano Total Causado</p>
+          <div className="rounded-3xl p-12 bg-white/5 border border-white/10 backdrop-blur-md relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_120%,rgba(59,130,246,0.1),transparent)] pointer-events-none"></div>
+            
+            <h2 className="text-2xl md:text-4xl font-bold text-center mb-16 relative z-10">
+              Transformando a forma de jogar RPG
+            </h2>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
+              {[
+                { value: "15.7K+", label: "Personagens", sub: "Criados por jogadores" },
+                { value: "8.3K+", label: "Campanhas", sub: "Histórias ativas" },
+                { value: "42.9K+", label: "Batalhas", sub: "Encontros épicos" },
+                { value: "1.2M+", label: "Dano", sub: "Pontos totais" },
+              ].map((stat, i) => (
+                <div key={i} className="text-center group">
+                  <div className="text-4xl md:text-5xl font-black text-primary mb-3 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] group-hover:scale-105 transition-transform">
+                    {stat.value}
+                  </div>
+                  <p className="text-lg font-bold text-white mb-1">{stat.label}</p>
+                  <p className="text-sm text-slate-500">{stat.sub}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-primary text-primary-foreground">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Pronto para Começar sua Aventura?
+      {/* CTA Section - Epic Finish */}
+      <section className="py-32 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary/5 -skew-y-3 transform origin-right"></div>
+        <div className="container mx-auto text-center relative z-10">
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">
+            Sua próxima aventura<br />começa agora.
           </h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-            Junte-se a nossa comunidade de mestres e jogadores hoje mesmo.
+          <p className="text-xl md:text-2xl text-slate-400 mb-12 max-w-xl mx-auto opacity-90">
+            Junte-se a milhares de aventureiros e mestres. Totalmente gratuito para começar.
           </p>
-          {status !== "authenticated" && (
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/register">
-              <Button size="lg" variant="secondary">
+              <Button size="lg" className="h-16 px-12 text-xl font-bold bg-white text-black hover:bg-slate-200 transition-all shadow-xl hover:shadow-white/20">
                 Criar Conta Gratuita
-                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-          )}
+          </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-4 border-t border-white/5 relative z-10">
+        <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-2">
+            <Dice6 className="h-5 w-5 text-primary" />
+            <span className="text-lg font-bold">RPGForge</span>
+          </div>
+          <p className="text-slate-500 text-sm">
+            © 2026 RPGForge. Todos os direitos reservados.
+          </p>
+          <div className="flex gap-6">
+            <Button variant="ghost" size="icon" className="text-slate-500 hover:text-white">
+              <Github className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

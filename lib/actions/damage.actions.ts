@@ -16,8 +16,7 @@ import { triggerBattleUpdate } from "../pusher";
 
 export const createDamage = async (damage: any) => {
   await connectDB();
-  const characterInfo = await getCharacterById(damage.character);
-
+  
   const battleInfo = await getBattleById(damage.battle);
   if (!battleInfo.data.active) {
     return {
@@ -26,21 +25,26 @@ export const createDamage = async (damage: any) => {
     };
   }
 
-  const characterInBattle = battleInfo.data.characters.some(
-    (char: any) => char._id.toString() === damage.character
-  );
+  let characterInfo: any = null;
+  if (damage.character) {
+    characterInfo = await getCharacterById(damage.character);
+    
+    const characterInBattle = battleInfo.data.characters.some(
+      (char: any) => char._id.toString() === damage.character
+    );
 
-  if (!characterInBattle) {
-    return {
-      ok: false,
-      message: "Personagem não está na batalha!",
-    };
+    if (!characterInBattle) {
+      return {
+        ok: false,
+        message: "Personagem não está na batalha!",
+      };
+    }
   }
 
   const payload = {
     ...damage,
-    owner: characterInfo.data.owner._id,
-    campaign: characterInfo.data.campaign._id,
+    owner: characterInfo ? characterInfo.data.owner._id : battleInfo.data.owner._id,
+    campaign: characterInfo ? characterInfo.data.campaign._id : battleInfo.data.campaign._id,
     target: damage.target || null,
   };
   const newDamage = new Damage(payload);

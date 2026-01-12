@@ -5,10 +5,11 @@ export interface DamageDocument {
   owner: ObjectId;
   campaign: ObjectId;
   battle: ObjectId;
-  type: "damage" | "heal";
-  damage: number;
+  type: "damage" | "heal" | "other";
+  damage?: number;
+  description?: string;
   isCritical: boolean;
-  character: ObjectId;
+  character?: ObjectId;
   target?: ObjectId;
   round: number;
   createdAt: Date;
@@ -34,11 +35,16 @@ const DamageSchema = new Schema<DamageDocument>(
     },
     damage: {
       type: Number,
-      required: [true, "Damage is required"],
+      required: false,
+      default: 0,
+    },
+    description: {
+      type: String,
+      required: false,
     },
     type: {
       type: String,
-      enum: ["damage", "heal"],
+      enum: ["damage", "heal", "other"],
       default: "damage",
     },
     isCritical: {
@@ -48,7 +54,7 @@ const DamageSchema = new Schema<DamageDocument>(
     character: {
       type: Schema.Types.ObjectId,
       ref: "Character",
-      required: true,
+      required: false,
     },
     target: {
       type: Schema.Types.ObjectId,
@@ -63,6 +69,10 @@ const DamageSchema = new Schema<DamageDocument>(
   { timestamps: true }
 );
 
-const Damage =
-  mongoose.models?.Damage || model<DamageDocument>("Damage", DamageSchema);
+// Forcing model re-registration to handle schema updates in Next.js dev mode
+if (mongoose.models.Damage) {
+  delete (mongoose.models as any).Damage;
+}
+
+const Damage = model<DamageDocument>("Damage", DamageSchema);
 export default Damage;

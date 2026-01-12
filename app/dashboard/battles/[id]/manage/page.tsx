@@ -24,6 +24,11 @@ import {
   Shield,
   Users,
   Swords,
+  ChevronDown,
+  ChevronRight,
+  Zap,
+  Target,
+  BarChart3,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -39,8 +44,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 type Battle = {
   _id: string;
@@ -54,9 +60,11 @@ type Battle = {
     damage: number;
     round: number;
     isCritical: boolean;
-    character: {
+    character?: {
       name: string;
     };
+    description?: string;
+    type?: string;
   }>;
   characters: Array<{
     _id: string;
@@ -75,6 +83,10 @@ const ManageBattlePage = () => {
   const [characterToRemove, setCharacterToRemove] = useState<string | null>(
     null
   );
+
+  // States for collapsible sections
+  const [isCharactersExpanded, setIsCharactersExpanded] = useState(true);
+  const [isHistoryExpanded, setIsHistoryExpanded] = useState(true);
 
   useEffect(() => {
     const fetchBattle = async () => {
@@ -153,41 +165,14 @@ const ManageBattlePage = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4 max-w-5xl">
-        <Card>
-          <CardHeader className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Swords className="h-5 w-5 text-muted-foreground" />
-              <Skeleton className="h-8 w-2/3" />
-            </div>
-            <Skeleton className="h-4 w-1/2" />
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Users className="h-5 w-5 text-muted-foreground" />
-                <Skeleton className="h-6 w-36" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-center gap-3">
-                      <Skeleton className="h-10 w-10 rounded-full" />
-                      <div className="space-y-2 flex-1">
-                        <Skeleton className="h-4 w-3/4" />
-                        <Skeleton className="h-3 w-1/2" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Skeleton className="h-3 w-full" />
-                      <Skeleton className="h-3 w-2/3" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="container mx-auto p-4 max-w-5xl space-y-8">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
+        </div>
+        <Skeleton className="h-96 w-full" />
       </div>
     );
   }
@@ -217,7 +202,7 @@ const ManageBattlePage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-5xl space-y-6">
+    <div className="container mx-auto p-4 max-w-5xl space-y-6 animate-in fade-in duration-500">
       <Breadcrumb
         items={[
           { label: "Dashboard", href: "/dashboard" },
@@ -227,10 +212,13 @@ const ManageBattlePage = () => {
         ]}
       />
 
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Gerenciar Batalha</h1>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight">Painel de Gerenciamento</h1>
+          <p className="text-muted-foreground mt-1">Controle total sobre {battle.name}</p>
+        </div>
         <Link href={`/dashboard/battles/${id}`}>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2 hover:bg-muted transition-colors">
             <ArrowLeft className="h-4 w-4" />
             Voltar para Batalha
           </Button>
@@ -238,204 +226,199 @@ const ManageBattlePage = () => {
       </div>
 
       <div className="grid gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div className="flex flex-col space-y-1.5">
-              <h2 className="text-xl font-semibold leading-none tracking-tight">
-                Personagens
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Gerencie os personagens participantes desta batalha
-              </p>
+        {/* Characters Section */}
+        <Card className="overflow-hidden border-none shadow-md bg-card/60 backdrop-blur-sm">
+          <CardHeader 
+            className="flex flex-row items-center justify-between cursor-pointer py-4 hover:bg-muted/30 transition-colors"
+            onClick={() => setIsCharactersExpanded(!isCharactersExpanded)}
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Personagens</CardTitle>
+                <p className="text-xs text-muted-foreground">Gerencie quem participa desta batalha</p>
+              </div>
             </div>
-            <AddCharacterModal />
+            <div className="flex items-center gap-2">
+              <AddCharacterModal />
+              {isCharactersExpanded ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-muted/50">
-                    <TableHead className="font-semibold">Nome</TableHead>
-                    <TableHead className="text-right font-semibold">
-                      Ações
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {battle.characters.map((character) => (
-                    <TableRow key={character._id} className="hover:bg-muted/50">
-                      <TableCell className="font-medium">
-                        {character.name}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-muted-foreground hover:text-destructive"
-                            >
-                              <UserMinus className="h-4 w-4" />
-                              <span className="sr-only">Remover</span>
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Confirmar remoção
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Tem certeza que deseja remover este personagem
-                                da batalha? Esta ação não pode ser desfeita.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel
-                                onClick={() => setCharacterToRemove(null)}
-                              >
-                                Cancelar
-                              </AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={handleRemoveCharacter}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                Remover
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </TableCell>
+          <div className={cn("transition-all duration-300 ease-in-out", isCharactersExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden")}>
+            <CardContent className="pt-0">
+              <div className="rounded-xl border bg-card/40 overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-muted/40">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="py-4">Nome</TableHead>
+                      <TableHead className="text-right py-4">Ações</TableHead>
                     </TableRow>
-                  ))}
-                  {battle.characters.length === 0 && (
-                    <TableRow>
-                      <TableCell
-                        colSpan={2}
-                        className="text-center text-muted-foreground h-32"
-                      >
-                        <div className="flex flex-col items-center justify-center gap-2">
-                          <Users className="h-8 w-8 opacity-20" />
-                          <p>Nenhum personagem na batalha</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
+                  </TableHeader>
+                  <TableBody>
+                    {battle.characters.map((character) => (
+                      <TableRow key={character._id} className="group hover:bg-muted/40 transition-colors border-muted">
+                        <TableCell className="font-medium py-3">
+                          {character.name}
+                        </TableCell>
+                        <TableCell className="text-right py-3">
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground group-hover:text-destructive transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setCharacterToRemove(character._id);
+                                }}
+                              >
+                                <UserMinus className="h-4 w-4" />
+                                <span className="sr-only">Remover</span>
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Confirmar remoção</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Tem certeza que deseja remover <strong>{character.name}</strong> da batalha?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setCharacterToRemove(null)}>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={handleRemoveCharacter}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Remover
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {battle.characters.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={2} className="text-center py-12 text-muted-foreground">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <Users className="h-10 w-10 opacity-10" />
+                            <p className="text-sm">Nenhum personagem na batalha</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </div>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col space-y-1.5">
-              <h2 className="text-xl font-semibold leading-none tracking-tight">
-                Histórico de Danos
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Visualize e gerencie o histórico de danos e eventos da batalha
-              </p>
+        {/* Damage History Section */}
+        <Card className="overflow-hidden border-none shadow-md bg-card/60 backdrop-blur-sm">
+          <CardHeader 
+            className="flex flex-row items-center justify-between cursor-pointer py-4 hover:bg-muted/30 transition-colors"
+            onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-500/10 rounded-lg">
+                <Swords className="h-5 w-5 text-amber-500" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Histórico de Danos</CardTitle>
+                <p className="text-xs text-muted-foreground">Visualize e gerencie cada evento da batalha</p>
+              </div>
             </div>
+            {isHistoryExpanded ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
           </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-muted/50">
-                    <TableHead className="font-semibold w-[100px]">
-                      Round
-                    </TableHead>
-                    <TableHead className="font-semibold">Personagem</TableHead>
-                    <TableHead className="font-semibold text-center w-[100px]">
-                      Dano
-                    </TableHead>
-                    <TableHead className="font-semibold text-center w-[100px]">
-                      Crítico
-                    </TableHead>
-                    <TableHead className="text-right font-semibold w-[100px]">
-                      Ações
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {battle.rounds.map((round) => (
-                    <TableRow key={round._id} className="hover:bg-muted/50">
-                      <TableCell>
-                        <span className="inline-flex items-center justify-center rounded-full bg-muted w-6 h-6 text-xs font-medium">
-                          {round.round}
-                        </span>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {round.character.name}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {round.damage}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {round.isCritical ? (
-                          <span className="text-amber-500 font-bold">Sim</span>
-                        ) : (
-                          <span className="text-muted-foreground">Não</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-muted-foreground hover:text-destructive"
-                              onClick={() => setDamageToDelete(round._id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Deletar</span>
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Confirmar exclusão
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Tem certeza que deseja excluir este dano? Esta
-                                ação não pode ser desfeita.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel
-                                onClick={() => setDamageToDelete(null)}
-                              >
-                                Cancelar
-                              </AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={handleDeleteDamage}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                Excluir
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </TableCell>
+          <div className={cn("transition-all duration-300 ease-in-out", isHistoryExpanded ? "max-h-[1000px] opacity-100 overflow-auto" : "max-h-0 opacity-0 overflow-hidden")}>
+            <CardContent className="pt-0">
+              <div className="rounded-xl border bg-card/40 overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-muted/40">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="w-[100px] py-4">Rodada</TableHead>
+                      <TableHead className="py-4">Personagem</TableHead>
+                      <TableHead className="text-center w-[100px] py-4">Dano</TableHead>
+                      <TableHead className="text-center w-[100px] py-4">Crítico</TableHead>
+                      <TableHead className="text-right w-[100px] py-4">Ações</TableHead>
                     </TableRow>
-                  ))}
-                  {battle.rounds.length === 0 && (
-                    <TableRow>
-                      <TableCell
-                        colSpan={5}
-                        className="text-center text-muted-foreground h-32"
-                      >
-                        <div className="flex flex-col items-center justify-center gap-2">
-                          <Swords className="h-8 w-8 opacity-20" />
-                          <p>Nenhum dano registrado</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
+                  </TableHeader>
+                  <TableBody>
+                    {battle.rounds.map((round) => (
+                      <TableRow key={round._id} className="group hover:bg-muted/40 transition-colors border-muted">
+                        <TableCell className="py-3">
+                          <span className="inline-flex items-center justify-center rounded-lg bg-primary/10 text-primary w-7 h-7 text-xs font-bold">
+                            {round.round}
+                          </span>
+                        </TableCell>
+                        <TableCell className="font-medium py-3">
+                          {round.character?.name || (round.type === "other" ? "Evento" : "N/A")}
+                        </TableCell>
+                        <TableCell className="text-center py-3 font-semibold">
+                          {round.damage}
+                        </TableCell>
+                        <TableCell className="text-center py-3">
+                          {round.isCritical ? (
+                            <span className="text-amber-500 font-bold text-xs px-2 py-0.5 rounded-full bg-amber-500/10 uppercase">Sim</span>
+                          ) : (
+                            <span className="text-muted-foreground text-xs uppercase">Não</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right py-3">
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground group-hover:text-destructive transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDamageToDelete(round._id);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Deletar</span>
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Tem certeza que deseja excluir este registro de dano?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setDamageToDelete(null)}>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={handleDeleteDamage}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {battle.rounds.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <Swords className="h-10 w-10 opacity-10" />
+                            <p className="text-sm">Nenhum dano registrado</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </div>
         </Card>
       </div>
     </div>

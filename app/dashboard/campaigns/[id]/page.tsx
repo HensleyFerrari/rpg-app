@@ -201,6 +201,20 @@ const CampaignDetail = async ({ params }: any) => {
           </TabsContent>
 
           <TabsContent value="characters" className="mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Personagens
+              </h3>
+              {isOwner && (
+                <Link href={`/dashboard/personagens/new?campaign=${campaign._id}`}>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <PlusCircle className="h-4 w-4" />
+                    Novo Personagem
+                  </Button>
+                </Link>
+              )}
+            </div>
             {characters.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {characters.map((character: any) => (
@@ -277,6 +291,20 @@ const CampaignDetail = async ({ params }: any) => {
           </TabsContent>
 
           <TabsContent value="npcs" className="mt-6">
+             <div className="flex items-center justify-between mb-4">
+               <h3 className="text-xl font-semibold flex items-center gap-2">
+                 <Users className="h-5 w-5" />
+                 NPCs
+               </h3>
+               {isOwner && (
+                 <Link href={`/dashboard/personagens/new?campaign=${campaign._id}&isNpc=true`}>
+                   <Button variant="outline" size="sm" className="gap-2">
+                     <PlusCircle className="h-4 w-4" />
+                     Novo NPC
+                   </Button>
+                 </Link>
+               )}
+             </div>
              {npcs.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {npcs.map((npc: any) => (
