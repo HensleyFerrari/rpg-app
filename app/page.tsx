@@ -1,10 +1,9 @@
 "use client";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Card } from "@/components/ui/card";
 import { Dice6, Users, Swords, Scroll, ArrowRight, Github } from "lucide-react";
 
 export default function Home() {

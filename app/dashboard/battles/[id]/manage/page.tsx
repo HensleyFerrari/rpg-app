@@ -26,9 +26,6 @@ import {
   Swords,
   ChevronDown,
   ChevronRight,
-  Zap,
-  Target,
-  BarChart3,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";

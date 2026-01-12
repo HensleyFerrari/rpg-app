@@ -10,7 +10,6 @@ import {
   Book, 
   Shield, 
   Calendar, 
-  ArrowLeft,
   Trash2,
   Clock,
   User
