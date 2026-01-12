@@ -20,8 +20,7 @@ interface PageProps {
 }
 
 export default async function Personagens({ searchParams }: PageProps) {
-  const filter = searchParams.filter;
-  const campaignId = searchParams.campaignId;
+  const { filter, campaignId } = await searchParams;
 
   // Fetch campaigns for the filter dropdown
   const campaignsResponse = await getCampaigns();

@@ -60,20 +60,9 @@ const items = [
   },
   {
     title: "Campanhas",
+    url: "/dashboard/campaigns",
     icons: Crown,
     id: "campaigns",
-    items: [
-      {
-        title: "Minhas Campanhas",
-        url: "/dashboard/campaigns/mycampaigns",
-        icons: ScrollText,
-      },
-      {
-        title: "Todas as campanhas",
-        url: "/dashboard/campaigns",
-        icons: Book,
-      },
-    ],
   },
   {
     title: "Personagens",
