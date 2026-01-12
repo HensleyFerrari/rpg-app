@@ -37,15 +37,20 @@ interface CharacterListViewProps {
   characters: Character[];
   showOwner?: boolean;
   onDelete?: (id: string) => void;
-  isOwner?: (character: Character) => boolean;
+  currentUserId?: string;
 }
 
 export function CharacterListView({ 
   characters, 
   showOwner = true, 
   onDelete,
-  isOwner = () => false
+  currentUserId
 }: CharacterListViewProps) {
+  const isOwner = (char: Character) => {
+    if (!currentUserId) return false;
+    const ownerId = typeof char.owner === 'object' ? char.owner._id : char.owner;
+    return ownerId === currentUserId;
+  };
   return (
     <div className="rounded-md border bg-card">
       <Table>

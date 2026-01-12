@@ -77,20 +77,8 @@ const items = [
   },
   {
     title: "Personagens",
+    url: "/dashboard/personagens",
     icons: UsersRound,
-    id: "characters",
-    items: [
-      {
-        title: "Meus Personagens",
-        url: "/dashboard/personagens/mycharacters",
-        icons: User,
-      },
-      {
-        title: "Todos os Personagens",
-        url: "/dashboard/personagens",
-        icons: Users,
-      },
-    ],
   },
   {
     title: "Batalhas",
