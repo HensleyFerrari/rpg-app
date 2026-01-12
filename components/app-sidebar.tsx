@@ -24,18 +24,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronDown,
-  Book,
   Heart,
   LayoutDashboard,
   User,
-  Users,
-  List,
   LogOut,
   Swords,
-  ScrollText,
   Crown,
   UsersRound,
-  Skull,
   Cog,
   Sparkles,
 } from "lucide-react";
@@ -75,11 +70,7 @@ const items = [
     icons: Swords,
     id: "battles",
   },
-  {
-    title: "Feedbacks",
-    url: "/dashboard/feedback",
-    icons: ScrollText,
-  },
+
   {
     title: `Configurações`,
     url: "/dashboard/settings",

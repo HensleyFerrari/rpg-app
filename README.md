@@ -24,11 +24,7 @@ Um aplicativo web para gerenciar campanhas de RPG, personagens e batalhas.
   - Registro de dano
   - Acompanhamento de batalhas ativas
 
-- **Feedback e Suporte**
-  - Sistema integrado de feedback
-  - Reporte de bugs
-  - Sugestões de melhorias
-  - Acompanhamento de status
+
 
 ## Requisitos
 
@@ -159,7 +155,7 @@ O aplicativo utiliza MongoDB como banco de dados principal, conectado através d
 - **Characters**: Armazena os personagens
 - **Battles**: Registra as batalhas
 - **Damages**: Registra os danos causados nas batalhas
-- **Feedbacks**: Armazena feedbacks dos usuários
+
 
 ## Tecnologias Utilizadas
 
