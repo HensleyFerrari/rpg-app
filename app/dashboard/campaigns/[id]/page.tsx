@@ -25,7 +25,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
-import { CharacterCardActions } from "./_components/character-card-actions";
+import { CharacterList } from "./_components/character-list";
 
 const CampaignDetail = async ({ params }: any) => {
   const { id } = params;
@@ -215,79 +215,12 @@ const CampaignDetail = async ({ params }: any) => {
                 </Link>
               )}
             </div>
-            {characters.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {characters.map((character: any) => (
-                  <Card key={character._id} className="h-full hover:bg-muted/50 transition-colors relative group">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start justify-between">
-                          <Link href={`/dashboard/personagens/${character._id}`} className="flex items-center gap-3 flex-1 min-w-0">
-                            {character.characterUrl ? (
-                              <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
-                                <Image
-                                  src={character.characterUrl}
-                                  alt={character.name}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                                <Users className="h-6 w-6 text-muted-foreground" />
-                              </div>
-                            )}
-                            <div className="min-w-0">
-                              <CardTitle className="text-base font-bold line-clamp-1">{character.name}</CardTitle>
-                              <CardDescription className="line-clamp-1">
-                                {character.class && <span>{character.class} • </span>}
-                                Nível {character.level || 1}
-                              </CardDescription>
-                            </div>
-                          </Link>
-                          <div className="ml-2">
-                            <CharacterCardActions 
-                                characterId={character._id}
-                                isNpc={false}
-                                isOwner={isOwner}
-                                characterName={character.name}
-                            />
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <Link href={`/dashboard/personagens/${character._id}`}>
-                          <div className="flex items-center justify-between mt-2">
-                             <Badge
-                                variant={
-                                  character.status === "alive"
-                                    ? "default"
-                                    : "destructive"
-                                }
-                                className="text-xs"
-                              >
-                                {character.status === "alive" ? "Vivo" : "Morto"}
-                              </Badge>
-                             <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <User className="h-3 w-3" />
-                                {character.owner?.name || character.owner?.username || "Jogador"}
-                             </span>
-                          </div>
-                        </Link>
-                      </CardContent>
-                    </Card>
-                ))}
-              </div>
-            ) : (
-               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
-                  <Users className="h-12 w-12 mb-4 opacity-20" />
-                  <p>Nenhum personagem (jogador) nesta campanha.</p>
-                  <Link href={`/dashboard/personagens/new?campaign=${campaign._id}`} className="mt-4">
-                     <Button variant="outline">Criar Personagem</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            )}
+            <CharacterList 
+              characters={characters} 
+              isOwner={isOwner} 
+              campaignId={campaign._id} 
+              isNpc={false}
+            />
           </TabsContent>
 
           <TabsContent value="npcs" className="mt-6">
@@ -305,75 +238,12 @@ const CampaignDetail = async ({ params }: any) => {
                  </Link>
                )}
              </div>
-             {npcs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {npcs.map((npc: any) => (
-                  <Card key={npc._id} className="h-full hover:bg-muted/50 transition-colors">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start justify-between">
-                            <Link href={`/dashboard/personagens/${npc._id}`} className="flex items-center gap-3 flex-1 min-w-0">
-                                {npc.characterUrl ? (
-                                  <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
-                                    <Image
-                                      src={npc.characterUrl}
-                                      alt={npc.name}
-                                      fill
-                                      className="object-cover"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                                    <Users className="h-6 w-6 text-muted-foreground" />
-                                  </div>
-                                )}
-                                <div className="min-w-0">
-                                  <CardTitle className="text-base font-bold line-clamp-1">{npc.name}</CardTitle>
-                                  <CardDescription className="line-clamp-1">
-                                    {npc.race && <span>{npc.race} • </span>}
-                                    NPC
-                                  </CardDescription>
-                                </div>
-                            </Link>
-                            <div className="ml-2">
-                                <CharacterCardActions 
-                                    characterId={npc._id}
-                                    isNpc={true}
-                                    isOwner={isOwner}
-                                    characterName={npc.name}
-                                />
-                            </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                         <Link href={`/dashboard/personagens/${npc._id}`}>
-                             <div className="flex items-center justify-between mt-2">
-                                 <Badge
-                                  variant={
-                                    npc.status === "alive"
-                                      ? "default"
-                                      : "destructive"
-                                  }
-                                  className="text-xs"
-                                >
-                                  {npc.status === "alive" ? "Vivo" : "Morto"}
-                                </Badge>
-                             </div>
-                         </Link>
-                      </CardContent>
-                    </Card>
-                ))}
-              </div>
-             ) : (
-               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
-                  <Users className="h-12 w-12 mb-4 opacity-20" />
-                  <p>Nenhum NPC nesta campanha.</p>
-                   <Link href={`/dashboard/personagens/new?campaign=${campaign._id}&isNpc=true`} className="mt-4">
-                     <Button variant="outline">Criar NPC</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-             )}
+             <CharacterList 
+               characters={npcs} 
+               isOwner={isOwner} 
+               campaignId={campaign._id} 
+               isNpc={true}
+             />
           </TabsContent>
 
           <TabsContent value="battles" className="mt-6">

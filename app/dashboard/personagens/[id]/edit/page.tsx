@@ -48,6 +48,7 @@ const formSchema = z.object({
   status: z.enum(["alive", "dead"], {
     required_error: "Selecione um status.",
   }),
+  alignment: z.enum(["ally", "enemy"]).default("ally"),
 });
 
 const CharacterEdit = () => {
@@ -62,6 +63,7 @@ const CharacterEdit = () => {
       characterUrl: "",
       message: "",
       status: "alive",
+      alignment: "ally",
     },
   });
 
@@ -88,6 +90,7 @@ const CharacterEdit = () => {
             characterUrl: character.characterUrl || "",
             message: character.message || "",
             status: character.status,
+            alignment: character.alignment || "ally",
           });
         } else {
           toast.error("Personagem não encontrado");
@@ -223,6 +226,35 @@ const CharacterEdit = () => {
                     </SelectContent>
                   </Select>
                   <FormDescription>Status atual do personagem.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="alignment"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Alinhamento / Lado</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o alinhamento" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="ally">Aliado</SelectItem>
+                      <SelectItem value="enemy">Inimigo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Define se é um aliado ou um inimigo na batalha.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
