@@ -117,13 +117,14 @@ const MyBattlesDashboard = () => {
 
       <div className="divide-y divide-border">
         {battles.map((battle) => (
-          <div 
-            key={battle._id} 
-            className="group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors items-center"
-          >
-            {/* Battle / Campaign */}
-            <div className="col-span-5 flex items-center gap-4">
-              <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
+        <div 
+          key={battle._id} 
+          className="group relative flex flex-col md:grid md:grid-cols-12 gap-4 px-4 md:px-6 py-4 hover:bg-muted/30 transition-colors border-b border-border last:border-0 md:items-center"
+        >
+          {/* Mobile Specific Header: Image + Name + Status */}
+          <div className="flex md:hidden items-start justify-between gap-3 w-full">
+            <div className="flex items-center gap-3 overflow-hidden">
+               <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
                 {battle.campaign?.imageUrl ? (
                   <Image
                     src={battle.campaign.imageUrl}
@@ -138,64 +139,95 @@ const MyBattlesDashboard = () => {
                   </div>
                 )}
               </div>
-              <div className="min-w-0">
-                <Link href={`/dashboard/battles/${battle._id}`}>
+              <div className="min-w-0 flex-1">
+                 <Link href={`/dashboard/battles/${battle._id}`}>
                   <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">
                     {battle.name || "Sem Nome"}
                   </h3>
                 </Link>
-                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {battle.campaign?.name || "Sem Campanha"}
                 </p>
               </div>
             </div>
+             <Badge 
+              variant={battle.active ? "default" : "secondary"}
+              className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] font-medium border px-2 py-0.5 rounded-full flex-shrink-0 h-fit`}
+            >
+              {battle.active ? "Ativa" : "Finalizada"}
+            </Badge>
+          </div>
 
-            {/* Status */}
-            <div className="col-span-2">
-              <Badge 
-                variant={battle.active ? "default" : "secondary"}
-                className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] sm:text-xs font-medium border px-2 py-0.5 rounded-full`}
-              >
-                {battle.active ? (
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Ativa
-                  </span>
-                ) : "Finalizada"}
-              </Badge>
+          {/* Desktop: Battle / Campaign */}
+          <div className="hidden md:flex col-span-5 items-center gap-4">
+            <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
+              {battle.campaign?.imageUrl ? (
+                <Image
+                  src={battle.campaign.imageUrl}
+                  alt={battle.campaign.name || "Campaign"}
+                  fill
+                  className="object-cover"
+                  unoptimized={false}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Shield className="h-6 w-6 text-slate-400" />
+                </div>
+              )}
             </div>
-
-            {/* Turn */}
-            <div className="col-span-1 text-sm font-medium text-slate-700 dark:text-slate-200 md:text-center flex items-center gap-2 md:block">
-              <RotateCcw className="h-4 w-4 text-slate-400 md:hidden" />
-              <span>{battle.round || 0}</span>
-            </div>
-
-            {/* Date */}
-            <div className="col-span-2 text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2 md:block">
-              <Calendar className="h-4 w-4 text-slate-400 md:hidden" />
-              <span>
-                {battle.createdAt
-                  ? new Date(battle.createdAt).toLocaleDateString('pt-BR')
-                  : "--/--/----"}
-              </span>
-            </div>
-
-            {/* Actions */}
-            <div className="col-span-2 flex justify-end items-center gap-2">
-              <Button variant="outline" size="sm" className="h-8 text-xs px-3 rounded-lg hidden sm:flex" asChild>
-                <Link href={`/dashboard/battles/${battle._id}`}>Painel</Link>
-              </Button>
-              <Button variant="default" size="sm" className="h-8 text-xs px-3 bg-primary hover:bg-primary/90 rounded-lg shadow-sm" asChild>
-                <Link href={`/dashboard/battles/${battle._id}/edit`}>Gerenciar</Link>
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg md:hidden" asChild>
-                <Link href={`/dashboard/battles/${battle._id}`}>
-                  <ChevronRight className="h-5 w-5 text-slate-400" />
-                </Link>
-              </Button>
+            <div className="min-w-0">
+              <Link href={`/dashboard/battles/${battle._id}`}>
+                <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">
+                  {battle.name || "Sem Nome"}
+                </h3>
+              </Link>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                {battle.campaign?.name || "Sem Campanha"}
+              </p>
             </div>
           </div>
+
+          {/* Desktop Status */}
+          <div className="hidden md:block col-span-2">
+            <Badge 
+              variant={battle.active ? "default" : "secondary"}
+              className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] sm:text-xs font-medium border px-2 py-0.5 rounded-full`}
+            >
+              {battle.active ? (
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Ativa
+                </span>
+              ) : "Finalizada"}
+            </Badge>
+          </div>
+
+          {/* Turn */}
+          <div className="flex md:col-span-1 text-sm font-medium text-slate-700 dark:text-slate-200 md:justify-center items-center gap-2 md:w-auto w-full pl-[60px] md:pl-0 -mt-1 md:mt-0">
+            <RotateCcw className="h-3.5 w-3.5 text-slate-400 md:hidden" />
+            <span className="text-xs md:text-sm">Turno {battle.round || 0}</span>
+          </div>
+
+          {/* Date */}
+          <div className="flex md:col-span-2 text-sm text-slate-500 dark:text-slate-400 items-center gap-2 md:w-auto w-full pl-[60px] md:pl-0 -mt-1 md:mt-0">
+            <Calendar className="h-3.5 w-3.5 text-slate-400 md:hidden" />
+            <span className="text-xs md:text-sm">
+              {battle.createdAt
+                ? new Date(battle.createdAt).toLocaleDateString('pt-BR')
+                : "--/--/----"}
+            </span>
+          </div>
+
+          {/* Actions */}
+          <div className="md:col-span-2 flex flex-row md:justify-end items-center gap-2 w-full md:w-auto mt-3 md:mt-0 border-t md:border-t-0 pt-3 md:pt-0 border-border/50">
+            <Button variant="outline" size="sm" className="h-8 text-xs px-3 rounded-lg flex-1 md:flex-none" asChild>
+              <Link href={`/dashboard/battles/${battle._id}`}>Painel</Link>
+            </Button>
+            <Button variant="default" size="sm" className="h-8 text-xs px-3 bg-primary hover:bg-primary/90 rounded-lg shadow-sm flex-1 md:flex-none" asChild>
+              <Link href={`/dashboard/battles/${battle._id}/edit`}>Gerenciar</Link>
+            </Button>
+          </div>
+        </div>
         ))}
       </div>
     </div>

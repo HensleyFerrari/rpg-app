@@ -62,28 +62,64 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
     </div>
 
     <div className="divide-y divide-border">
-      {battles.map((battle) => (
         <div 
           key={battle._id} 
-          className="group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors items-center"
+          className="group relative flex flex-col md:grid md:grid-cols-12 gap-4 px-4 md:px-6 py-4 hover:bg-muted/30 transition-colors border-b border-border last:border-0 md:items-center"
         >
-          {/* Battle / Campaign */}
-          <div className="col-span-4 flex items-center gap-4">
-            <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
-              {battle.campaign?.imageUrl ? (
-                <Image
-                  src={battle.campaign.imageUrl}
-                  alt={battle.campaign.name || "Campaign"}
-                  fill
-                  className="object-cover"
-                  unoptimized={false}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-slate-400" />
-                </div>
-              )}
+          {/* Mobile Specific Header: Image + Name + Status */}
+          <div className="flex md:hidden items-start justify-between gap-3 w-full">
+            <div className="flex items-center gap-3 overflow-hidden">
+               <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
+                {battle.campaign?.imageUrl ? (
+                  <Image
+                    src={battle.campaign.imageUrl}
+                    alt={battle.campaign.name || "Campaign"}
+                    fill
+                    className="object-cover"
+                    unoptimized={false}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Shield className="h-6 w-6 text-slate-400" />
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                 <Link href={`/dashboard/battles/${battle._id}`}>
+                  <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">
+                    {battle.name || "Sem Nome"}
+                  </h3>
+                </Link>
+                <p className="text-xs text-muted-foreground truncate">
+                  {battle.campaign?.name || "Sem Campanha"}
+                </p>
+              </div>
             </div>
+             <Badge 
+              variant={battle.active ? "default" : "secondary"}
+              className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] font-medium border px-2 py-0.5 rounded-full flex-shrink-0 h-fit`}
+            >
+              {battle.active ? "Ativa" : "Finalizada"}
+            </Badge>
+          </div>
+
+          {/* Desktop: Battle / Campaign */}
+          <div className="hidden md:flex col-span-4 items-center gap-4">
+             <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
+                {battle.campaign?.imageUrl ? (
+                  <Image
+                    src={battle.campaign.imageUrl}
+                    alt={battle.campaign.name || "Campaign"}
+                    fill
+                    className="object-cover"
+                    unoptimized={false}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Shield className="h-6 w-6 text-slate-400" />
+                  </div>
+                )}
+              </div>
             <div className="min-w-0">
               <Link href={`/dashboard/battles/${battle._id}`}>
                 <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">
@@ -97,13 +133,13 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
           </div>
 
           {/* Owner */}
-          <div className="col-span-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+          <div className="flex md:col-span-2 items-center gap-2 text-sm text-slate-600 dark:text-slate-300 md:w-auto w-full mt-2 md:mt-0 pl-[60px] md:pl-0">
             <User className="h-4 w-4 text-slate-400 md:hidden" />
-            <span className="truncate">{battle.owner?.name || "Mestre"}</span>
+            <span className="truncate text-xs md:text-sm">{battle.owner?.name || "Mestre"}</span>
           </div>
 
-          {/* Status */}
-          <div className="col-span-2">
+          {/* Desktop Status */}
+          <div className="hidden md:block col-span-2">
             <Badge 
               variant={battle.active ? "default" : "secondary"}
               className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] sm:text-xs font-medium border px-2 py-0.5 rounded-full`}
@@ -118,15 +154,15 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
           </div>
 
           {/* Turn */}
-          <div className="col-span-1 text-sm font-medium text-slate-700 dark:text-slate-200 md:text-center flex items-center gap-2 md:block">
-            <RotateCcw className="h-4 w-4 text-slate-400 md:hidden" />
-            <span>{battle.round || 0}</span>
+          <div className="flex md:col-span-1 text-sm font-medium text-slate-700 dark:text-slate-200 md:justify-center items-center gap-2 md:w-auto w-full pl-[60px] md:pl-0 -mt-1 md:mt-0">
+            <RotateCcw className="h-3.5 w-3.5 text-slate-400 md:hidden" />
+            <span className="text-xs md:text-sm">Turno {battle.round || 0}</span>
           </div>
 
           {/* Date */}
-          <div className="col-span-2 text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2 md:block">
-            <Calendar className="h-4 w-4 text-slate-400 md:hidden" />
-            <span>
+          <div className="flex md:col-span-2 text-sm text-slate-500 dark:text-slate-400 items-center gap-2 md:w-auto w-full pl-[60px] md:pl-0 -mt-1 md:mt-0">
+            <Calendar className="h-3.5 w-3.5 text-slate-400 md:hidden" />
+            <span className="text-xs md:text-sm">
               {battle.createdAt
                 ? new Date(battle.createdAt).toLocaleDateString('pt-BR')
                 : "--/--/----"}
@@ -134,16 +170,24 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
           </div>
 
           {/* Actions */}
-          <div className="col-span-1 flex justify-end items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg" asChild>
+          <div className="md:col-span-1 flex justify-end items-center gap-2 w-full md:w-auto mt-3 md:mt-0 border-t md:border-t-0 pt-3 md:pt-0 border-border/50">
+            <Button variant="ghost" size="sm" className="h-8 w-full md:w-8 px-2 md:px-0 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg md:hidden text-xs justify-center" asChild>
+              <Link href={`/dashboard/battles/${battle._id}`}>
+                Ver Batalha
+              </Link>
+            </Button>
+             
+             {/* Desktop Action Button */}
+             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg hidden md:flex" asChild>
               <Link href={`/dashboard/battles/${battle._id}`}>
                 <ChevronRight className="h-5 w-5 text-slate-400" />
               </Link>
             </Button>
+
             {currentUser?._id === battle.owner?._id && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg shrink-0">
                     <MoreVertical className="h-4 w-4 text-slate-400" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -158,7 +202,6 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
             )}
           </div>
         </div>
-      ))}
     </div>
   </div>
 );
