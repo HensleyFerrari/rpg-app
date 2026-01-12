@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +10,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,12 +24,11 @@ import {
   User, 
   RotateCcw,
   LayoutDashboard,
-  Search,
   Trophy,
   ChevronRight,
   Shield
 } from "lucide-react";
-
+import { BattleFilters } from "./components/battle-filters";
 
 const StatCard = ({ title, value, icon: Icon, description, colorClass }: any) => (
   <Card className="overflow-hidden border-none shadow-md bg-card/50 backdrop-blur-sm">
@@ -62,6 +59,7 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
     </div>
 
     <div className="divide-y divide-border">
+      {battles.map((battle) => (
         <div 
           key={battle._id} 
           className="group relative flex flex-col md:grid md:grid-cols-12 gap-4 px-4 md:px-6 py-4 hover:bg-muted/30 transition-colors border-b border-border last:border-0 md:items-center"
@@ -202,32 +200,18 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
             )}
           </div>
         </div>
+      ))}
     </div>
   </div>
 );
 
-export default function BattlesDashboardClient({ allBattles, currentUser }: { allBattles: any[], currentUser: any }) {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Filter battles based on search term
-  const filteredBattles = allBattles.filter((battle) => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      battle.name?.toLowerCase().includes(searchLower) ||
-      battle.campaign?.name?.toLowerCase().includes(searchLower) ||
-      battle.owner?.name?.toLowerCase().includes(searchLower)
-    );
-  });
-
-  const activeBattles = filteredBattles.filter((battle: any) => battle.active);
-  const inactiveBattles = filteredBattles.filter((battle: any) => !battle.active);
-
-  // Original unfiltered counts for stats
+export default function BattlesDashboardClient({ allBattles, currentUser, campaigns }: { allBattles: any[], currentUser: any, campaigns: any[] }) {
+  // Calculated stats based on the filtered view (allBattles contains the filtered result from server)
   const totalActive = allBattles.filter((b) => b.active).length;
   const totalInactive = allBattles.filter((b) => !b.active).length;
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8 max-w-7xl">
+    <>
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -247,106 +231,58 @@ export default function BattlesDashboardClient({ allBattles, currentUser }: { al
         </Button>
       </div>
 
-      {/* Stats Summary - Using original counts to show system state regardless of filter */}
+      {/* Stats Summary - Reflects CURRENT FILTERED VIEW */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard 
-          title="Total de Batalhas" 
+          title="Batalhas Listadas" 
           value={allBattles.length} 
           icon={History}
-          description="Contagem total no sistema"
+          description="Quantidade na visualização atual"
           colorClass="bg-slate-400"
         />
         <StatCard 
-          title="Batalhas Ativas" 
+          title="Ativas" 
           value={totalActive} 
           icon={Swords}
-          description="Combates em andamento agora"
+          description="Em andamento nesta lista"
           colorClass="bg-emerald-500"
         />
         <StatCard 
-          title="Taxa de Conclusão" 
-          value={allBattles.length > 0 ? `${Math.round((totalInactive / allBattles.length) * 100)}%` : "0%"} 
+          title="Concluídas" 
+          value={totalInactive} 
           icon={Trophy}
-          description="Batalhas finalizadas com sucesso"
+          description="Finalizadas nesta lista"
           colorClass="bg-indigo-500"
         />
       </div>
 
       {/* Main Content */}
       <div className="space-y-6">
-        <Tabs defaultValue="active" className="w-full">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-            <TabsList className="bg-muted p-1">
-              <TabsTrigger value="active" className="px-6 data-[state=active]:bg-card shadow-sm">
-                Ativas ({activeBattles.length})
-              </TabsTrigger>
-              <TabsTrigger value="inactive" className="px-6 data-[state=active]:bg-card shadow-sm">
-                Arquivadas ({inactiveBattles.length})
-              </TabsTrigger>
-            </TabsList>
-            
-            <div className="relative w-full md:w-64">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Procurar batalha..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-card border border-border rounded-lg py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm"
-              />
-            </div>
-          </div>
+        
+        <BattleFilters campaigns={campaigns} />
 
-          <TabsContent value="active" className="mt-0 outline-none">
-            {activeBattles.length > 0 ? (
-              <BattleList battles={activeBattles} currentUser={currentUser} />
-            ) : (
-              <Card className="border-dashed border-2 bg-transparent">
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 p-4 mb-4">
-                    <Swords className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <h3 className="text-xl font-bold">
-                    {searchTerm ? "Nenhuma batalha encontrada" : "Nenhum combate ativo"}
-                  </h3>
-                  <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">
-                    {searchTerm 
-                      ? "Tente buscar com outros termos." 
-                      : "Todos os campos de batalha estão quietos por enquanto. Que tal iniciar uma nova saga?"}
-                  </p>
-                  {!searchTerm && (
-                    <Button variant="outline" className="mt-6 rounded-lg" asChild>
-                      <Link href="/dashboard/battles/newBattle">Criar Batalha</Link>
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="inactive" className="mt-0 outline-none">
-            {inactiveBattles.length > 0 ? (
-              <BattleList battles={inactiveBattles} currentUser={currentUser} />
-            ) : (
-              <Card className="border-dashed border-2 bg-transparent">
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="rounded-full bg-slate-100 dark:bg-slate-800 p-4 mb-4">
-                    <History className="h-8 w-8 text-slate-400" />
-                  </div>
-                  <h3 className="text-xl font-bold">
-                    {searchTerm ? "Nenhuma batalha encontrada" : "Histórico vazio"}
-                  </h3>
-                  <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">
-                    {searchTerm
-                      ? "Tente buscar com outros termos."
-                      : "Não há registros de batalhas concluídas ainda. Suas vitórias e derrotas aparecerão aqui."}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
+        {allBattles.length > 0 ? (
+          <BattleList battles={allBattles} currentUser={currentUser} />
+        ) : (
+          <Card className="border-dashed border-2 bg-transparent">
+            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="rounded-full bg-slate-100 dark:bg-slate-800 p-4 mb-4">
+                <Swords className="h-8 w-8 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-bold">
+                Nenhuma batalha encontrada
+              </h3>
+              <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">
+                 Tente ajustar os filtros ou iniciar uma nova jornada.
+              </p>
+              <Button variant="outline" className="mt-6 rounded-lg" asChild>
+                <Link href="/dashboard/battles/newBattle">Criar Batalha</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
-    </div>
+    </>
   );
 }
+

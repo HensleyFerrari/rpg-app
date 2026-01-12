@@ -71,20 +71,9 @@ const items = [
   },
   {
     title: "Batalhas",
+    url: "/dashboard/battles",
     icons: Swords,
     id: "battles",
-    items: [
-      {
-        title: "Minhas Batalhas",
-        url: "/dashboard/battles/mybattles",
-        icons: Skull,
-      },
-      {
-        title: "Todas as Batalhas",
-        url: "/dashboard/battles",
-        icons: List,
-      },
-    ],
   },
   {
     title: "Feedbacks",
