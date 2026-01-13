@@ -87,7 +87,7 @@ const Dashboard = async () => {
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
-          <Link href="/dashboard/personagens/new">
+          <Link href="/dashboard/personagens?new=true">
             <div className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 p-2">
               <Users className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
             </div>
