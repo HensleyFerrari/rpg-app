@@ -195,6 +195,7 @@ const CharacterPage = () => {
                     alt={character.name}
                     fill
                     className="object-cover transition-transform hover:scale-105 duration-500"
+                    unoptimized
                   />
                 ) : (
                   <div className="w-full h-full bg-muted flex items-center justify-center">
