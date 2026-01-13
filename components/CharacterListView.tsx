@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+
 import {
   Table,
   TableBody,
@@ -47,7 +49,9 @@ export function CharacterListView({
   onDelete,
   currentUserId
 }: CharacterListViewProps) {
+  const searchParams = useSearchParams();
   const isOwner = (char: Character) => {
+
     if (!currentUserId) return false;
     const ownerId = typeof char.owner === 'object' ? char.owner._id : char.owner;
     return ownerId === currentUserId;
@@ -123,7 +127,13 @@ export function CharacterListView({
                       {isOwner(char) && (
                         <>
                           <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/personagens/${char._id}/edit`} className="flex items-center">
+                            <Link
+                              href={{
+                                pathname: "/dashboard/personagens",
+                                query: { ...Object.fromEntries(searchParams.entries()), edit: char._id },
+                              }}
+                              className="flex items-center"
+                            >
                               <Edit className="mr-2 h-4 w-4" /> Editar
                             </Link>
                           </DropdownMenuItem>

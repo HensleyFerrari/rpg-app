@@ -27,6 +27,8 @@ import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { CharacterModal } from "../_components/character-modal";
+
 
 // Character type definition
 type Character = {
@@ -168,7 +170,7 @@ const CharacterPage = () => {
         <div className="flex items-center gap-2">
           {hasEditPermission && (
             <>
-              <Link href={`/dashboard/personagens/${id}/edit`}>
+              <Link href={`?edit=${id}`}>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Edit className="w-4 h-4" /> Editar
                 </Button>
@@ -294,6 +296,7 @@ const CharacterPage = () => {
           </Card>
         </div>
       </div>
+      <CharacterModal />
     </div>
   );
 };

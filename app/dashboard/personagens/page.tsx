@@ -9,6 +9,8 @@ import { CharacterFilters } from "./_components/character-filters";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/actions/user.actions";
+import { CharacterModal } from "./_components/character-modal";
+
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +22,8 @@ interface PageProps {
 }
 
 export default async function Personagens({ searchParams }: PageProps) {
-  const { filter, campaignId } = await searchParams;
+  const resolvedParams = await searchParams;
+  const { filter, campaignId } = resolvedParams;
 
   // Fetch campaigns for the filter dropdown
   const campaignsResponse = await getCampaigns();
@@ -46,7 +49,7 @@ export default async function Personagens({ searchParams }: PageProps) {
   }
 
   const characters = response.ok ? (response.data as any[]) || [] : [];
-  
+
   // Get current user to check ownership
   const currentUser = await getCurrentUser();
 
@@ -71,14 +74,19 @@ export default async function Personagens({ searchParams }: PageProps) {
               {type === "pc" ? "Nenhum personagem encontrado" : "Nenhum NPC encontrado"}
             </h3>
             <p className="text-muted-foreground mb-6 max-w-sm">{emptyMessage}</p>
-            
+
             {type === "pc" && (
-                <Link href="/dashboard/personagens/new">
-                  <Button variant="outline" className="gap-2">
-                    <UserPlus className="h-4 w-4" />
-                    Criar Novo Personagem
-                  </Button>
-                </Link>
+              <Link
+                href={{
+                  pathname: "/dashboard/personagens",
+                  query: { ...resolvedParams, new: "true" },
+                }}
+              >
+                <Button variant="outline" className="gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Criar Novo Personagem
+                </Button>
+              </Link>
             )}
           </CardContent>
         </Card>
@@ -94,8 +102,8 @@ export default async function Personagens({ searchParams }: PageProps) {
             <h2 className="text-xl font-semibold text-foreground/90">Vivos</h2>
             <Badge variant="secondary" className="bg-primary/10 text-primary border-none">{alive.length}</Badge>
           </div>
-          <CharacterListView 
-            characters={alive} 
+          <CharacterListView
+            characters={alive}
             currentUserId={currentUser?._id?.toString()}
           />
         </div>
@@ -108,8 +116,8 @@ export default async function Personagens({ searchParams }: PageProps) {
               <h2 className="text-xl font-semibold text-foreground/90">Mortos</h2>
               <Badge variant="secondary" className="border-none">{dead.length}</Badge>
             </div>
-            <CharacterListView 
-              characters={dead} 
+            <CharacterListView
+              characters={dead}
               currentUserId={currentUser?._id?.toString()}
             />
           </div>
@@ -125,7 +133,12 @@ export default async function Personagens({ searchParams }: PageProps) {
           <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
           <p className="text-muted-foreground">{description}</p>
         </div>
-        <Link href="/dashboard/personagens/new">
+        <Link
+          href={{
+            pathname: "/dashboard/personagens",
+            query: { ...resolvedParams, new: "true" },
+          }}
+        >
           <Button className="gap-2 shadow-sm">
             <UserPlus className="h-4 w-4" /> Novo Personagem
           </Button>
@@ -133,6 +146,8 @@ export default async function Personagens({ searchParams }: PageProps) {
       </div>
 
       <CharacterFilters campaigns={campaigns} />
+
+      <CharacterModal />
 
       {!response.ok ? (
         <div className="text-center py-10 bg-destructive/10 rounded-lg border border-destructive/20">
@@ -151,11 +166,11 @@ export default async function Personagens({ searchParams }: PageProps) {
               <VenetianMask className="h-4 w-4" /> NPCs
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="characters" className="focus-visible:outline-none focus-visible:ring-0">
             {renderCharacterSection(playerCharacters, "pc")}
           </TabsContent>
-          
+
           <TabsContent value="npcs" className="focus-visible:outline-none focus-visible:ring-0">
             {renderCharacterSection(npcCharacters, "npc")}
           </TabsContent>
