@@ -28,7 +28,6 @@ import {
 
 const formSchema = zod.object({
   name: zod.string().min(1, "Nome é obrigatório"),
-  round: zod.coerce.number().min(1, "O round deve ser pelo menos 1"),
   active: zod.boolean(),
 });
 
@@ -54,7 +53,6 @@ export function EditBattleModal({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      round: 1,
       active: true,
     },
   });
@@ -63,7 +61,6 @@ export function EditBattleModal({
     if (battle) {
       form.reset({
         name: battle.name,
-        round: battle.round,
         active: battle.active,
       });
     }
@@ -132,20 +129,7 @@ export function EditBattleModal({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="round"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Round Atual</FormLabel>
-                    <FormControl>
-                      <Input type="number" min={1} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div>
 
               <FormField
                 control={form.control}
