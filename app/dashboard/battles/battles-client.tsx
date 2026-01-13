@@ -13,15 +13,17 @@ import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  MoreVertical, 
-  Swords, 
-  History, 
-  Plus, 
-  Calendar, 
-  User, 
+import { EditBattleModal } from "./components/edit-battle-modal";
+import {
+  MoreVertical,
+  Swords,
+  History,
+  Plus,
+  Calendar,
+  User,
   RotateCcw,
   LayoutDashboard,
   Trophy,
@@ -48,7 +50,7 @@ const StatCard = ({ title, value, icon: Icon, description, colorClass }: any) =>
   </Card>
 );
 
-const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any }) => (
+const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentUser: any, onEdit: (battle: any) => void }) => (
   <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
     {/* Table Header - Desktop Only */}
     <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-muted/50 border-b border-border text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -62,14 +64,14 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
 
     <div className="divide-y divide-border">
       {battles.map((battle) => (
-        <div 
-          key={battle._id} 
+        <div
+          key={battle._id}
           className="group relative flex flex-col md:grid md:grid-cols-12 gap-4 px-4 md:px-6 py-4 hover:bg-muted/30 transition-colors border-b border-border last:border-0 md:items-center"
         >
           {/* Mobile Specific Header: Image + Name + Status */}
           <div className="flex md:hidden items-start justify-between gap-3 w-full">
             <div className="flex items-center gap-3 overflow-hidden">
-               <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
+              <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
                 {battle.campaign?.imageUrl ? (
                   <Image
                     src={battle.campaign.imageUrl}
@@ -85,7 +87,7 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                 <Link href={`/dashboard/battles/${battle._id}`}>
+                <Link href={`/dashboard/battles/${battle._id}`}>
                   <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">
                     {battle.name || "Sem Nome"}
                   </h3>
@@ -95,7 +97,7 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
                 </p>
               </div>
             </div>
-             <Badge 
+            <Badge
               variant={battle.active ? "default" : "secondary"}
               className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] font-medium border px-2 py-0.5 rounded-full flex-shrink-0 h-fit`}
             >
@@ -105,21 +107,21 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
 
           {/* Desktop: Battle / Campaign */}
           <div className="hidden md:flex col-span-4 items-center gap-4">
-             <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
-                {battle.campaign?.imageUrl ? (
-                  <Image
-                    src={battle.campaign.imageUrl}
-                    alt={battle.campaign.name || "Campaign"}
-                    fill
-                    className="object-cover"
-                    unoptimized={false}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Shield className="h-6 w-6 text-slate-400" />
-                  </div>
-                )}
-              </div>
+            <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
+              {battle.campaign?.imageUrl ? (
+                <Image
+                  src={battle.campaign.imageUrl}
+                  alt={battle.campaign.name || "Campaign"}
+                  fill
+                  className="object-cover"
+                  unoptimized={false}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Shield className="h-6 w-6 text-slate-400" />
+                </div>
+              )}
+            </div>
             <div className="min-w-0">
               <Link href={`/dashboard/battles/${battle._id}`}>
                 <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">
@@ -140,7 +142,7 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
 
           {/* Desktop Status */}
           <div className="hidden md:block col-span-2">
-            <Badge 
+            <Badge
               variant={battle.active ? "default" : "secondary"}
               className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] sm:text-xs font-medium border px-2 py-0.5 rounded-full`}
             >
@@ -176,9 +178,9 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
                 Ver Batalha
               </Link>
             </Button>
-             
-             {/* Desktop Action Button */}
-             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg hidden md:flex" asChild>
+
+            {/* Desktop Action Button */}
+            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg hidden md:flex" asChild>
               <Link href={`/dashboard/battles/${battle._id}`}>
                 <ChevronRight className="h-5 w-5 text-slate-400" />
               </Link>
@@ -192,11 +194,16 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <Link href={`/dashboard/battles/${battle._id}/edit`}>
-                    <div className="px-2 py-1.5 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md cursor-pointer">
-                      Editar Batalha
-                    </div>
-                  </Link>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      // Delay opening the modal to allow the dropdown to close properly
+                      // preventing focus mgmt conflicts in Radix UI
+                      setTimeout(() => onEdit(battle), 50);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    Editar Batalha
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -217,10 +224,14 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
   // Calculated stats based on the filtered view (allBattles contains the filtered result from server)
   const totalActive = allBattles.filter((b) => b.active).length;
   const totalInactive = allBattles.filter((b) => !b.active).length;
-  
+
   // Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [createBattleDraft, setCreateBattleDraft] = useState<any>(null);
+
+  // Edit Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedBattle, setSelectedBattle] = useState<any>(null);
 
   useEffect(() => {
     if (searchParams.get("action") === "new-battle") {
@@ -234,23 +245,31 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
       const params = new URLSearchParams(searchParams.toString());
       if (params.get("action") === "new-battle") {
         params.delete("action");
-        // Maintain other params like 'campaign' if needed, or clear them?
-        // If we want to clear 'campaign' too if it was only for creating:
-        // params.delete("campaign"); 
-        // But 'campaign' might be a filter for the list too.
-        // Let's safe-keep other params.
-        router.replace(`${pathname}?${params.toString()}`);
+        setTimeout(() => {
+          router.replace(`${pathname}?${params.toString()}`);
+        }, 100);
       }
     }
   };
 
+  const handleEditBattle = (battle: any) => {
+    setSelectedBattle(battle);
+    setIsEditModalOpen(true);
+  };
+
   return (
     <>
-      <CreateBattleModal 
-        open={isCreateModalOpen} 
+      <CreateBattleModal
+        open={isCreateModalOpen}
         onOpenChange={handleOpenChange}
         draftData={createBattleDraft}
         onSaveDraft={setCreateBattleDraft}
+      />
+
+      <EditBattleModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        battle={selectedBattle}
       />
 
       {/* Header Section */}
@@ -264,8 +283,8 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
             Gerencie e acompanhe o progresso de todos os combates épicos.
           </p>
         </div>
-        <Button 
-          className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20" 
+        <Button
+          className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
           onClick={() => setIsCreateModalOpen(true)}
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -275,23 +294,23 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
 
       {/* Stats Summary - Reflects CURRENT FILTERED VIEW */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <StatCard 
-          title="Batalhas Listadas" 
-          value={allBattles.length} 
+        <StatCard
+          title="Batalhas Listadas"
+          value={allBattles.length}
           icon={History}
           description="Quantidade na visualização atual"
           colorClass="bg-slate-400"
         />
-        <StatCard 
-          title="Ativas" 
-          value={totalActive} 
+        <StatCard
+          title="Ativas"
+          value={totalActive}
           icon={Swords}
           description="Em andamento nesta lista"
           colorClass="bg-emerald-500"
         />
-        <StatCard 
-          title="Concluídas" 
-          value={totalInactive} 
+        <StatCard
+          title="Concluídas"
+          value={totalInactive}
           icon={Trophy}
           description="Finalizadas nesta lista"
           colorClass="bg-indigo-500"
@@ -300,11 +319,15 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
 
       {/* Main Content */}
       <div className="space-y-6">
-        
+
         <BattleFilters campaigns={campaigns} />
 
         {allBattles.length > 0 ? (
-          <BattleList battles={allBattles} currentUser={currentUser} />
+          <BattleList
+            battles={allBattles}
+            currentUser={currentUser}
+            onEdit={handleEditBattle}
+          />
         ) : (
           <Card className="border-dashed border-2 bg-transparent">
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
@@ -315,11 +338,11 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
                 Nenhuma batalha encontrada
               </h3>
               <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">
-                 Tente ajustar os filtros ou iniciar uma nova jornada.
+                Tente ajustar os filtros ou iniciar uma nova jornada.
               </p>
-              <Button 
-                variant="outline" 
-                className="mt-6 rounded-lg" 
+              <Button
+                variant="outline"
+                className="mt-6 rounded-lg"
                 onClick={() => setIsCreateModalOpen(true)}
               >
                 Criar Batalha

@@ -39,6 +39,7 @@ import NewDamage from "./components/newDamage";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
@@ -80,7 +81,7 @@ interface Battle {
   }>;
   active: boolean;
   round: number;
-    rounds: Array<{
+  rounds: Array<{
     _id: string;
     damage: number;
     type?: "damage" | "heal" | "other";
@@ -101,11 +102,14 @@ interface Battle {
 
 
 
+import { EditBattleModal } from "../components/edit-battle-modal";
+
 const BattlePage = () => {
   const { id } = useParams<{ id: string }>();
   const [battle, setBattle] = useState<Battle | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBattle = async () => {
@@ -127,7 +131,6 @@ const BattlePage = () => {
 
     fetchBattle();
 
-    // Pusher setup
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
     });
@@ -263,6 +266,11 @@ const BattlePage = () => {
           { label: battle?.name || "Detalhes da Batalha" },
         ]}
       />
+      <EditBattleModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        battle={battle}
+      />
       {battle && (
         <Card className="w-full shadow-lg">
           <CardHeader className="px-3 sm:px-6">
@@ -299,14 +307,17 @@ const BattlePage = () => {
                         />
                       </div>
                       <DropdownMenuSeparator />
-                      <div className="px-2 py-1 5">
-                        <Link
-                          href={`/dashboard/battles/${battle._id}/edit`}
-                          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      <div className="px-1 py-1">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            // Delay opening to allow dropdown to close cleanly first
+                            setTimeout(() => setIsEditModalOpen(true), 50);
+                          }}
+                          className="flex items-center gap-2 cursor-pointer"
                         >
                           <Pencil className="h-4 w-4" />
                           Editar
-                        </Link>
+                        </DropdownMenuItem>
                       </div>
                       <DropdownMenuSeparator />
                       <div className="px-2 py-1 5">
@@ -325,7 +336,7 @@ const BattlePage = () => {
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">            
+          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">
             <Tabs defaultValue="history" className="w-full">
               <div className="flex items-center justify-between mb-4">
                 <TabsList>
@@ -407,12 +418,12 @@ const BattlePage = () => {
                                 {(() => {
                                   const damageRounds = battle?.rounds?.filter((r) => r.type !== "heal") || [];
                                   if (damageRounds.length === 0) return 0;
-                                  
+
                                   const damagePerRound = damageRounds.reduce((acc, round) => {
                                     acc[round.round] = (acc[round.round] || 0) + round.damage;
                                     return acc;
                                   }, {} as Record<number, number>);
-                                  
+
                                   return Math.max(...Object.values(damagePerRound));
                                 })()}
                               </p>
@@ -481,9 +492,9 @@ const BattlePage = () => {
                               <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Média Aliada</p>
                               <p className="text-lg font-bold leading-tight">
                                 {(() => {
-                                  const allyRounds = battle?.rounds?.filter((r) => 
-                                    r.type !== "heal" && 
-                                    r.character && 
+                                  const allyRounds = battle?.rounds?.filter((r) =>
+                                    r.type !== "heal" &&
+                                    r.character &&
                                     (!r.character.alignment || r.character.alignment === "ally")
                                   ) || [];
                                   const totalDamage = allyRounds.reduce((acc, r) => acc + (r.damage || 0), 0);
@@ -505,8 +516,8 @@ const BattlePage = () => {
                               <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Média Inimiga</p>
                               <p className="text-lg font-bold leading-tight">
                                 {(() => {
-                                  const enemyRounds = battle?.rounds?.filter((r) => 
-                                    r.type !== "heal" && 
+                                  const enemyRounds = battle?.rounds?.filter((r) =>
+                                    r.type !== "heal" &&
                                     r.character?.alignment === "enemy"
                                   ) || [];
                                   const totalDamage = enemyRounds.reduce((acc, r) => acc + (r.damage || 0), 0);
@@ -563,8 +574,8 @@ const BattlePage = () => {
                               key={index}
                               className={cn(
                                 "p-3 rounded-lg hover:bg-muted/80 transition-colors",
-                                round.description?.startsWith("[TURNO_ALTERADO]") 
-                                  ? "bg-blue-500/10 border border-blue-500/20" 
+                                round.description?.startsWith("[TURNO_ALTERADO]")
+                                  ? "bg-blue-500/10 border border-blue-500/20"
                                   : "bg-muted"
                               )}
                             >
@@ -576,8 +587,8 @@ const BattlePage = () => {
                                 {round.type === "other" ? (
                                   <span className={cn(
                                     "col-span-2 flex items-start gap-2 break-all whitespace-pre-wrap min-w-0",
-                                    round.description?.startsWith("[TURNO_ALTERADO]") 
-                                      ? "text-blue-600 dark:text-blue-400 font-semibold" 
+                                    round.description?.startsWith("[TURNO_ALTERADO]")
+                                      ? "text-blue-600 dark:text-blue-400 font-semibold"
                                       : "italic text-muted-foreground"
                                   )}>
                                     {round.description?.startsWith("[TURNO_ALTERADO]") ? (
@@ -595,7 +606,7 @@ const BattlePage = () => {
                                       className={cn(
                                         "truncate flex items-center gap-2",
                                         round.character?.alignment === "enemy" &&
-                                          "text-red-500"
+                                        "text-red-500"
                                       )}
                                     >
                                       <UsersIcon className="h-4 w-4 text-muted-foreground" />
@@ -700,7 +711,7 @@ const BattlePage = () => {
                                 className={cn(
                                   "font-medium",
                                   char.status === "dead" &&
-                                    "line-through text-muted-foreground"
+                                  "line-through text-muted-foreground"
                                 )}
                               >
                                 {char.name}
@@ -729,23 +740,21 @@ const BattlePage = () => {
                                 );
                                 if (result.ok) {
                                   toast.success(
-                                    `Status de ${
-                                      char.name
-                                    } atualizado para ${
-                                      newStatus === "alive" ? "Vivo" : "Morto"
+                                    `Status de ${char.name
+                                    } atualizado para ${newStatus === "alive" ? "Vivo" : "Morto"
                                     }`
                                   );
                                   setBattle((prev) =>
                                     prev
                                       ? {
-                                          ...prev,
-                                          characters: prev.characters.map(
-                                            (c) =>
-                                              c._id === char._id
-                                                ? { ...c, status: newStatus }
-                                                : c
-                                          ),
-                                        }
+                                        ...prev,
+                                        characters: prev.characters.map(
+                                          (c) =>
+                                            c._id === char._id
+                                              ? { ...c, status: newStatus }
+                                              : c
+                                        ),
+                                      }
                                       : null
                                   );
                                 } else {
@@ -768,10 +777,10 @@ const BattlePage = () => {
                       {battle.characters.filter(
                         (char) => !char.alignment || char.alignment === "ally"
                       ).length === 0 && (
-                        <p className="text-sm text-muted-foreground">
-                          Nenhum aliado.
-                        </p>
-                      )}
+                          <p className="text-sm text-muted-foreground">
+                            Nenhum aliado.
+                          </p>
+                        )}
                     </div>
                   </div>
 
@@ -802,7 +811,7 @@ const BattlePage = () => {
                                 className={cn(
                                   "font-medium",
                                   char.status === "dead" &&
-                                    "line-through text-muted-foreground"
+                                  "line-through text-muted-foreground"
                                 )}
                               >
                                 {char.name}
@@ -829,23 +838,21 @@ const BattlePage = () => {
                                 );
                                 if (result.ok) {
                                   toast.success(
-                                    `Status de ${
-                                      char.name
-                                    } atualizado para ${
-                                      newStatus === "alive" ? "Vivo" : "Morto"
+                                    `Status de ${char.name
+                                    } atualizado para ${newStatus === "alive" ? "Vivo" : "Morto"
                                     }`
                                   );
                                   setBattle((prev) =>
                                     prev
                                       ? {
-                                          ...prev,
-                                          characters: prev.characters.map(
-                                            (c) =>
-                                              c._id === char._id
-                                                ? { ...c, status: newStatus }
-                                                : c
-                                          ),
-                                        }
+                                        ...prev,
+                                        characters: prev.characters.map(
+                                          (c) =>
+                                            c._id === char._id
+                                              ? { ...c, status: newStatus }
+                                              : c
+                                        ),
+                                      }
                                       : null
                                   );
                                 } else {
@@ -868,10 +875,10 @@ const BattlePage = () => {
                       {battle.characters.filter(
                         (char) => char.alignment === "enemy"
                       ).length === 0 && (
-                        <p className="text-sm text-muted-foreground">
-                          Nenhum inimigo.
-                        </p>
-                      )}
+                          <p className="text-sm text-muted-foreground">
+                            Nenhum inimigo.
+                          </p>
+                        )}
                     </div>
                   </div>
                 </div>

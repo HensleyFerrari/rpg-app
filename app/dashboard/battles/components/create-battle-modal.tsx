@@ -64,8 +64,6 @@ export function CreateBattleModal({
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
 
-  // Initialize form with draft data or default values
-  // We prioritize draftData, then URL param, then empty
   const defaultValues = {
     name: draftData?.name || "",
     campaign: draftData?.campaign || campaignIdParam || "",
@@ -76,15 +74,13 @@ export function CreateBattleModal({
     defaultValues,
   });
 
-  // Watch for changes and save draft
   const watchedValues = form.watch();
   useEffect(() => {
     if (open) {
       onSaveDraft(watchedValues);
     }
-  }, [JSON.stringify(watchedValues), open]); // JSON.stringify to avoid deep diff issues if object ref changes
+  }, [JSON.stringify(watchedValues), open]); 
 
-  // Fetch campaigns on mount (or when opening)
   useEffect(() => {
     const fetchCampaigns = async () => {
       setIsLoadingCampaigns(true);
@@ -105,9 +101,6 @@ export function CreateBattleModal({
 
     if (open) {
       fetchCampaigns();
-      // Reset form if it was opened with fresh needs, but here we rely on defaultValues passed to useForm
-      // React Hook Form's 'defaultValues' in useForm only applies on initial mount.
-      // If the component is re-mounted (DialogContent unmounts on close), it picks up the new defaultValues prop.
     }
   }, [open]);
 
@@ -137,13 +130,10 @@ export function CreateBattleModal({
         description: "A batalha foi criada com sucesso.",
       });
       
-      // Clear draft
       onSaveDraft(null);
       
-      // Close modal
       onOpenChange(false);
       
-      // Navigate to the new battle
       router.push(`/dashboard/battles/${response.data._id}`);
       
     } catch (error) {
@@ -158,7 +148,10 @@ export function CreateBattleModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent 
+        className="sm:max-w-[425px]"
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Nova Batalha</DialogTitle>
           <DialogDescription>
