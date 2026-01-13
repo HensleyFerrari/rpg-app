@@ -112,20 +112,7 @@ export default function ManageCampaign() {
                       href={`/dashboard/personagens/${character._id}`}
                       className="flex items-center gap-3 flex-1"
                     >
-                      {character.characterUrl ? (
-                        <div className="relative w-12 h-12 rounded-md overflow-hidden">
-                          <Image
-                            src={character.characterUrl}
-                            alt={character.name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center">
-                          <Users className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                      )}
+                      <CharacterAvatar character={character} />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{character.name}</p>
                         <div className="flex items-center gap-2">
@@ -192,6 +179,31 @@ export default function ManageCampaign() {
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+function CharacterAvatar({ character }: { character: any }) {
+  const [error, setError] = useState(false);
+
+  if (character.characterUrl && !error) {
+    return (
+      <div className="relative w-12 h-12 rounded-md overflow-hidden">
+        <Image
+          src={character.characterUrl}
+          alt={character.name}
+          fill
+          className="object-cover"
+          unoptimized
+          onError={() => setError(true)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center">
+      <Users className="h-6 w-6 text-muted-foreground" />
     </div>
   );
 }

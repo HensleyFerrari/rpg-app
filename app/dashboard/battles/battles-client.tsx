@@ -50,6 +50,29 @@ const StatCard = ({ title, value, icon: Icon, description, colorClass }: any) =>
   </Card>
 );
 
+const CampaignImage = ({ src, name }: { src?: string, name?: string }) => {
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
+      {src && !error ? (
+        <Image
+          src={src}
+          alt={name || "Campaign"}
+          fill
+          className="object-cover"
+          unoptimized
+          onError={() => setError(true)}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <Shield className="h-6 w-6 text-slate-400" />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentUser: any, onEdit: (battle: any) => void }) => (
   <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
     {/* Table Header - Desktop Only */}
@@ -71,21 +94,7 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
           {/* Mobile Specific Header: Image + Name + Status */}
           <div className="flex md:hidden items-start justify-between gap-3 w-full">
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
-                {battle.campaign?.imageUrl ? (
-                  <Image
-                    src={battle.campaign.imageUrl}
-                    alt={battle.campaign.name || "Campaign"}
-                    fill
-                    className="object-cover"
-                    unoptimized={false}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Shield className="h-6 w-6 text-slate-400" />
-                  </div>
-                )}
-              </div>
+              <CampaignImage src={battle.campaign?.imageUrl} name={battle.campaign?.name} />
               <div className="min-w-0 flex-1">
                 <Link href={`/dashboard/battles/${battle._id}`}>
                   <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">
@@ -107,21 +116,7 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
 
           {/* Desktop: Battle / Campaign */}
           <div className="hidden md:flex col-span-4 items-center gap-4">
-            <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 border border-border bg-muted">
-              {battle.campaign?.imageUrl ? (
-                <Image
-                  src={battle.campaign.imageUrl}
-                  alt={battle.campaign.name || "Campaign"}
-                  fill
-                  className="object-cover"
-                  unoptimized={false}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-slate-400" />
-                </div>
-              )}
-            </div>
+            <CampaignImage src={battle.campaign?.imageUrl} name={battle.campaign?.name} />
             <div className="min-w-0">
               <Link href={`/dashboard/battles/${battle._id}`}>
                 <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">

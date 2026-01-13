@@ -41,10 +41,10 @@ const CampaignDetail = async ({ params }: any) => {
   const battles = battlesResponse.ok ? battlesResponse.data : [];
   const formattedDate = campaign.createdAt
     ? new Date(campaign.createdAt).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      })
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    })
     : "Data desconhecida";
 
   const isOwner = currentUser?._id.toString() === campaign.owner?._id;
@@ -93,25 +93,25 @@ const CampaignDetail = async ({ params }: any) => {
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="flex flex-wrap h-auto w-full justify-start gap-2 bg-transparent p-0 mb-6">
-            <TabsTrigger 
+            <TabsTrigger
               value="overview"
               className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
             >
               Visão Geral
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="characters"
               className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
             >
               Personagens ({characters.length})
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="npcs"
               className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
             >
               NPCs ({npcs.length})
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="battles"
               className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
             >
@@ -141,6 +141,7 @@ const CampaignDetail = async ({ params }: any) => {
                           fill
                           className="object-contain"
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          unoptimized
                         />
                       </div>
                     )}
@@ -176,6 +177,7 @@ const CampaignDetail = async ({ params }: any) => {
                             alt={campaign.owner?.name || "Mestre"}
                             fill
                             className="object-cover"
+                            unoptimized
                           />
                         </div>
                       ) : (
@@ -215,35 +217,35 @@ const CampaignDetail = async ({ params }: any) => {
                 </Link>
               )}
             </div>
-            <CharacterList 
-              characters={characters} 
-              isOwner={isOwner} 
-              campaignId={campaign._id} 
+            <CharacterList
+              characters={characters}
+              isOwner={isOwner}
+              campaignId={campaign._id}
               isNpc={false}
             />
           </TabsContent>
 
           <TabsContent value="npcs" className="mt-6">
-             <div className="flex items-center justify-between mb-4">
-               <h3 className="text-xl font-semibold flex items-center gap-2">
-                 <Users className="h-5 w-5" />
-                 NPCs
-               </h3>
-               {isOwner && (
-                 <Link href={`/dashboard/personagens/new?campaign=${campaign._id}&isNpc=true`}>
-                   <Button variant="outline" size="sm" className="gap-2">
-                     <PlusCircle className="h-4 w-4" />
-                     Novo NPC
-                   </Button>
-                 </Link>
-               )}
-             </div>
-             <CharacterList 
-               characters={npcs} 
-               isOwner={isOwner} 
-               campaignId={campaign._id} 
-               isNpc={true}
-             />
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                NPCs
+              </h3>
+              {isOwner && (
+                <Link href={`/dashboard/personagens/new?campaign=${campaign._id}&isNpc=true`}>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <PlusCircle className="h-4 w-4" />
+                    Novo NPC
+                  </Button>
+                </Link>
+              )}
+            </div>
+            <CharacterList
+              characters={npcs}
+              isOwner={isOwner}
+              campaignId={campaign._id}
+              isNpc={true}
+            />
           </TabsContent>
 
           <TabsContent value="battles" className="mt-6">
@@ -277,7 +279,7 @@ const CampaignDetail = async ({ params }: any) => {
                       >
                         <div className="flex items-center gap-3">
                           <div className="bg-primary/10 p-2 rounded-full">
-                             <Shield className="h-4 w-4 text-primary" />
+                            <Shield className="h-4 w-4 text-primary" />
                           </div>
                           <div>
                             <p className="font-medium">{battle.name}</p>
