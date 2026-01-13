@@ -29,6 +29,8 @@ import {
   Shield
 } from "lucide-react";
 import { BattleFilters } from "./components/battle-filters";
+import { CreateBattleModal } from "./components/create-battle-modal";
+import { useState, useEffect } from "react";
 
 const StatCard = ({ title, value, icon: Icon, description, colorClass }: any) => (
   <Card className="overflow-hidden border-none shadow-md bg-card/50 backdrop-blur-sm">
@@ -205,13 +207,52 @@ const BattleList = ({ battles, currentUser }: { battles: any[], currentUser: any
   </div>
 );
 
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+
 export default function BattlesDashboardClient({ allBattles, currentUser, campaigns }: { allBattles: any[], currentUser: any, campaigns: any[] }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   // Calculated stats based on the filtered view (allBattles contains the filtered result from server)
   const totalActive = allBattles.filter((b) => b.active).length;
   const totalInactive = allBattles.filter((b) => !b.active).length;
+  
+  // Modal State
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createBattleDraft, setCreateBattleDraft] = useState<any>(null);
+
+  useEffect(() => {
+    if (searchParams.get("action") === "new-battle") {
+      setIsCreateModalOpen(true);
+    }
+  }, [searchParams]);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsCreateModalOpen(open);
+    if (!open) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (params.get("action") === "new-battle") {
+        params.delete("action");
+        // Maintain other params like 'campaign' if needed, or clear them?
+        // If we want to clear 'campaign' too if it was only for creating:
+        // params.delete("campaign"); 
+        // But 'campaign' might be a filter for the list too.
+        // Let's safe-keep other params.
+        router.replace(`${pathname}?${params.toString()}`);
+      }
+    }
+  };
 
   return (
     <>
+      <CreateBattleModal 
+        open={isCreateModalOpen} 
+        onOpenChange={handleOpenChange}
+        draftData={createBattleDraft}
+        onSaveDraft={setCreateBattleDraft}
+      />
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -223,11 +264,12 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
             Gerencie e acompanhe o progresso de todos os combates épicos.
           </p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20" asChild>
-          <Link href="/dashboard/battles/newBattle" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Nova Batalha
-          </Link>
+        <Button 
+          className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20" 
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Nova Batalha
         </Button>
       </div>
 
@@ -275,8 +317,12 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
               <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">
                  Tente ajustar os filtros ou iniciar uma nova jornada.
               </p>
-              <Button variant="outline" className="mt-6 rounded-lg" asChild>
-                <Link href="/dashboard/battles/newBattle">Criar Batalha</Link>
+              <Button 
+                variant="outline" 
+                className="mt-6 rounded-lg" 
+                onClick={() => setIsCreateModalOpen(true)}
+              >
+                Criar Batalha
               </Button>
             </CardContent>
           </Card>

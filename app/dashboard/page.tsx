@@ -73,7 +73,7 @@ const Dashboard = async () => {
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
-          <Link href="/dashboard/battles/newBattle">
+          <Link href="/dashboard/battles?action=new-battle">
             <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-2">
               <Swords className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>

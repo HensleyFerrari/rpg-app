@@ -256,7 +256,7 @@ const CampaignDetail = async ({ params }: any) => {
                   </CardTitle>
                   {isOwner && (
                     <Link
-                      href={`/dashboard/battles/newBattle?campaign=${campaign._id}`}
+                      href={`/dashboard/battles?action=new-battle&campaign=${campaign._id}`}
                     >
                       <Button variant="outline" size="sm">
                         <PlusCircle className="h-4 w-4" />
