@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Heart, Skull, Sword, User, Users } from "lucide-react";
+import { Heart, Skull, User, Users } from "lucide-react";
 import Link from "next/link";
 import { CharacterCardActions } from "./character-card-actions";
 

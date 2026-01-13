@@ -23,7 +23,7 @@ export async function getCampaigns({ query, filterType }: { query?: string, filt
   try {
     await connectDB();
 
-    let queryObj: any = {};
+    const queryObj: any = {};
 
     if (query) {
       queryObj.name = { $regex: query, $options: "i" };

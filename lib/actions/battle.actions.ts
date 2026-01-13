@@ -302,7 +302,7 @@ export const getBattles = async ({
   try {
     await connectDB();
 
-    let queryObj: any = {};
+    const queryObj: any = {};
 
     if (query) {
       queryObj.name = { $regex: query, $options: "i" };
