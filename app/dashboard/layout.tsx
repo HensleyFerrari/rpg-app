@@ -4,7 +4,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
-  title: "Drgp - Dashboard",
+  title: "Drpg - Dashboard",
   description: "Controle sua campanha de RPG",
 };
 
