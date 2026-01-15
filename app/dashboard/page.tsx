@@ -38,7 +38,7 @@ const Dashboard = async () => {
   // Stats calculation
   const totalBattles = battles.length;
   const activeBattles = battles.filter((b) => b.active).length;
-  
+
   const totalCharacters = characters.length;
   const aliveCharacters = characters.filter((c) => c.status === "alive").length;
   const deadCharacters = characters.filter((c) => c.status === "dead").length;
@@ -68,12 +68,12 @@ const Dashboard = async () => {
 
       {/* Quick Actions Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
-          <Link href="/dashboard/battles/newBattle">
+          <Link href="/dashboard/battles?action=new-battle">
             <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-2">
               <Swords className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
@@ -82,12 +82,12 @@ const Dashboard = async () => {
           </Link>
         </Button>
 
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
-          <Link href="/dashboard/personagens/new">
+          <Link href="/dashboard/personagens?new=true">
             <div className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 p-2">
               <Users className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
             </div>
@@ -96,8 +96,8 @@ const Dashboard = async () => {
           </Link>
         </Button>
 
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
@@ -190,14 +190,15 @@ const Dashboard = async () => {
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
                         {battle.campaign?.imageUrl ? (
-                           <div className="relative h-10 w-10 rounded-lg overflow-hidden">
-                             <Image 
-                               src={battle.campaign.imageUrl} 
-                               alt="Campaign" 
-                               fill 
-                               className="object-cover"
-                             />
-                           </div>
+                          <div className="relative h-10 w-10 rounded-lg overflow-hidden">
+                            <Image
+                              src={battle.campaign.imageUrl}
+                              alt="Campaign"
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </div>
                         ) : (
                           <Swords className="h-5 w-5 text-slate-500" />
                         )}
@@ -246,11 +247,12 @@ const Dashboard = async () => {
                       <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 overflow-hidden">
                         {char.characterUrl ? (
                           <div className="relative h-10 w-10">
-                            <Image 
-                              src={char.characterUrl} 
-                              alt={char.name} 
-                              fill 
+                            <Image
+                              src={char.characterUrl}
+                              alt={char.name}
+                              fill
                               className="object-cover"
+                              unoptimized
                             />
                           </div>
                         ) : (

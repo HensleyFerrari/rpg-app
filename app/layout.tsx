@@ -12,8 +12,11 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Dr.PG",
-  description: "Dr.PG - RPG Battle Manager",
+  title: "Drpg",
+  description: "Drpg - RPG Battle Manager",
+  icons: {
+    icon: "/drpg-logo.png",
+  },
 };
 
 export default function RootLayout({

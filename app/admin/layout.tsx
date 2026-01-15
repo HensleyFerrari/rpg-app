@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Drgp - Dashboard",
+  title: "Drpg - Dashboard",
   description: "Controle sua campanha de RPG",
 };
 

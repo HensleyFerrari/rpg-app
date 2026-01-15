@@ -24,18 +24,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronDown,
-  Book,
   Heart,
   LayoutDashboard,
   User,
-  Users,
-  List,
   LogOut,
   Swords,
-  ScrollText,
   Crown,
   UsersRound,
-  Skull,
   Cog,
   Sparkles,
 } from "lucide-react";
@@ -60,60 +55,22 @@ const items = [
   },
   {
     title: "Campanhas",
+    url: "/dashboard/campaigns",
     icons: Crown,
     id: "campaigns",
-    items: [
-      {
-        title: "Minhas Campanhas",
-        url: "/dashboard/campaigns/mycampaigns",
-        icons: ScrollText,
-      },
-      {
-        title: "Todas as campanhas",
-        url: "/dashboard/campaigns",
-        icons: Book,
-      },
-    ],
   },
   {
     title: "Personagens",
+    url: "/dashboard/personagens",
     icons: UsersRound,
-    id: "characters",
-    items: [
-      {
-        title: "Meus Personagens",
-        url: "/dashboard/personagens/mycharacters",
-        icons: User,
-      },
-      {
-        title: "Todos os Personagens",
-        url: "/dashboard/personagens",
-        icons: Users,
-      },
-    ],
   },
   {
     title: "Batalhas",
+    url: "/dashboard/battles",
     icons: Swords,
     id: "battles",
-    items: [
-      {
-        title: "Minhas Batalhas",
-        url: "/dashboard/battles/mybattles",
-        icons: Skull,
-      },
-      {
-        title: "Todas as Batalhas",
-        url: "/dashboard/battles",
-        icons: List,
-      },
-    ],
   },
-  {
-    title: "Feedbacks",
-    url: "/dashboard/feedback",
-    icons: ScrollText,
-  },
+
   {
     title: `Configurações`,
     url: "/dashboard/settings",

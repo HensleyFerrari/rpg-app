@@ -19,11 +19,25 @@ const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
 
-export async function getCampaigns() {
+export async function getCampaigns({ query, filterType }: { query?: string, filterType?: 'all' | 'my' } = {}) {
   try {
     await connectDB();
 
-    const campaigns = await Campaign.find({})
+    const queryObj: any = {};
+
+    if (query) {
+      queryObj.name = { $regex: query, $options: "i" };
+    }
+
+    if (filterType === 'my') {
+      const userData = await getCurrentUser();
+      const user = await findByEmail(userData.email);
+      if (user && user._id) {
+        queryObj.owner = user._id;
+      }
+    }
+
+    const campaigns = await Campaign.find(queryObj)
       .populate("owner", "name")
       .sort({ createdAt: -1 })
       .lean();

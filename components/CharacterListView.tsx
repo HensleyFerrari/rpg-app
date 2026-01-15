@@ -1,14 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import { useSearchParams } from "next/navigation";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { Book, User2, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
@@ -37,15 +40,22 @@ interface CharacterListViewProps {
   characters: Character[];
   showOwner?: boolean;
   onDelete?: (id: string) => void;
-  isOwner?: (character: Character) => boolean;
+  currentUserId?: string;
 }
 
-export function CharacterListView({ 
-  characters, 
-  showOwner = true, 
+export function CharacterListView({
+  characters,
+  showOwner = true,
   onDelete,
-  isOwner = () => false
+  currentUserId
 }: CharacterListViewProps) {
+  const searchParams = useSearchParams();
+  const isOwner = (char: Character) => {
+
+    if (!currentUserId) return false;
+    const ownerId = typeof char.owner === 'object' ? char.owner._id : char.owner;
+    return ownerId === currentUserId;
+  };
   return (
     <div className="rounded-md border bg-card">
       <Table>
@@ -70,24 +80,11 @@ export function CharacterListView({
             characters.map((char) => (
               <TableRow key={char._id} className="group">
                 <TableCell>
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden bg-muted border">
-                    {char.characterUrl ? (
-                      <Image
-                        src={char.characterUrl}
-                        alt={char.name}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <User2 className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                    )}
-                  </div>
+                  <CharacterAvatar char={char} />
                 </TableCell>
                 <TableCell className="font-medium">
                   <div className="flex flex-col">
-                    <Link 
+                    <Link
                       href={`/dashboard/personagens/${char._id}`}
                       className="hover:underline"
                     >
@@ -109,8 +106,8 @@ export function CharacterListView({
                 </TableCell>
                 {showOwner && (
                   <TableCell className="text-sm text-muted-foreground">
-                    {typeof char.owner === 'object' 
-                      ? char.owner.name || char.owner.username 
+                    {typeof char.owner === 'object'
+                      ? char.owner.name || char.owner.username
                       : char.owner}
                   </TableCell>
                 )}
@@ -130,12 +127,18 @@ export function CharacterListView({
                       {isOwner(char) && (
                         <>
                           <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/personagens/${char._id}/edit`} className="flex items-center">
+                            <Link
+                              href={{
+                                pathname: "/dashboard/personagens",
+                                query: { ...Object.fromEntries(searchParams.entries()), edit: char._id },
+                              }}
+                              className="flex items-center"
+                            >
                               <Edit className="mr-2 h-4 w-4" /> Editar
                             </Link>
                           </DropdownMenuItem>
                           {onDelete && (
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               className="text-destructive focus:text-destructive"
                               onClick={() => onDelete(char._id)}
                             >
@@ -152,6 +155,29 @@ export function CharacterListView({
           )}
         </TableBody>
       </Table>
+    </div >
+  );
+}
+
+function CharacterAvatar({ char }: { char: Character }) {
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="relative w-10 h-10 rounded-full overflow-hidden bg-muted border">
+      {char.characterUrl && !error ? (
+        <Image
+          src={char.characterUrl}
+          alt={char.name}
+          fill
+          className="object-cover"
+          onError={() => setError(true)}
+          unoptimized
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <User2 className="w-5 h-5 text-muted-foreground" />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { getCampaigns } from "../../../lib/actions/campaign.actions";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Dice4, ScrollText } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -11,29 +11,55 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CampaignFilters } from "./components/campaign-filters";
 
-const CampaignsPage = async () => {
-  const campaignsResponse = await getCampaigns();
+const CampaignsPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; filter?: "all" | "my" }>;
+}) => {
+  const { q: query, filter: filterType } = await searchParams;
+
+  const campaignsResponse = await getCampaigns({ query, filterType });
+  const campaigns = Array.isArray(campaignsResponse) ? campaignsResponse : []; // Handle potential non-array response safely if needed, though getCampaigns returns array or serialized array
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Campanhas</h1>
-        <Link href="/dashboard/campaigns/createCampaign">
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Nova Campanha
-          </Button>
-        </Link>
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Campanhas</h1>
+            <Link href="/dashboard/campaigns/createCampaign">
+            <Button className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Nova Campanha
+            </Button>
+            </Link>
+        </div>
+        
+        <CampaignFilters />
       </div>
-      {campaignsResponse.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-10 text-center">
-          <p className="text-muted-foreground mb-4">
-            Não existem campanhas cadastradas
-          </p>
-          <Link href="/dashboard/campaigns/createCampaign">
-            <Button>Criar Primeira Campanha</Button>
-          </Link>
+
+      {campaigns.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-6 py-16 text-center rounded-md border border-dashed p-8">
+            <div className="flex gap-4">
+            <Dice4 className="h-12 w-12 text-muted-foreground/50" />
+            <ScrollText className="h-12 w-12 text-muted-foreground/50" />
+            </div>
+            <div className="space-y-2">
+            <h3 className="text-xl font-semibold">
+                Nenhuma campanha encontrada
+            </h3>
+            <p className="text-muted-foreground max-w-sm mx-auto">
+                {query 
+                ? `Não encontramos nenhuma campanha com o termo "${query}". Tente buscar por outro nome.` 
+                : "Não existem campanhas cadastradas para o filtro selecionado."}
+            </p>
+            </div>
+            {!query && (
+                <Link href="/dashboard/campaigns/createCampaign">
+                    <Button>Criar Primeira Campanha</Button>
+                </Link>
+            )}
         </div>
       ) : (
         <div className="rounded-md border">
@@ -48,7 +74,7 @@ const CampaignsPage = async () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {campaignsResponse.map((campaign: any) => (
+              {campaigns.map((campaign: any) => (
                 <TableRow key={campaign._id}>
                   <TableCell>
                     <Avatar className="h-12 w-12 rounded-sm">

@@ -61,22 +61,23 @@ export default function Home() {
       <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/20 backdrop-blur-xl">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
+            {/* <div className="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
               <Dice6 className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">RPG<span className="text-primary italic">Forge</span></span>
+            </div> */}
+            <img src="/drpg-logo.png" alt="Drpg Logo" className="h-10 w-10" />
+            <span className="text-xl font-bold tracking-tight">Drpg</span>
           </div>
           <div className="flex items-center gap-4">
-             <Link href="/login">
-                <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-white/5">
-                  Entrar
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
-                  Cadastrar
-                </Button>
-              </Link>
+            <Link href="/login">
+              <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-white/5">
+                Entrar
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+                Cadastrar
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -85,18 +86,19 @@ export default function Home() {
       <section className="relative px-4 pt-32 pb-20 md:pt-48 md:pb-32 flex items-center justify-center overflow-hidden">
         <div className="container mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-primary mb-8 backdrop-blur-sm animate-fade-in">
-             <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-             Novo: Gerenciamento de Combates Redesenhado
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            Novo: Gerenciamento de Combates Redesenhado
           </div>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 leading-tight">
             Forje suas Lendas<br />no Mundo Digital
           </h1>
           <p className="text-lg md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-            A plataforma definitiva para organizar suas campanhas de RPG. 
+            A plataforma definitiva para organizar suas campanhas de RPG.
             Mestres e jogadores conectados em uma experiência premium e intuitiva.
+            Drpg é a ferramenta que você precisava para levar suas sessões para o próximo nível.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Link href="/register" className="w-full sm:w-auto">
@@ -105,7 +107,7 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-             <Link href="/login" className="w-full sm:w-auto">
+            <Link href="/login" className="w-full sm:w-auto">
               <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-semibold w-full border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white transition-all duration-300">
                 Ver Demonstração
               </Button>
@@ -143,11 +145,11 @@ export default function Home() {
         <div className="container mx-auto">
           <div className="rounded-3xl p-12 bg-white/5 border border-white/10 backdrop-blur-md relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_120%,rgba(59,130,246,0.1),transparent)] pointer-events-none"></div>
-            
+
             <h2 className="text-2xl md:text-4xl font-bold text-center mb-16 relative z-10">
               Transformando a forma de jogar RPG
             </h2>
-            
+
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
               {[
                 { value: "15.7K+", label: "Personagens", sub: "Criados por jogadores" },
@@ -192,11 +194,11 @@ export default function Home() {
       <footer className="py-12 px-4 border-t border-white/5 relative z-10">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
-            <Dice6 className="h-5 w-5 text-primary" />
-            <span className="text-lg font-bold">RPGForge</span>
+            <img src="/drpg-logo.png" alt="Drpg Logo" className="h-6 w-6" />
+            <span className="text-lg font-bold">Drpg</span>
           </div>
           <p className="text-slate-500 text-sm">
-            © 2026 RPGForge. Todos os direitos reservados.
+            © 2026 Drpg. Todos os direitos reservados.
           </p>
           <div className="flex gap-6">
             <Button variant="ghost" size="icon" className="text-slate-500 hover:text-white">

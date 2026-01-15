@@ -25,7 +25,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
-import { CharacterCardActions } from "./_components/character-card-actions";
+import { CharacterList } from "./_components/character-list";
 
 const CampaignDetail = async ({ params }: any) => {
   const { id } = params;
@@ -41,10 +41,10 @@ const CampaignDetail = async ({ params }: any) => {
   const battles = battlesResponse.ok ? battlesResponse.data : [];
   const formattedDate = campaign.createdAt
     ? new Date(campaign.createdAt).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      })
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    })
     : "Data desconhecida";
 
   const isOwner = currentUser?._id.toString() === campaign.owner?._id;
@@ -65,7 +65,7 @@ const CampaignDetail = async ({ params }: any) => {
           />
 
           <div className="flex flex-wrap gap-2">
-            <Link href={`/dashboard/personagens/new?campaign=${campaign._id}`}>
+            <Link href={`/dashboard/personagens?new=true&campaign=${campaign._id}`}>
               <Button variant="outline" className="gap-2">
                 <PlusCircle className="h-4 w-4" />
                 Novo Personagem
@@ -93,25 +93,25 @@ const CampaignDetail = async ({ params }: any) => {
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="flex flex-wrap h-auto w-full justify-start gap-2 bg-transparent p-0 mb-6">
-            <TabsTrigger 
+            <TabsTrigger
               value="overview"
               className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
             >
               Visão Geral
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="characters"
               className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
             >
               Personagens ({characters.length})
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="npcs"
               className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
             >
               NPCs ({npcs.length})
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="battles"
               className="data-[state=active]:bg-background data-[state=active]:shadow-sm border bg-muted/50 px-4 py-2"
             >
@@ -141,6 +141,7 @@ const CampaignDetail = async ({ params }: any) => {
                           fill
                           className="object-contain"
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          unoptimized
                         />
                       </div>
                     )}
@@ -176,6 +177,7 @@ const CampaignDetail = async ({ params }: any) => {
                             alt={campaign.owner?.name || "Mestre"}
                             fill
                             className="object-cover"
+                            unoptimized
                           />
                         </div>
                       ) : (
@@ -207,7 +209,7 @@ const CampaignDetail = async ({ params }: any) => {
                 Personagens
               </h3>
               {isOwner && (
-                <Link href={`/dashboard/personagens/new?campaign=${campaign._id}`}>
+                <Link href={`/dashboard/personagens?new=true&campaign=${campaign._id}`}>
                   <Button variant="outline" size="sm" className="gap-2">
                     <PlusCircle className="h-4 w-4" />
                     Novo Personagem
@@ -215,165 +217,35 @@ const CampaignDetail = async ({ params }: any) => {
                 </Link>
               )}
             </div>
-            {characters.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {characters.map((character: any) => (
-                  <Card key={character._id} className="h-full hover:bg-muted/50 transition-colors relative group">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start justify-between">
-                          <Link href={`/dashboard/personagens/${character._id}`} className="flex items-center gap-3 flex-1 min-w-0">
-                            {character.characterUrl ? (
-                              <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
-                                <Image
-                                  src={character.characterUrl}
-                                  alt={character.name}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                                <Users className="h-6 w-6 text-muted-foreground" />
-                              </div>
-                            )}
-                            <div className="min-w-0">
-                              <CardTitle className="text-base font-bold line-clamp-1">{character.name}</CardTitle>
-                              <CardDescription className="line-clamp-1">
-                                {character.class && <span>{character.class} • </span>}
-                                Nível {character.level || 1}
-                              </CardDescription>
-                            </div>
-                          </Link>
-                          <div className="ml-2">
-                            <CharacterCardActions 
-                                characterId={character._id}
-                                isNpc={false}
-                                isOwner={isOwner}
-                                characterName={character.name}
-                            />
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <Link href={`/dashboard/personagens/${character._id}`}>
-                          <div className="flex items-center justify-between mt-2">
-                             <Badge
-                                variant={
-                                  character.status === "alive"
-                                    ? "default"
-                                    : "destructive"
-                                }
-                                className="text-xs"
-                              >
-                                {character.status === "alive" ? "Vivo" : "Morto"}
-                              </Badge>
-                             <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <User className="h-3 w-3" />
-                                {character.owner?.name || character.owner?.username || "Jogador"}
-                             </span>
-                          </div>
-                        </Link>
-                      </CardContent>
-                    </Card>
-                ))}
-              </div>
-            ) : (
-               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
-                  <Users className="h-12 w-12 mb-4 opacity-20" />
-                  <p>Nenhum personagem (jogador) nesta campanha.</p>
-                  <Link href={`/dashboard/personagens/new?campaign=${campaign._id}`} className="mt-4">
-                     <Button variant="outline">Criar Personagem</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            )}
+            <CharacterList
+              characters={characters}
+              isOwner={isOwner}
+              campaignId={campaign._id}
+              isNpc={false}
+            />
           </TabsContent>
 
           <TabsContent value="npcs" className="mt-6">
-             <div className="flex items-center justify-between mb-4">
-               <h3 className="text-xl font-semibold flex items-center gap-2">
-                 <Users className="h-5 w-5" />
-                 NPCs
-               </h3>
-               {isOwner && (
-                 <Link href={`/dashboard/personagens/new?campaign=${campaign._id}&isNpc=true`}>
-                   <Button variant="outline" size="sm" className="gap-2">
-                     <PlusCircle className="h-4 w-4" />
-                     Novo NPC
-                   </Button>
-                 </Link>
-               )}
-             </div>
-             {npcs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {npcs.map((npc: any) => (
-                  <Card key={npc._id} className="h-full hover:bg-muted/50 transition-colors">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start justify-between">
-                            <Link href={`/dashboard/personagens/${npc._id}`} className="flex items-center gap-3 flex-1 min-w-0">
-                                {npc.characterUrl ? (
-                                  <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
-                                    <Image
-                                      src={npc.characterUrl}
-                                      alt={npc.name}
-                                      fill
-                                      className="object-cover"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                                    <Users className="h-6 w-6 text-muted-foreground" />
-                                  </div>
-                                )}
-                                <div className="min-w-0">
-                                  <CardTitle className="text-base font-bold line-clamp-1">{npc.name}</CardTitle>
-                                  <CardDescription className="line-clamp-1">
-                                    {npc.race && <span>{npc.race} • </span>}
-                                    NPC
-                                  </CardDescription>
-                                </div>
-                            </Link>
-                            <div className="ml-2">
-                                <CharacterCardActions 
-                                    characterId={npc._id}
-                                    isNpc={true}
-                                    isOwner={isOwner}
-                                    characterName={npc.name}
-                                />
-                            </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                         <Link href={`/dashboard/personagens/${npc._id}`}>
-                             <div className="flex items-center justify-between mt-2">
-                                 <Badge
-                                  variant={
-                                    npc.status === "alive"
-                                      ? "default"
-                                      : "destructive"
-                                  }
-                                  className="text-xs"
-                                >
-                                  {npc.status === "alive" ? "Vivo" : "Morto"}
-                                </Badge>
-                             </div>
-                         </Link>
-                      </CardContent>
-                    </Card>
-                ))}
-              </div>
-             ) : (
-               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
-                  <Users className="h-12 w-12 mb-4 opacity-20" />
-                  <p>Nenhum NPC nesta campanha.</p>
-                   <Link href={`/dashboard/personagens/new?campaign=${campaign._id}&isNpc=true`} className="mt-4">
-                     <Button variant="outline">Criar NPC</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-             )}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                NPCs
+              </h3>
+              {isOwner && (
+                <Link href={`/dashboard/personagens?new=true&campaign=${campaign._id}&isNpc=true`}>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <PlusCircle className="h-4 w-4" />
+                    Novo NPC
+                  </Button>
+                </Link>
+              )}
+            </div>
+            <CharacterList
+              characters={npcs}
+              isOwner={isOwner}
+              campaignId={campaign._id}
+              isNpc={true}
+            />
           </TabsContent>
 
           <TabsContent value="battles" className="mt-6">
@@ -386,7 +258,7 @@ const CampaignDetail = async ({ params }: any) => {
                   </CardTitle>
                   {isOwner && (
                     <Link
-                      href={`/dashboard/battles/newBattle?campaign=${campaign._id}`}
+                      href={`/dashboard/battles?action=new-battle&campaign=${campaign._id}`}
                     >
                       <Button variant="outline" size="sm">
                         <PlusCircle className="h-4 w-4" />
@@ -407,7 +279,7 @@ const CampaignDetail = async ({ params }: any) => {
                       >
                         <div className="flex items-center gap-3">
                           <div className="bg-primary/10 p-2 rounded-full">
-                             <Shield className="h-4 w-4 text-primary" />
+                            <Shield className="h-4 w-4 text-primary" />
                           </div>
                           <div>
                             <p className="font-medium">{battle.name}</p>

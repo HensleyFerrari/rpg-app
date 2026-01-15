@@ -275,6 +275,7 @@ export const deleteBattle = async (id: string) => {
     await Battle.findByIdAndDelete(id);
 
     revalidatePath("/dashboard/campaigns");
+    revalidatePath("/dashboard/battles");
 
     return {
       ok: true,
@@ -288,6 +289,65 @@ export const deleteBattle = async (id: string) => {
     };
   }
 };
+
+export const getBattles = async ({
+  query,
+  filterType,
+  campaignId,
+}: {
+  query?: string;
+  filterType?: "all" | "my";
+  campaignId?: string;
+} = {}) => {
+  try {
+    await connectDB();
+
+    const queryObj: any = {};
+
+    if (query) {
+      queryObj.name = { $regex: query, $options: "i" };
+    }
+
+    if (filterType === "my") {
+      const userData = await getCurrentUser();
+      if (userData && userData._id) {
+        queryObj.owner = userData._id;
+      }
+    }
+
+    if (campaignId && campaignId !== "all") {
+       if (mongoose.isValidObjectId(campaignId)) {
+        queryObj.campaign = campaignId;
+      }
+    }
+
+    const battles = await Battle.find(queryObj)
+      .populate({
+        path: "owner",
+        select: "name",
+        model: User,
+      })
+      .populate({
+        path: "campaign",
+        select: "name imageUrl",
+        model: Campaign,
+      })
+      .sort({ createdAt: -1 });
+
+    return {
+      ok: true,
+      data: serializeData(battles),
+    };
+  } catch (error) {
+    console.error("Error getting battles:", error);
+    return {
+      ok: false,
+      message: "Erro ao buscar batalhas",
+      data: [],
+    };
+  }
+};
+
 
 export const getAllBattles = async () => {
   await connectDB();

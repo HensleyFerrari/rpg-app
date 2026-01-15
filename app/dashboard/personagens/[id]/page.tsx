@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { 
-  User2, 
-  Swords, 
-  Edit, 
-  Book, 
-  Shield, 
-  Calendar, 
+import {
+  User2,
+  Swords,
+  Edit,
+  Book,
+  Shield,
+  Calendar,
   Trash2,
   Clock,
   User
@@ -27,6 +27,8 @@ import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { CharacterModal } from "../_components/character-modal";
+
 
 // Character type definition
 type Character = {
@@ -66,6 +68,7 @@ const CharacterPage = () => {
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasEditPermission, setHasEditPermission] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -95,7 +98,7 @@ const CharacterPage = () => {
 
   const handleDelete = async () => {
     if (!confirm("Tem certeza que deseja excluir este personagem?")) return;
-    
+
     try {
       const response = await deleteCharacter(id);
       if (response.ok) {
@@ -159,15 +162,15 @@ const CharacterPage = () => {
           <h1 className="text-4xl font-extrabold tracking-tight mt-2 flex items-center gap-3">
             {character.name}
             {character.isNpc && (
-                <Badge variant="outline" className="text-xs uppercase px-2 py-0 border-primary/30 text-primary">NPC</Badge>
+              <Badge variant="outline" className="text-xs uppercase px-2 py-0 border-primary/30 text-primary">NPC</Badge>
             )}
           </h1>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {hasEditPermission && (
             <>
-              <Link href={`/dashboard/personagens/${id}/edit`}>
+              <Link href={`?edit=${id}`}>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Edit className="w-4 h-4" /> Editar
                 </Button>
@@ -189,12 +192,14 @@ const CharacterPage = () => {
           <Card className="overflow-hidden border-none shadow-lg ring-1 ring-border">
             <CardContent className="p-0">
               <div className="relative aspect-[3/4] w-full">
-                {character.characterUrl ? (
+                {character.characterUrl && !imageError ? (
                   <Image
                     src={character.characterUrl}
                     alt={character.name}
                     fill
                     className="object-cover transition-transform hover:scale-105 duration-500"
+                    unoptimized
+                    onError={() => setImageError(true)}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted flex items-center justify-center">
@@ -221,7 +226,7 @@ const CharacterPage = () => {
               <div className="flex flex-col items-center justify-center p-4 bg-secondary/30 rounded-xl border border-border/50">
                 <Shield className="w-5 h-5 text-secondary-foreground mb-2" />
                 <span className="text-sm font-semibold capitalize">
-                   {character.alignment === 'ally' ? 'Aliado' : 
+                  {character.alignment === 'ally' ? 'Aliado' :
                     character.alignment === 'enemy' ? 'Inimigo' : 'Neutro'}
                 </span>
                 <span className="text-xs text-muted-foreground">Alinhamento</span>
@@ -249,7 +254,7 @@ const CharacterPage = () => {
                   </p>
                   <p className="font-semibold text-lg">{character.campaign.name}</p>
                 </div>
-                
+
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground flex items-center gap-2">
                     <User className="w-3 h-3" /> Criador por
@@ -291,6 +296,7 @@ const CharacterPage = () => {
           </Card>
         </div>
       </div>
+      <CharacterModal />
     </div>
   );
 };
