@@ -74,9 +74,6 @@ export function CharacterModal() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
 
-  // Parâmetros de Criação
-  const campaignFromUrl = searchParams.get("campaignId"); // Usar campaignId para consistência com outras partes ou campaign
-  // Nota: dashboard/personagens/new/page.tsx usava "campaign". Vou suportar ambos.
   const campaignParam = searchParams.get("campaign") || searchParams.get("campaignId");
   const isNpcFromUrl = searchParams.get("isNpc") === "true";
 
