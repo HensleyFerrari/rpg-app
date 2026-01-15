@@ -22,6 +22,7 @@ import {
   Skull,
 } from "lucide-react";
 import Image from "next/image";
+import { CharacterAvatar } from "@/components/CharacterAvatar";
 
 export const dynamic = 'force-dynamic';
 
@@ -244,21 +245,11 @@ const Dashboard = async () => {
                 {recentCharacters.map((char) => (
                   <div key={char._id} className="flex items-center justify-between border-b last:border-0 pb-4 last:pb-0">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 overflow-hidden">
-                        {char.characterUrl ? (
-                          <div className="relative h-10 w-10">
-                            <Image
-                              src={char.characterUrl}
-                              alt={char.name}
-                              fill
-                              className="object-cover"
-                              unoptimized
-                            />
-                          </div>
-                        ) : (
-                          <Shield className="h-5 w-5 text-slate-500" />
-                        )}
-                      </div>
+                      <CharacterAvatar
+                        src={char.characterUrl}
+                        alt={char.name}
+                        isNpc={char.isNpc}
+                      />
                       <div>
                         <p className="font-medium text-sm">{char.name}</p>
                         <p className="text-xs text-muted-foreground">

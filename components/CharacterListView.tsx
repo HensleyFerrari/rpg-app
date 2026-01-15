@@ -13,7 +13,8 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { Book, User2, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
+import { Book, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
+import { CharacterAvatar } from "@/components/CharacterAvatar";
 import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -80,7 +81,7 @@ export function CharacterListView({
             characters.map((char) => (
               <TableRow key={char._id} className="group">
                 <TableCell>
-                  <CharacterAvatar char={char} />
+                  <CharacterAvatarWrapper char={char} />
                 </TableCell>
                 <TableCell className="font-medium">
                   <div className="flex flex-col">
@@ -159,25 +160,13 @@ export function CharacterListView({
   );
 }
 
-function CharacterAvatar({ char }: { char: Character }) {
-  const [error, setError] = useState(false);
-
+function CharacterAvatarWrapper({ char }: { char: Character }) {
   return (
-    <div className="relative w-10 h-10 rounded-full overflow-hidden bg-muted border">
-      {char.characterUrl && !error ? (
-        <Image
-          src={char.characterUrl}
-          alt={char.name}
-          fill
-          className="object-cover"
-          onError={() => setError(true)}
-          unoptimized
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <User2 className="w-5 h-5 text-muted-foreground" />
-        </div>
-      )}
-    </div>
+    <CharacterAvatar
+      src={char.characterUrl}
+      alt={char.name}
+      isNpc={char.isNpc}
+      size={40}
+    />
   );
 }
