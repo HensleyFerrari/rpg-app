@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { CharacterAvatar } from "@/components/CharacterAvatar";
+import { CampaignModal } from "./campaigns/components/campaign-modal";
 
 export const dynamic = 'force-dynamic';
 
@@ -57,6 +58,8 @@ const Dashboard = async () => {
 
   return (
     <div className="flex flex-col gap-8 p-6 max-w-7xl mx-auto w-full">
+      <CampaignModal />
+
       {/* Header Section */}
       <div className="space-y-4">
         <h2 className="text-3xl font-bold tracking-tight">
@@ -102,7 +105,7 @@ const Dashboard = async () => {
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
-          <Link href="/dashboard/campaigns/createCampaign">
+          <Link href="/dashboard?new=true">
             <div className="rounded-full bg-amber-100 dark:bg-amber-900/30 p-2">
               <Crown className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
