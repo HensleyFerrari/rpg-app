@@ -24,7 +24,7 @@ type FormData = {
   name: string;
   description: string;
   imageUrl: string;
-  isAcepptingCharacters: boolean;
+  isAccepptingCharacters: boolean;
 };
 
 export function CampaignModal() {
@@ -51,7 +51,7 @@ export function CampaignModal() {
       name: "",
       description: "",
       imageUrl: "",
-      isAcepptingCharacters: true,
+      isAccepptingCharacters: true,
     },
   });
 
@@ -70,7 +70,7 @@ export function CampaignModal() {
           name: "",
           description: "",
           imageUrl: "",
-          isAcepptingCharacters: true,
+          isAccepptingCharacters: true,
         });
       } else if (editId) {
         setIsFetching(true);
@@ -82,7 +82,7 @@ export function CampaignModal() {
               name: campaign.name || "",
               description: campaign.description || "",
               imageUrl: campaign.imageUrl || "",
-              isAcepptingCharacters: Boolean(campaign.isAcepptingCharacters),
+              isAccepptingCharacters: Boolean(campaign.isAccepptingCharacters),
             });
           } else {
             toast.error("Erro ao carregar campanha");
@@ -134,7 +134,7 @@ export function CampaignModal() {
           name: data.name,
           description: data.description,
           imageUrl: data.imageUrl,
-          isAcepptingCharacters: data.isAcepptingCharacters
+          isAccepptingCharacters: data.isAccepptingCharacters
         });
 
         if (result.ok) {
@@ -231,15 +231,15 @@ export function CampaignModal() {
               */}
             {editId && (
               <div className="flex items-center justify-between border p-3 rounded-md">
-                <Label htmlFor="isAcepptingCharacters">
+                <Label htmlFor="isAccepptingCharacters">
                   Aceitando novos personagens
                 </Label>
                 <Controller
                   control={control}
-                  name="isAcepptingCharacters"
+                  name="isAccepptingCharacters"
                   render={({ field }) => (
                     <Switch
-                      id="isAcepptingCharacters"
+                      id="isAccepptingCharacters"
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />

@@ -29,7 +29,7 @@ import { CharacterList } from "./_components/character-list";
 import { CampaignModal } from "../components/campaign-modal";
 
 const CampaignDetail = async ({ params }: any) => {
-  const { id } = params;
+  const { id } = await params;
   const campaignResponse = await getCampaignById(id);
   const currentUser = await getCurrentUser();
   const battlesResponse = await getBattlesByCampaign(id);
