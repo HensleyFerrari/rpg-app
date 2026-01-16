@@ -26,6 +26,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
 import { CharacterList } from "./_components/character-list";
+import { CampaignModal } from "../components/campaign-modal";
 
 const CampaignDetail = async ({ params }: any) => {
   const { id } = params;
@@ -54,6 +55,7 @@ const CampaignDetail = async ({ params }: any) => {
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
+      <CampaignModal />
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <Breadcrumb
@@ -79,7 +81,7 @@ const CampaignDetail = async ({ params }: any) => {
                     Gerenciar Personagens
                   </Button>
                 </Link>
-                <Link href={`/dashboard/campaigns/${id}/edit`}>
+                <Link href={`?edit=${id}`}>
                   <Button variant="default" className="gap-2">
                     Editar Campanha
                   </Button>
