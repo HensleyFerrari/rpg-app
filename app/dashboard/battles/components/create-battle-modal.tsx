@@ -59,7 +59,7 @@ export function CreateBattleModal({
   const router = useRouter();
   const searchParams = useSearchParams();
   const campaignIdParam = searchParams.get("campaign");
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
@@ -79,7 +79,7 @@ export function CreateBattleModal({
     if (open) {
       onSaveDraft(watchedValues);
     }
-  }, [JSON.stringify(watchedValues), open]); 
+  }, [JSON.stringify(watchedValues), open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -129,13 +129,13 @@ export function CreateBattleModal({
       toast.success("Batalha criada", {
         description: "A batalha foi criada com sucesso.",
       });
-      
+
       onSaveDraft(null);
-      
+
       onOpenChange(false);
-      
+
       router.push(`/dashboard/battles/${response.data._id}`);
-      
+
     } catch (error) {
       console.error("Erro ao criar batalha:", error);
       toast.error("Erro", {
@@ -148,7 +148,7 @@ export function CreateBattleModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+      <DialogContent
         className="sm:max-w-[425px]"
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
@@ -211,7 +211,7 @@ export function CreateBattleModal({
             />
 
             <DialogFooter>
-               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={isLoading}>

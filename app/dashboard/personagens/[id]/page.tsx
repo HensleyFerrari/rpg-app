@@ -2,18 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   User2,
   Swords,
   Edit,
   Book,
-  Shield,
   Calendar,
   Trash2,
   Clock,
-  User
+  User,
+  Shield
 } from "lucide-react";
+import { CharacterAvatar } from "@/components/CharacterAvatar";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,7 +68,6 @@ const CharacterPage = () => {
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasEditPermission, setHasEditPermission] = useState(false);
-  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -192,20 +191,13 @@ const CharacterPage = () => {
           <Card className="overflow-hidden border-none shadow-lg ring-1 ring-border">
             <CardContent className="p-0">
               <div className="relative aspect-[3/4] w-full">
-                {character.characterUrl && !imageError ? (
-                  <Image
-                    src={character.characterUrl}
-                    alt={character.name}
-                    fill
-                    className="object-cover transition-transform hover:scale-105 duration-500"
-                    unoptimized
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <User2 className="w-24 h-24 text-muted-foreground/30" />
-                  </div>
-                )}
+                <CharacterAvatar
+                  src={character.characterUrl}
+                  alt={character.name}
+                  isNpc={character.isNpc}
+                  className="w-full h-full rounded-none"
+                  size={500} // Large size for the square-ish preview
+                />
                 <div className="absolute top-4 left-4">
                   <CharacterStatusBadge status={character.status} />
                 </div>

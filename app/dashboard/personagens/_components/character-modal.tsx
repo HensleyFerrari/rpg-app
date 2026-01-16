@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -77,7 +77,16 @@ export function CharacterModal() {
   const campaignParam = searchParams.get("campaign") || searchParams.get("campaignId");
   const isNpcFromUrl = searchParams.get("isNpc") === "true";
 
-  const defaultValues: Partial<CharacterFormValues> = {
+  const handleClose = useCallback(() => {
+    // Remover query params relacionados ao modal
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("new");
+    params.delete("edit");
+    params.delete("isNpc"); // Opcional: limpar também isNpc se quiser resetar totalmente
+    router.push(`?${params.toString()}`);
+  }, [searchParams, router]);
+
+  const defaultValues: Partial<CharacterFormValues> = useMemo(() => ({
     name: "",
     campaign: "",
     characterUrl: "",
@@ -85,7 +94,7 @@ export function CharacterModal() {
     status: "alive",
     isNpc: isNpcFromUrl,
     alignment: "ally",
-  };
+  }), [isNpcFromUrl]);
 
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(characterFormSchema),
@@ -97,7 +106,7 @@ export function CharacterModal() {
     if (!isOpen) {
       form.reset(defaultValues);
     }
-  }, [isOpen]);
+  }, [isOpen, form, defaultValues]);
 
   // Carregar Dados Iniciais (Campanhas e Personagem se for Edição)
   useEffect(() => {
@@ -160,23 +169,20 @@ export function CharacterModal() {
     };
 
     loadData();
-  }, [isOpen, editId, isCreateMode, campaignParam, isNpcFromUrl]);
+    loadData();
+  }, [isOpen, editId, isCreateMode, campaignParam, isNpcFromUrl, form, defaultValues, handleClose]);
+  // Wait, handleClose is used inside loadData? No.
+  // Oh, wait, in one error message it said handleClose missing deps in effect at line 163?
+  // Previous lint output: 163:6 Warning: React Hook useEffect has missing dependencies: 'defaultValues', 'form', and 'handleClose'.
+  // But wait, line 163 corresponds to the end of the effect. Let's see inside the effect. 
+  // Line 128 calls handleClose().
+  // And line 143 calls handleClose().
+  // So yes, need handleClose.
 
-  const handleClose = () => {
-    // Remover query params relacionados ao modal
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("new");
-    params.delete("edit");
-    params.delete("isNpc"); // Opcional: limpar também isNpc se quiser resetar totalmente
-    // Manter campaignId filtros se existirem? Se eu fechar o modal, volto pra lista.
-    // Melhor manter filtros de listagem (filter, campaignId da lista)
-    // Mas remover params de criação.
+  // So I need to define handleClose BEFORE this effect or use hoisting (which const doesn't support) or wrap in useCallback above.
+  // I must move handleClose definition UP.
 
-    // Se estavamos criando com base em uma campanha (ex: vindo da tela de campanha), talvez queiramos manter o context.
-    // Mas aqui estamos falando sobre abrir/fechar modal.
 
-    router.push(`?${params.toString()}`);
-  };
 
   const onSubmit = async (values: CharacterFormValues) => {
     setIsSubmitting(true);

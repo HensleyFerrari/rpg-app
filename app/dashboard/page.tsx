@@ -14,7 +14,6 @@ import Link from "next/link";
 import {
   Swords,
   Users,
-  Shield,
   ArrowRight,
   Target,
   Crown,
@@ -22,6 +21,8 @@ import {
   Skull,
 } from "lucide-react";
 import Image from "next/image";
+import { CharacterAvatar } from "@/components/CharacterAvatar";
+import { CampaignModal } from "./campaigns/components/campaign-modal";
 
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +57,8 @@ const Dashboard = async () => {
 
   return (
     <div className="flex flex-col gap-8 p-6 max-w-7xl mx-auto w-full">
+      <CampaignModal />
+
       {/* Header Section */}
       <div className="space-y-4">
         <h2 className="text-3xl font-bold tracking-tight">
@@ -101,7 +104,7 @@ const Dashboard = async () => {
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
-          <Link href="/dashboard/campaigns/createCampaign">
+          <Link href="/dashboard?new=true">
             <div className="rounded-full bg-amber-100 dark:bg-amber-900/30 p-2">
               <Crown className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
@@ -244,21 +247,11 @@ const Dashboard = async () => {
                 {recentCharacters.map((char) => (
                   <div key={char._id} className="flex items-center justify-between border-b last:border-0 pb-4 last:pb-0">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 overflow-hidden">
-                        {char.characterUrl ? (
-                          <div className="relative h-10 w-10">
-                            <Image
-                              src={char.characterUrl}
-                              alt={char.name}
-                              fill
-                              className="object-cover"
-                              unoptimized
-                            />
-                          </div>
-                        ) : (
-                          <Shield className="h-5 w-5 text-slate-500" />
-                        )}
-                      </div>
+                      <CharacterAvatar
+                        src={char.characterUrl}
+                        alt={char.name}
+                        isNpc={char.isNpc}
+                      />
                       <div>
                         <p className="font-medium text-sm">{char.name}</p>
                         <p className="text-xs text-muted-foreground">

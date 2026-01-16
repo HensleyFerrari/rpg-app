@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Dice6, Users, Swords, Scroll, ArrowRight, Github } from "lucide-react";
+import Image from "next/image";
 
 export default function Home() {
   const { status } = useSession();
@@ -64,7 +65,7 @@ export default function Home() {
             {/* <div className="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
               <Dice6 className="h-6 w-6 text-primary-foreground" />
             </div> */}
-            <img src="/drpg-logo.png" alt="Drpg Logo" className="h-10 w-10" />
+            <Image src="/drpg-logo.png" alt="Drpg Logo" width={40} height={40} className="h-10 w-10" />
             <span className="text-xl font-bold tracking-tight">Drpg</span>
           </div>
           <div className="flex items-center gap-4">
@@ -194,7 +195,7 @@ export default function Home() {
       <footer className="py-12 px-4 border-t border-white/5 relative z-10">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
-            <img src="/drpg-logo.png" alt="Drpg Logo" className="h-6 w-6" />
+            <Image src="/drpg-logo.png" alt="Drpg Logo" width={24} height={24} className="h-6 w-6" />
             <span className="text-lg font-bold">Drpg</span>
           </div>
           <p className="text-slate-500 text-sm">
