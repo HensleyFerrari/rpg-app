@@ -55,6 +55,13 @@ export function CampaignModal() {
     },
   });
 
+  const handleClose = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("new");
+    params.delete("edit");
+    router.replace(`${pathname}?${params.toString()}`);
+  }, [searchParams, pathname, router]);
+
   // Reset or Fetch data when modal opens
   useEffect(() => {
     const loadData = async () => {
@@ -95,13 +102,6 @@ export function CampaignModal() {
       loadData();
     }
   }, [isOpen, isNew, editId, reset, handleClose]);
-
-  const handleClose = useCallback(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("new");
-    params.delete("edit");
-    router.replace(`${pathname}?${params.toString()}`);
-  }, [searchParams, pathname, router]);
 
   const onSubmit = async (data: FormData) => {
     if (!session?.user?.email) {
