@@ -34,36 +34,40 @@ const CampaignCard = ({
 }: Props) => {
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      })
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    })
     : null;
 
   return (
     <Card className="overflow-hidden flex flex-col h-full transition-all hover:shadow-md">
       {/* Banner Image */}
-      <div className="relative w-full h-40">
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={name}
-            fill
-            className="object-contain"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
-        ) : (
-          <div className="w-full h-full bg-muted/30 flex items-center justify-center">
-            <Book className="h-12 w-12 text-muted-foreground/40" />
-          </div>
-        )}
-      </div>
+      <Link href={`/dashboard/campaigns/${id}`}>
+        <div className="relative w-full h-40 cursor-pointer overflow-hidden">
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={name}
+              fill
+              className="object-contain transition-transform hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted/30 flex items-center justify-center hover:bg-muted/50 transition-colors">
+              <Book className="h-12 w-12 text-muted-foreground/40" />
+            </div>
+          )}
+        </div>
+      </Link>
 
       <div className="flex flex-col flex-grow p-4">
         <CardHeader className="p-0 pb-3">
-          <CardTitle className="text-xl font-bold line-clamp-1">
-            {name}
-          </CardTitle>
+          <Link href={`/dashboard/campaigns/${id}`}>
+            <CardTitle className="text-xl font-bold line-clamp-1 hover:text-primary transition-colors cursor-pointer">
+              {name}
+            </CardTitle>
+          </Link>
         </CardHeader>
 
         <CardContent className="p-0 flex-grow">

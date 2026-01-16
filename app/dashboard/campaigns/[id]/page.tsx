@@ -65,7 +65,7 @@ const CampaignDetail = async ({ params }: any) => {
           />
 
           <div className="flex flex-wrap gap-2">
-            <Link href={`/dashboard/personagens?new=true&campaign=${campaign._id}`}>
+            <Link href={`?action=new-character&campaign=${campaign._id}`}>
               <Button variant="outline" className="gap-2">
                 <PlusCircle className="h-4 w-4" />
                 Novo Personagem
@@ -209,7 +209,7 @@ const CampaignDetail = async ({ params }: any) => {
                 Personagens
               </h3>
               {isOwner && (
-                <Link href={`/dashboard/personagens?new=true&campaign=${campaign._id}`}>
+                <Link href={`?action=new-character&campaign=${campaign._id}`}>
                   <Button variant="outline" size="sm" className="gap-2">
                     <PlusCircle className="h-4 w-4" />
                     Novo Personagem
@@ -232,7 +232,7 @@ const CampaignDetail = async ({ params }: any) => {
                 NPCs
               </h3>
               {isOwner && (
-                <Link href={`/dashboard/personagens?new=true&campaign=${campaign._id}&isNpc=true`}>
+                <Link href={`?action=new-character&campaign=${campaign._id}&isNpc=true`}>
                   <Button variant="outline" size="sm" className="gap-2">
                     <PlusCircle className="h-4 w-4" />
                     Novo NPC
@@ -258,7 +258,7 @@ const CampaignDetail = async ({ params }: any) => {
                   </CardTitle>
                   {isOwner && (
                     <Link
-                      href={`/dashboard/battles?action=new-battle&campaign=${campaign._id}`}
+                      href={`?action=new-battle&campaign=${campaign._id}`}
                     >
                       <Button variant="outline" size="sm">
                         <PlusCircle className="h-4 w-4" />

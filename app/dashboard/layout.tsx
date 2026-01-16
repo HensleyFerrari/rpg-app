@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { cookies } from "next/headers";
+import { GlobalModals } from "./_components/global-modals";
 
 export const metadata: Metadata = {
   title: "Drpg - Dashboard",
@@ -24,6 +25,7 @@ export default async function RootLayout({
           <SidebarTrigger />
         </header>
         <div className="flex flex-1 flex-col gap-4 p-8">
+          <GlobalModals />
           {children}
         </div>
       </SidebarInset>

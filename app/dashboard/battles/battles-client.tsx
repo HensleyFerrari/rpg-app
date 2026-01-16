@@ -31,7 +31,7 @@ import {
   Shield
 } from "lucide-react";
 import { BattleFilters } from "./components/battle-filters";
-import { CreateBattleModal } from "./components/create-battle-modal";
+
 import { useState, useEffect } from "react";
 
 const StatCard = ({ title, value, icon: Icon, description, colorClass }: any) => (
@@ -213,39 +213,14 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 export default function BattlesDashboardClient({ allBattles, currentUser, campaigns }: { allBattles: any[], currentUser: any, campaigns: any[] }) {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
 
-  // Calculated stats based on the filtered view (allBattles contains the filtered result from server)
   const totalActive = allBattles.filter((b) => b.active).length;
   const totalInactive = allBattles.filter((b) => !b.active).length;
 
-  // Modal State
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [createBattleDraft, setCreateBattleDraft] = useState<any>(null);
-
-  // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBattle, setSelectedBattle] = useState<any>(null);
 
-  useEffect(() => {
-    if (searchParams.get("action") === "new-battle") {
-      setIsCreateModalOpen(true);
-    }
-  }, [searchParams]);
 
-  const handleOpenChange = (open: boolean) => {
-    setIsCreateModalOpen(open);
-    if (!open) {
-      const params = new URLSearchParams(searchParams.toString());
-      if (params.get("action") === "new-battle") {
-        params.delete("action");
-        setTimeout(() => {
-          router.replace(`${pathname}?${params.toString()}`);
-        }, 100);
-      }
-    }
-  };
 
   const handleEditBattle = (battle: any) => {
     setSelectedBattle(battle);
@@ -254,20 +229,12 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
 
   return (
     <>
-      <CreateBattleModal
-        open={isCreateModalOpen}
-        onOpenChange={handleOpenChange}
-        draftData={createBattleDraft}
-        onSaveDraft={setCreateBattleDraft}
-      />
-
       <EditBattleModal
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
         battle={selectedBattle}
       />
 
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2">
@@ -278,17 +245,15 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
             Gerencie e acompanhe o progresso de todos os combates épicos.
           </p>
         </div>
-        <Button
-          className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Batalha
-        </Button>
-      </div>
+        <Link href={{ query: { ...Object.fromEntries(searchParams.entries()), action: "new-battle" } }}>
+          <Button className="gap-2 shadow-sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Nova Batalha
+          </Button>
+        </Link>
+      </div >
 
-      {/* Stats Summary - Reflects CURRENT FILTERED VIEW */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      < div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" >
         <StatCard
           title="Batalhas Listadas"
           value={allBattles.length}
@@ -310,42 +275,40 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
           description="Finalizadas nesta lista"
           colorClass="bg-indigo-500"
         />
-      </div>
+      </div >
 
       {/* Main Content */}
-      <div className="space-y-6">
+      < div className="space-y-6" >
 
         <BattleFilters campaigns={campaigns} />
 
-        {allBattles.length > 0 ? (
-          <BattleList
-            battles={allBattles}
-            currentUser={currentUser}
-            onEdit={handleEditBattle}
-          />
-        ) : (
-          <Card className="border-dashed border-2 bg-transparent">
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="rounded-full bg-slate-100 dark:bg-slate-800 p-4 mb-4">
-                <Swords className="h-8 w-8 text-slate-400" />
-              </div>
-              <h3 className="text-xl font-bold">
-                Nenhuma batalha encontrada
-              </h3>
-              <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">
-                Tente ajustar os filtros ou iniciar uma nova jornada.
-              </p>
-              <Button
-                variant="outline"
-                className="mt-6 rounded-lg"
-                onClick={() => setIsCreateModalOpen(true)}
-              >
-                Criar Batalha
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+        {
+          allBattles.length > 0 ? (
+            <BattleList
+              battles={allBattles}
+              currentUser={currentUser}
+              onEdit={handleEditBattle}
+            />
+          ) : (
+            <Card className="border-dashed border-2 bg-transparent">
+              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="rounded-full bg-slate-100 dark:bg-slate-800 p-4 mb-4">
+                  <Swords className="h-8 w-8 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-bold">
+                  Nenhuma batalha encontrada
+                </h3>
+                <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">
+                  Tente ajustar os filtros ou iniciar uma nova jornada.
+                </p>
+                <Link href={{ query: { ...Object.fromEntries(searchParams.entries()), action: "new-battle" } }}>
+                  Criar Batalha
+                </Link>
+              </CardContent>
+            </Card >
+          )
+        }
+      </div >
     </>
   );
 }
