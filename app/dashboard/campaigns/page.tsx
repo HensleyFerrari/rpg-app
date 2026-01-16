@@ -24,13 +24,11 @@ import {
 const CampaignsPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; filter?: "all" | "my"; new?: string; edit?: string }>;
+  searchParams: Promise<{ q?: string; filter?: "all" | "my" }>;
 }) => {
   const params = await searchParams;
   const query = params.q;
   const filterType = params.filter;
-  const newParam = params.new;
-  const editParam = params.edit;
 
   const campaignsResponse = await getCampaigns({ query, filterType });
   const campaigns = Array.isArray(campaignsResponse) ? campaignsResponse : [];

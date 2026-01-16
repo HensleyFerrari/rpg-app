@@ -14,7 +14,6 @@ import Link from "next/link";
 import {
   Swords,
   Users,
-  Shield,
   ArrowRight,
   Target,
   Crown,

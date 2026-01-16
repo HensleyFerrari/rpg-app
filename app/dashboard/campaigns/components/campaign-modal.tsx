@@ -15,7 +15,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { createCampaign, updateCampaign, getCampaignById } from "@/lib/actions/campaign.actions";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
@@ -46,7 +46,6 @@ export function CampaignModal() {
     formState: { errors },
     control,
     reset,
-    setValue,
   } = useForm<FormData>({
     defaultValues: {
       name: "",
@@ -95,14 +94,14 @@ export function CampaignModal() {
     if (isOpen) {
       loadData();
     }
-  }, [isOpen, isNew, editId, reset]);
+  }, [isOpen, isNew, editId, reset, handleClose]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("new");
     params.delete("edit");
     router.replace(`${pathname}?${params.toString()}`);
-  };
+  }, [searchParams, pathname, router]);
 
   const onSubmit = async (data: FormData) => {
     if (!session?.user?.email) {

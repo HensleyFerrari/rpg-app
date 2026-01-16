@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   User2,
   Swords,
   Edit,
   Book,
-  Shield,
   Calendar,
   Trash2,
   Clock,
