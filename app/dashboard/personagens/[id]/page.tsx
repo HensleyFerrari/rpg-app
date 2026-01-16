@@ -179,31 +179,26 @@ const CharacterPage = () => {
               </Button>
             </>
           )}
-          {/* <Button variant="ghost" size="sm" className="gap-2" onClick={() => router.back()}>
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button> */}
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
         {/* Left Column: Image and Status */}
         <div className="md:col-span-4 space-y-6">
-          <Card className="overflow-hidden border-none shadow-lg ring-1 ring-border">
+          <div className="overflow-hidden border-none shadow-lg">
             <CardContent className="p-0">
-              <div className="relative aspect-[3/4] w-full">
-                <CharacterAvatar
-                  src={character.characterUrl}
-                  alt={character.name}
-                  isNpc={character.isNpc}
-                  className="w-full h-full rounded-none"
-                  size={500} // Large size for the square-ish preview
-                />
-                <div className="absolute top-4 left-4">
-                  <CharacterStatusBadge status={character.status} />
-                </div>
+              <CharacterAvatar
+                src={character.characterUrl}
+                alt={character.name}
+                isNpc={character.isNpc}
+                className="w-full h-full rounded-lg"
+                autoHeight
+              />
+              <div className="absolute top-4 left-4">
+                <CharacterStatusBadge status={character.status} />
               </div>
             </CardContent>
-          </Card>
+          </div>
 
           <Card className="border-none shadow-md ring-1 ring-border">
             <CardHeader className="pb-2">

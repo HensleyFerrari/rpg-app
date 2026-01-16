@@ -10,7 +10,9 @@ interface CharacterAvatarProps {
   alt?: string;
   size?: number;
   className?: string;
+  imageClassName?: string;
   isNpc?: boolean;
+  autoHeight?: boolean;
 }
 
 export function CharacterAvatar({
@@ -18,9 +20,44 @@ export function CharacterAvatar({
   alt = "Character",
   size = 40,
   className,
-  isNpc = false
+  imageClassName,
+  isNpc = false,
+  autoHeight = false,
 }: CharacterAvatarProps) {
   const [error, setError] = useState(false);
+
+  if (autoHeight) {
+    return (
+      <div
+        className={cn(
+          "relative bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 overflow-hidden",
+          className
+        )}
+      >
+        {src && !error ? (
+          <Image
+            src={src}
+            alt={alt}
+            width={0}
+            height={0}
+            sizes="100vw"
+            style={{ width: "100%", height: "auto" }}
+            className={cn(imageClassName)}
+            onError={() => setError(true)}
+            unoptimized
+          />
+        ) : (
+          <div className="w-full flex items-center justify-center p-8">
+            {isNpc ? (
+              <Shield className="text-slate-500 w-16 h-16" />
+            ) : (
+              <User2 className="text-slate-500 w-16 h-16" />
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -35,7 +72,7 @@ export function CharacterAvatar({
           src={src}
           alt={alt}
           fill
-          className="object-cover"
+          className={cn("object-cover", imageClassName)}
           onError={() => setError(true)}
           unoptimized
         />
