@@ -107,20 +107,24 @@ const CampaignsPage = async ({
                 return (
                   <TableRow key={campaign._id}>
                     <TableCell>
-                      <Avatar className="h-12 w-12 rounded-sm">
-                        <AvatarImage
-                          src={campaign.imageUrl}
-                          className="object-cover"
-                          alt={campaign.name}
-                        />
-                        <AvatarFallback className="rounded-sm">
-                          {campaign.name.substring(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
+                      <Link href={`/dashboard/campaigns/${campaign._id}`}>
+                        <Avatar className="h-12 w-12 rounded-sm cursor-pointer hover:opacity-80 transition-opacity">
+                          <AvatarImage
+                            src={campaign.imageUrl}
+                            className="object-cover"
+                            alt={campaign.name}
+                          />
+                          <AvatarFallback className="rounded-sm">
+                            {campaign.name.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Link>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-semibold">{campaign.name}</span>
+                        <Link href={`/dashboard/campaigns/${campaign._id}`}>
+                          <span className="font-semibold hover:text-primary transition-colors cursor-pointer">{campaign.name}</span>
+                        </Link>
                         <div className="text-xs text-muted-foreground line-clamp-1 max-w-[200px] md:max-w-xs">
                           {campaign.description ? (
                             campaign.description.replace(/<[^>]*>?/gm, '')

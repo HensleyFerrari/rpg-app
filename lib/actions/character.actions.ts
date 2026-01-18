@@ -66,6 +66,41 @@ export async function createCharacter({
       };
     }
 
+    const campaignData = await Campaign.findById(campaign);
+    if (!campaignData) {
+      return {
+        ok: false,
+        message: "Campanha não encontrada",
+      };
+    }
+
+    // Check if campaign is accepting characters
+    if (campaignData.isAccepptingCharacters === false) {
+      console.log("Campaign is NOT accepting characters. Checking owner...");
+      console.log("Campaign Owner:", campaignData.owner.toString());
+      console.log("Request Owner:", ownerData._id.toString());
+
+      const isCampaignOwner =
+        campaignData.owner.toString() === ownerData._id.toString();
+
+      console.log("Is Campaign Owner?", isCampaignOwner);
+
+      if (!isCampaignOwner) {
+        return {
+          ok: false,
+          message:
+            "Esta campanha não está aceitando novos personagens no momento.",
+        };
+      } else {
+        console.log("Allowed because user is owner.");
+      }
+    } else {
+      console.log(
+        "Campaign IS accepting characters (or field is missing/true). Value:",
+        campaignData.isAccepptingCharacters
+      );
+    }
+
     const newCharacterData = await Character.create({
       name,
       owner: ownerData._id,
@@ -143,8 +178,8 @@ export async function getCharacterById(id: string) {
         select: "name _id owner",
         populate: {
           path: "owner",
-          select: "_id name username"
-        }
+          select: "_id name username",
+        },
       });
 
     if (!characterData) {
@@ -307,6 +342,28 @@ export async function updateCharacter(
       };
     }
 
+    // If changing campaign, check if the new campaign accepts characters
+    if (updates.campaign) {
+      const newCampaign = await Campaign.findById(updates.campaign);
+      if (!newCampaign) {
+        return { ok: false, message: "Nova campanha não encontrada" };
+      }
+
+      if (newCampaign.isAccepptingCharacters === false) {
+        const actualUser = await getCurrentUser();
+        const isCampaignOwner =
+          newCampaign.owner.toString() === actualUser?._id.toString();
+
+        if (!isCampaignOwner) {
+          return {
+            ok: false,
+            message:
+              "A campanha de destino não está aceitando novos personagens.",
+          };
+        }
+      }
+    }
+
     const actualUser = await getCurrentUser();
     if (!actualUser) {
       return { ok: false, message: "Usuário não autenticado" };
@@ -317,11 +374,16 @@ export async function updateCharacter(
       return { ok: false, message: "Personagem não encontrado" };
     }
 
-    const isCharacterOwner = characterToUpdate.owner.toString() === actualUser._id.toString();
-    const isCampaignOwner = characterToUpdate.campaign.owner.toString() === actualUser._id.toString();
+    const isCharacterOwner =
+      characterToUpdate.owner.toString() === actualUser._id.toString();
+    const isCampaignOwner =
+      characterToUpdate.campaign.owner.toString() === actualUser._id.toString();
 
     if (!isCharacterOwner && !isCampaignOwner) {
-      return { ok: false, message: "Você não tem permissão para editar este personagem" };
+      return {
+        ok: false,
+        message: "Você não tem permissão para editar este personagem",
+      };
     }
 
     const updatedCharacterData = await Character.findByIdAndUpdate(
@@ -394,11 +456,16 @@ export async function deleteCharacter(id: string): Promise<CharacterResponse> {
       };
     }
 
-    const isCharacterOwner = characterData.owner.toString() === actualUser._id.toString();
-    const isCampaignOwner = characterData.campaign.owner.toString() === actualUser._id.toString();
+    const isCharacterOwner =
+      characterData.owner.toString() === actualUser._id.toString();
+    const isCampaignOwner =
+      characterData.campaign.owner.toString() === actualUser._id.toString();
 
     if (!isCharacterOwner && !isCampaignOwner) {
-      return { ok: false, message: "Você não tem permissão para excluir este personagem" };
+      return {
+        ok: false,
+        message: "Você não tem permissão para excluir este personagem",
+      };
     }
 
     if (!characterData) {
@@ -549,7 +616,7 @@ export async function updateCharacterStatus(
         activeBattles.map((battle: any) => triggerBattleUpdate(battle._id))
       );
     }
-    
+
     // Use revalidatePath for the battle page
     // revalidatePath(`/dashboard/battles/[id]`); // Ideally we would need the battle ID here, but this generic revalidate might not work as intended for a specific path parameter.
     // Better to revalidate strictly where needed or rely on client state updates.

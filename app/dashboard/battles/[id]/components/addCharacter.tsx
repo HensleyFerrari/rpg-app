@@ -82,22 +82,43 @@ const AddCharacterModal = () => {
     try {
       const battleId =
         typeof id === "string" ? id : Array.isArray(id) ? id[0] : "";
+
+      let successCount = 0;
+      let lastError = "";
+
+      // Add characters sequentially
       for (const characterId of selectedCharacters) {
         const response = await addCharacterToBattle(battleId, characterId);
-        if (!response.ok) {
-          toast.error("Error", {
-            description:
-              response.message || "Failed to add character to battle",
-          });
+        if (response.ok) {
+          successCount++;
+        } else {
+          lastError = response.message || "Failed to add character";
         }
       }
 
-      toast.success("Success", {
-        description: "Characters added to battle successfully",
-      });
-      setIsOpen(false);
-      setSelectedCharacters([]);
-      window.location.reload();
+      if (successCount > 0) {
+        toast.success("Success", {
+          description: `${successCount} character(s) added successfully`,
+        });
+
+        // Fetch updated battle data and dispatch event
+        const updatedBattle = await getBattleById(battleId);
+        if (updatedBattle.ok) {
+          window.dispatchEvent(
+            new CustomEvent("battleUpdated", { detail: updatedBattle.data })
+          );
+        }
+
+        setIsOpen(false);
+        setSelectedCharacters([]);
+      }
+
+      if (lastError && successCount < selectedCharacters.length) {
+        toast.error("Warning", {
+          description: `Some characters could not be added: ${lastError}`,
+        });
+      }
+
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "An unknown error occurred";
@@ -126,16 +147,24 @@ const AddCharacterModal = () => {
     try {
       const battleId =
         typeof id === "string" ? id : Array.isArray(id) ? id[0] : "";
-        
+
       const response = await createQuickCharacters(battleId, names, alignment);
-      
+
       if (response.ok) {
         toast.success("Success", {
           description: response.message,
         });
+
+        // Fetch updated battle data and dispatch event
+        const updatedBattle = await getBattleById(battleId);
+        if (updatedBattle.ok) {
+          window.dispatchEvent(
+            new CustomEvent("battleUpdated", { detail: updatedBattle.data })
+          );
+        }
+
         setIsOpen(false);
         setQuickNames("");
-        window.location.reload();
       } else {
         toast.error("Error", {
           description: response.message || "Failed to create characters",
@@ -145,7 +174,7 @@ const AddCharacterModal = () => {
       const errorMessage =
         error instanceof Error ? error.message : "An unknown error occurred";
       toast.error("Error", {
-         description: "Something went wrong: " + errorMessage,
+        description: "Something went wrong: " + errorMessage,
       });
     } finally {
       setIsSubmitting(false);
@@ -171,13 +200,13 @@ const AddCharacterModal = () => {
         <DialogHeader>
           <DialogTitle>Gerenciar Personagens da Batalha</DialogTitle>
         </DialogHeader>
-        
+
         <Tabs defaultValue="existing" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="existing">Existentes</TabsTrigger>
             <TabsTrigger value="quick">Criação Rápida</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="existing" className="space-y-4 py-4">
             <div className="max-h-[300px] overflow-y-auto pr-2">
               {characters.length > 0 ? (
@@ -204,7 +233,7 @@ const AddCharacterModal = () => {
                 </p>
               )}
             </div>
-            
+
             <DialogFooter>
               <Button
                 onClick={onSubmitExisting}
@@ -215,7 +244,7 @@ const AddCharacterModal = () => {
               </Button>
             </DialogFooter>
           </TabsContent>
-          
+
           <TabsContent value="quick" className="space-y-4 py-4">
             <div className="space-y-3">
               <Label>Alinhamento</Label>
@@ -249,9 +278,9 @@ const AddCharacterModal = () => {
                 Isso criará novos personagens vinculados a esta campanha e os adicionará automaticamente à batalha.
               </p>
             </div>
-            
+
             <DialogFooter>
-               <Button
+              <Button
                 onClick={onSubmitQuick}
                 disabled={isSubmitting || !quickNames.trim()}
                 className="w-full sm:w-auto"

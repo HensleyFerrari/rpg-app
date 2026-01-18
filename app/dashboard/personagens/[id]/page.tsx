@@ -28,6 +28,17 @@ import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { CharacterModal } from "../_components/character-modal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 
 // Character type definition
@@ -96,13 +107,11 @@ const CharacterPage = () => {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!confirm("Tem certeza que deseja excluir este personagem?")) return;
-
     try {
       const response = await deleteCharacter(id);
       if (response.ok) {
         toast.success("Personagem excluído com sucesso");
-        router.push("/dashboard/personagens/mycharacters");
+        router.push("/dashboard/personagens");
       } else {
         toast.error(response.message);
       }
@@ -174,9 +183,30 @@ const CharacterPage = () => {
                   <Edit className="w-4 h-4" /> Editar
                 </Button>
               </Link>
-              <Button variant="destructive" size="sm" className="gap-2" onClick={handleDelete}>
-                <Trash2 className="w-4 h-4" /> Excluir
-              </Button>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" className="gap-2">
+                    <Trash2 className="w-4 h-4" /> Excluir
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Essa ação não pode ser desfeita. Isso excluirá permanentemente o personagem
+                      <span className="font-semibold text-foreground"> {character.name} </span>
+                      e removerá todos os dados associados.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Excluir
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </>
           )}
         </div>

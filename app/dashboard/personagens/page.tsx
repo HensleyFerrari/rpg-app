@@ -9,7 +9,7 @@ import { CharacterFilters } from "./_components/character-filters";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/actions/user.actions";
-import { CharacterModal } from "./_components/character-modal";
+
 
 
 export const dynamic = "force-dynamic";
@@ -78,8 +78,7 @@ export default async function Personagens({ searchParams }: PageProps) {
             {type === "pc" && (
               <Link
                 href={{
-                  pathname: "/dashboard/personagens",
-                  query: { ...resolvedParams, new: "true" },
+                  query: { ...resolvedParams, action: "new-character" },
                 }}
               >
                 <Button variant="outline" className="gap-2">
@@ -135,8 +134,7 @@ export default async function Personagens({ searchParams }: PageProps) {
         </div>
         <Link
           href={{
-            pathname: "/dashboard/personagens",
-            query: { ...resolvedParams, new: "true" },
+            query: { ...resolvedParams, action: "new-character" },
           }}
         >
           <Button className="gap-2 shadow-sm">
@@ -147,7 +145,7 @@ export default async function Personagens({ searchParams }: PageProps) {
 
       <CharacterFilters campaigns={campaigns} />
 
-      <CharacterModal />
+
 
       {!response.ok ? (
         <div className="text-center py-10 bg-destructive/10 rounded-lg border border-destructive/20">

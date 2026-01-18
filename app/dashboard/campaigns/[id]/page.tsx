@@ -26,9 +26,10 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
 import { CharacterList } from "./_components/character-list";
+import { CampaignModal } from "../components/campaign-modal";
 
 const CampaignDetail = async ({ params }: any) => {
-  const { id } = params;
+  const { id } = await params;
   const campaignResponse = await getCampaignById(id);
   const currentUser = await getCurrentUser();
   const battlesResponse = await getBattlesByCampaign(id);
@@ -54,6 +55,7 @@ const CampaignDetail = async ({ params }: any) => {
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
+      <CampaignModal />
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <Breadcrumb
@@ -65,7 +67,7 @@ const CampaignDetail = async ({ params }: any) => {
           />
 
           <div className="flex flex-wrap gap-2">
-            <Link href={`/dashboard/personagens?new=true&campaign=${campaign._id}`}>
+            <Link href={`?action=new-character&campaign=${campaign._id}`}>
               <Button variant="outline" className="gap-2">
                 <PlusCircle className="h-4 w-4" />
                 Novo Personagem
@@ -79,7 +81,7 @@ const CampaignDetail = async ({ params }: any) => {
                     Gerenciar Personagens
                   </Button>
                 </Link>
-                <Link href={`/dashboard/campaigns/${id}/edit`}>
+                <Link href={`?edit=${id}`}>
                   <Button variant="default" className="gap-2">
                     Editar Campanha
                   </Button>
@@ -209,7 +211,7 @@ const CampaignDetail = async ({ params }: any) => {
                 Personagens
               </h3>
               {isOwner && (
-                <Link href={`/dashboard/personagens?new=true&campaign=${campaign._id}`}>
+                <Link href={`?action=new-character&campaign=${campaign._id}`}>
                   <Button variant="outline" size="sm" className="gap-2">
                     <PlusCircle className="h-4 w-4" />
                     Novo Personagem
@@ -232,7 +234,7 @@ const CampaignDetail = async ({ params }: any) => {
                 NPCs
               </h3>
               {isOwner && (
-                <Link href={`/dashboard/personagens?new=true&campaign=${campaign._id}&isNpc=true`}>
+                <Link href={`?action=new-character&campaign=${campaign._id}&isNpc=true`}>
                   <Button variant="outline" size="sm" className="gap-2">
                     <PlusCircle className="h-4 w-4" />
                     Novo NPC
@@ -258,7 +260,7 @@ const CampaignDetail = async ({ params }: any) => {
                   </CardTitle>
                   {isOwner && (
                     <Link
-                      href={`/dashboard/battles?action=new-battle&campaign=${campaign._id}`}
+                      href={`?action=new-battle&campaign=${campaign._id}`}
                     >
                       <Button variant="outline" size="sm">
                         <PlusCircle className="h-4 w-4" />

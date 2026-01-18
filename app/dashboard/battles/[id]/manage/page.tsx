@@ -60,6 +60,9 @@ type Battle = {
     character?: {
       name: string;
     };
+    target?: {
+      name: string;
+    };
     description?: string;
     type?: string;
   }>;
@@ -225,7 +228,7 @@ const ManageBattlePage = () => {
       <div className="grid gap-6">
         {/* Characters Section */}
         <Card className="overflow-hidden border-none shadow-md bg-card/60 backdrop-blur-sm">
-          <CardHeader 
+          <CardHeader
             className="flex flex-row items-center justify-between cursor-pointer py-4 hover:bg-muted/30 transition-colors"
             onClick={() => setIsCharactersExpanded(!isCharactersExpanded)}
           >
@@ -315,7 +318,7 @@ const ManageBattlePage = () => {
 
         {/* Damage History Section */}
         <Card className="overflow-hidden border-none shadow-md bg-card/60 backdrop-blur-sm">
-          <CardHeader 
+          <CardHeader
             className="flex flex-row items-center justify-between cursor-pointer py-4 hover:bg-muted/30 transition-colors"
             onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
           >
@@ -338,7 +341,9 @@ const ManageBattlePage = () => {
                     <TableRow className="hover:bg-transparent">
                       <TableHead className="w-[100px] py-4">Rodada</TableHead>
                       <TableHead className="py-4">Personagem</TableHead>
-                      <TableHead className="text-center w-[100px] py-4">Dano</TableHead>
+                      <TableHead className="py-4">Alvo</TableHead>
+                      <TableHead className="text-center w-[120px] py-4">Valor</TableHead>
+                      <TableHead className="text-center w-[150px] py-4">Tipo/Descrição</TableHead>
                       <TableHead className="text-center w-[100px] py-4">Crítico</TableHead>
                       <TableHead className="text-right w-[100px] py-4">Ações</TableHead>
                     </TableRow>
@@ -354,8 +359,22 @@ const ManageBattlePage = () => {
                         <TableCell className="font-medium py-3">
                           {round.character?.name || (round.type === "other" ? "Evento" : "N/A")}
                         </TableCell>
+                        <TableCell className="py-3">
+                          {round.target?.name || "-"}
+                        </TableCell>
                         <TableCell className="text-center py-3 font-semibold">
                           {round.damage}
+                        </TableCell>
+                        <TableCell className="text-center py-3">
+                          {round.type === "damage" ? (
+                            <span className="text-destructive font-medium">Dano</span>
+                          ) : round.type === "heal" ? (
+                            <span className="text-green-500 font-medium">Cura</span>
+                          ) : (
+                            <span className="text-muted-foreground italic">
+                              {round.description || "Evento"}
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell className="text-center py-3">
                           {round.isCritical ? (
@@ -403,7 +422,7 @@ const ManageBattlePage = () => {
                     ))}
                     {battle.rounds.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                        <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                           <div className="flex flex-col items-center justify-center gap-2">
                             <Swords className="h-10 w-10 opacity-10" />
                             <p className="text-sm">Nenhum dano registrado</p>

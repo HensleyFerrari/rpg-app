@@ -19,7 +19,10 @@ const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
 
-export async function getCampaigns({ query, filterType }: { query?: string, filterType?: 'all' | 'my' } = {}) {
+export async function getCampaigns({
+  query,
+  filterType,
+}: { query?: string; filterType?: "all" | "my" } = {}) {
   try {
     await connectDB();
 
@@ -29,7 +32,7 @@ export async function getCampaigns({ query, filterType }: { query?: string, filt
       queryObj.name = { $regex: query, $options: "i" };
     }
 
-    if (filterType === 'my') {
+    if (filterType === "my") {
       const userData = await getCurrentUser();
       const user = await findByEmail(userData.email);
       if (user && user._id) {
@@ -225,7 +228,7 @@ export const updateCampaign = async (
     name: string;
     description: string;
     imageUrl: string;
-    isAcepptingCharacters: boolean;
+    isAccepptingCharacters: boolean;
   }>
 ): Promise<CampaignResponse> => {
   try {
@@ -252,9 +255,9 @@ export const updateCampaign = async (
       };
     }
 
-    // Garantir que isAcepptingCharacters seja um booleano
-    if ("isAcepptingCharacters" in updates) {
-      updates.isAcepptingCharacters = Boolean(updates.isAcepptingCharacters);
+    // Garantir que isAccepptingCharacters seja um booleano
+    if ("isAccepptingCharacters" in updates) {
+      updates.isAccepptingCharacters = Boolean(updates.isAccepptingCharacters);
     }
 
     const updatedCampaignData = await Campaign.findByIdAndUpdate(

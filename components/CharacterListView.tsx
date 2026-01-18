@@ -128,8 +128,7 @@ export function CharacterListView({
                           <DropdownMenuItem asChild>
                             <Link
                               href={{
-                                pathname: "/dashboard/personagens",
-                                query: { ...Object.fromEntries(searchParams.entries()), edit: char._id },
+                                query: { ...Object.fromEntries(searchParams.entries()), editCharacter: char._id },
                               }}
                               className="flex items-center"
                             >

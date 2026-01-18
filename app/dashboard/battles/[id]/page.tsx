@@ -33,6 +33,8 @@ import {
   ScrollText,
   CalendarDays,
   MessageSquare,
+  BarChart3,
+  Info,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
@@ -95,6 +97,10 @@ interface Battle {
     target?: {
       name: string;
     };
+    createdAt: string;
+    owner?: {
+      name: string;
+    }
   }>;
   createdAt: string;
   updatedAt: string;
@@ -103,6 +109,7 @@ interface Battle {
 
 
 import { EditBattleModal } from "../components/edit-battle-modal";
+import { TurnDetailsModal } from "./components/turn-details-modal";
 
 const BattlePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -110,6 +117,8 @@ const BattlePage = () => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTurn, setSelectedTurn] = useState<any>(null);
+  const [isTurnDetailsModalOpen, setIsTurnDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBattle = async () => {
@@ -271,6 +280,11 @@ const BattlePage = () => {
         onOpenChange={setIsEditModalOpen}
         battle={battle}
       />
+      <TurnDetailsModal
+        open={isTurnDetailsModalOpen}
+        onOpenChange={setIsTurnDetailsModalOpen}
+        turn={selectedTurn}
+      />
       {battle && (
         <Card className="w-full shadow-lg">
           <CardHeader className="px-3 sm:px-6">
@@ -338,10 +352,32 @@ const BattlePage = () => {
 
           <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">
             <Tabs defaultValue="history" className="w-full">
-              <div className="flex items-center justify-between mb-4">
-                <TabsList>
-                  <TabsTrigger value="history">Histórico</TabsTrigger>
-                  <TabsTrigger value="characters">Personagens</TabsTrigger>
+              <div className="mb-6">
+                <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 rounded-xl">
+                  <TabsTrigger
+                    value="history"
+                    className="flex items-center gap-2 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all"
+                  >
+                    <History className="h-4 w-4" />
+                    <span className="hidden sm:inline">Histórico</span>
+                    <span className="sm:hidden">Turnos</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="statistics"
+                    className="flex items-center gap-2 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Estatísticas</span>
+                    <span className="sm:hidden">Stats</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="characters"
+                    className="flex items-center gap-2 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all"
+                  >
+                    <Users className="h-4 w-4" />
+                    <span className="hidden sm:inline">Personagens</span>
+                    <span className="sm:hidden">Pers.</span>
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
@@ -406,7 +442,7 @@ const BattlePage = () => {
                         </CardContent>
                       </Card>
 
-                      <Card className="bg-card/50 shadow-sm border-none">
+                      {/* <Card className="bg-card/50 shadow-sm border-none">
                         <CardContent className="p-3">
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-amber-500/10 rounded-lg">
@@ -430,7 +466,7 @@ const BattlePage = () => {
                             </div>
                           </div>
                         </CardContent>
-                      </Card>
+                      </Card> */}
 
                       <Card className="bg-card/50 shadow-sm border-none">
                         <CardContent className="p-3">
@@ -581,8 +617,19 @@ const BattlePage = () => {
                             >
                               <div className="grid grid-cols-3 gap-4 text-sm items-center min-w-0">
                                 <span className="font-medium flex items-center gap-2 shrink-0">
-                                  <Target className="h-4 w-4 text-muted-foreground" />
-                                  Turno {round.round}
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
+                                    onClick={() => {
+                                      setSelectedTurn(round);
+                                      setIsTurnDetailsModalOpen(true);
+                                    }}
+                                  >
+                                    <Info className="h-4 w-4" />
+                                  </Button>
+                                  <Target className="h-4 w-4 text-muted-foreground shrink-0" />
+                                  <span className="shrink-0">Turno {round.round}</span>
                                 </span>
                                 {round.type === "other" ? (
                                   <span className={cn(
@@ -678,6 +725,147 @@ const BattlePage = () => {
                   </div>
                 </div>
               </TabsContent>
+
+              <TabsContent value="statistics" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Damage Stats */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Swords className="h-5 w-5" />
+                        Estatísticas de Dano
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {(() => {
+                          const stats: Record<string, { total: number; maxTurn: number; maxTurnVal: number }> = {};
+
+                          // First pass: Calculate totals and per-turn sums
+                          const roundsByCharAndTurn: Record<string, Record<number, number>> = {};
+
+                          battle.rounds.forEach(round => {
+                            if (round.type === 'heal' || round.type === 'other' || !round.character?.name) return;
+
+                            const charName = round.character.name;
+                            if (!stats[charName]) {
+                              stats[charName] = { total: 0, maxTurn: 0, maxTurnVal: 0 };
+                            }
+                            stats[charName].total += round.damage;
+
+                            if (!roundsByCharAndTurn[charName]) roundsByCharAndTurn[charName] = {};
+                            roundsByCharAndTurn[charName][round.round] = (roundsByCharAndTurn[charName][round.round] || 0) + round.damage;
+                          });
+
+                          // Second pass: Calculate max turn damage
+                          Object.entries(roundsByCharAndTurn).forEach(([name, turns]) => {
+                            if (stats[name]) {
+                              const maxVal = Math.max(...Object.values(turns));
+                              stats[name].maxTurn = maxVal;
+                            }
+                          });
+
+                          return Object.entries(stats)
+                            .sort((a, b) => b[1].total - a[1].total)
+                            .map(([name, stat], index) => (
+                              <div key={name} className="flex items-center justify-between p-3 border rounded-lg bg-card/50">
+                                <div className="flex items-center gap-3">
+                                  <span className="font-bold text-lg text-muted-foreground w-6 text-center">#{index + 1}</span>
+                                  <div>
+                                    <p className="font-medium">{name}</p>
+                                    <div className="flex flex-wrap gap-x-3 gap-y-1">
+                                      <p className="text-[10px] text-muted-foreground">Maior: <span className="font-semibold text-foreground">{stat.maxTurn}</span></p>
+                                      <p className="text-[10px] text-muted-foreground">Média: <span className="font-semibold text-foreground">
+                                        {(stat.total / Object.keys(roundsByCharAndTurn[name]).length).toFixed(1)}
+                                      </span></p>
+                                      <p className="text-[10px] text-muted-foreground">Ações: <span className="font-semibold text-foreground">{Object.keys(roundsByCharAndTurn[name]).length}</span></p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-lg font-bold">{stat.total}</p>
+                                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Total</p>
+                                </div>
+                              </div>
+                            ));
+                        })()}
+                        {battle.rounds.filter(r => r.type !== 'heal' && r.type !== 'other').length === 0 && (
+                          <p className="text-muted-foreground text-center py-4">Nenhum dano registrado.</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Healing Stats */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Heart className="h-5 w-5 text-green-500" />
+                        Estatísticas de Cura
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {(() => {
+                          const stats: Record<string, { total: number; maxTurn: number }> = {};
+
+                          // First pass: Calculate totals and per-turn sums
+                          const roundsByCharAndTurn: Record<string, Record<number, number>> = {};
+
+                          battle.rounds.forEach(round => {
+                            if (round.type !== 'heal' || !round.character?.name) return;
+
+                            const charName = round.character.name;
+                            if (!stats[charName]) {
+                              stats[charName] = { total: 0, maxTurn: 0 };
+                            }
+                            stats[charName].total += round.damage;
+
+                            if (!roundsByCharAndTurn[charName]) roundsByCharAndTurn[charName] = {};
+                            roundsByCharAndTurn[charName][round.round] = (roundsByCharAndTurn[charName][round.round] || 0) + round.damage;
+                          });
+
+                          // Second pass: Calculate max turn damage
+                          Object.entries(roundsByCharAndTurn).forEach(([name, turns]) => {
+                            if (stats[name]) {
+                              const maxVal = Math.max(...Object.values(turns));
+                              stats[name].maxTurn = maxVal;
+                            }
+                          });
+
+                          return Object.entries(stats)
+                            .sort((a, b) => b[1].total - a[1].total)
+                            .map(([name, stat], index) => (
+                              <div key={name} className="flex items-center justify-between p-3 border rounded-lg bg-card/50">
+                                <div className="flex items-center gap-3">
+                                  <span className="font-bold text-lg text-muted-foreground w-6 text-center">#{index + 1}</span>
+                                  <div>
+                                    <p className="font-medium">{name}</p>
+                                    <div className="flex flex-wrap gap-x-3 gap-y-1">
+                                      <p className="text-[10px] text-muted-foreground">Maior: <span className="font-semibold text-foreground">{stat.maxTurn}</span></p>
+                                      <p className="text-[10px] text-muted-foreground">Média: <span className="font-semibold text-foreground">
+                                        {(stat.total / Object.keys(roundsByCharAndTurn[name]).length).toFixed(1)}
+                                      </span></p>
+                                      <p className="text-[10px] text-muted-foreground">Ações: <span className="font-semibold text-foreground">{Object.keys(roundsByCharAndTurn[name]).length}</span></p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-lg font-bold text-green-500">{stat.total}</p>
+                                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Total</p>
+                                </div>
+                              </div>
+                            ));
+                        })()}
+                        {battle.rounds.filter(r => r.type === 'heal').length === 0 && (
+                          <p className="text-muted-foreground text-center py-4">Nenhuma cura registrada.</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
 
               <TabsContent value="characters">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -76,7 +76,7 @@ const Dashboard = async () => {
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
-          <Link href="/dashboard/battles?action=new-battle">
+          <Link href="?action=new-battle">
             <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-2">
               <Swords className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
@@ -90,7 +90,7 @@ const Dashboard = async () => {
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
-          <Link href="/dashboard/personagens?new=true">
+          <Link href="?action=new-character">
             <div className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 p-2">
               <Users className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
             </div>
@@ -104,7 +104,7 @@ const Dashboard = async () => {
           className="h-auto p-4 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 border-dashed border-2 hover:border-solid transition-all"
           asChild
         >
-          <Link href="/dashboard?new=true">
+          <Link href="?new=true">
             <div className="rounded-full bg-amber-100 dark:bg-amber-900/30 p-2">
               <Crown className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>

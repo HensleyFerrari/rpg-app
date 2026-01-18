@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -62,11 +62,12 @@ interface Campaign {
 export function CharacterModal() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { data: session } = useSession();
 
   // Estados Baseados na URL
-  const isCreateMode = searchParams.has("new");
-  const editId = searchParams.get("edit");
+  const isCreateMode = searchParams.get("action") === "new-character";
+  const editId = searchParams.get("editCharacter");
   const isOpen = isCreateMode || !!editId;
 
   // Estados Locais
@@ -78,13 +79,12 @@ export function CharacterModal() {
   const isNpcFromUrl = searchParams.get("isNpc") === "true";
 
   const handleClose = useCallback(() => {
-    // Remover query params relacionados ao modal
     const params = new URLSearchParams(searchParams.toString());
-    params.delete("new");
-    params.delete("edit");
-    params.delete("isNpc"); // Opcional: limpar também isNpc se quiser resetar totalmente
-    router.push(`?${params.toString()}`);
-  }, [searchParams, router]);
+    params.delete("action");
+    params.delete("editCharacter");
+    params.delete("isNpc");
+    router.replace(`${pathname}?${params.toString()}`);
+  }, [searchParams, router, pathname]);
 
   const defaultValues: Partial<CharacterFormValues> = useMemo(() => ({
     name: "",

@@ -150,12 +150,12 @@ export function AppSidebar() {
           <SidebarMenu>
             {items.map((item) => {
               const isActive = pathname === item.url || (item.items && item.items.some(sub => pathname === sub.url));
-              
+
               if (!item.items) {
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton 
-                      asChild 
+                    <SidebarMenuButton
+                      asChild
                       isActive={pathname === item.url}
                       tooltip={item.title}
                       className={cn(
@@ -177,7 +177,7 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton 
+                        <SidebarMenuButton
                           tooltip={item.title}
                           className={cn(
                             "transition-all duration-200",
@@ -194,7 +194,7 @@ export function AppSidebar() {
                         <DropdownMenuSeparator className="bg-white/10" />
                         {item.items.map((subItem) => (
                           <DropdownMenuItem key={subItem.title} asChild>
-                            <a 
+                            <a
                               href={subItem.url}
                               className={cn(
                                 "flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors",
@@ -221,7 +221,7 @@ export function AppSidebar() {
                 >
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton 
+                      <SidebarMenuButton
                         isActive={isActive}
                         tooltip={item.title}
                         className={cn(
@@ -238,8 +238,8 @@ export function AppSidebar() {
                       <SidebarMenuSub className="border-blue-500/20 ml-4 mt-1 border-l group-data-[collapsible=icon]:hidden">
                         {item.items.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton 
-                              asChild 
+                            <SidebarMenuSubButton
+                              asChild
                               isActive={pathname === subItem.url}
                               className={cn(
                                 "transition-all duration-200",
@@ -278,15 +278,11 @@ export function AppSidebar() {
                       <User className="h-5 w-5" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background bg-green-500" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="right" align="end" className="w-56 bg-background/95 backdrop-blur-xl border-white/10">
                 <DropdownMenuLabel className="flex flex-col gap-1 px-3 py-2">
                   <span className="text-sm font-semibold">{actualUser?.name || "Usuário"}</span>
-                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                    Mestre <Crown className="h-2 w-2 text-yellow-500" />
-                  </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem asChild>
@@ -303,7 +299,7 @@ export function AppSidebar() {
                   <ModeToggle />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className="flex items-center gap-3 px-3 py-2 text-red-500 focus:text-red-500 focus:bg-red-500/10 cursor-pointer"
                   onSelect={() => {
                     signOut({ redirect: false }).then(() => {
