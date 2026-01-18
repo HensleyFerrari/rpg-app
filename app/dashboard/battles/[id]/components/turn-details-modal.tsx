@@ -8,7 +8,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, Clock, User, Heart, Swords, Target, MessageSquare, AlertCircle } from "lucide-react";
+import { CalendarIcon, User, Heart, Swords, Target, MessageSquare, AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 interface TurnDetailsModalProps {
@@ -33,19 +33,6 @@ export function TurnDetailsModal({
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
-
-  const getBadgeVariant = (type: string) => {
-    switch (type) {
-      case "heal":
-        return "success";
-      case "damage":
-        return "destructive";
-      case "other":
-        return "secondary";
-      default:
-        return "default";
-    }
   };
 
   const isEvent = turn.type === "other";

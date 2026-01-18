@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { BattleFilters } from "./components/battle-filters";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const StatCard = ({ title, value, icon: Icon, description, colorClass }: any) => (
   <Card className="overflow-hidden border-none shadow-md bg-card/50 backdrop-blur-sm">
@@ -209,7 +209,7 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
   </div>
 );
 
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export default function BattlesDashboardClient({ allBattles, currentUser, campaigns }: { allBattles: any[], currentUser: any, campaigns: any[] }) {
   const searchParams = useSearchParams();
