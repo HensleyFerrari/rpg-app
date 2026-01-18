@@ -33,6 +33,7 @@ import {
   ScrollText,
   CalendarDays,
   MessageSquare,
+  BarChart3,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
@@ -338,11 +339,32 @@ const BattlePage = () => {
 
           <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">
             <Tabs defaultValue="history" className="w-full">
-              <div className="flex items-center justify-between mb-4">
-                <TabsList>
-                  <TabsTrigger value="history">Histórico</TabsTrigger>
-                  <TabsTrigger value="statistics">Estatísticas</TabsTrigger>
-                  <TabsTrigger value="characters">Personagens</TabsTrigger>
+              <div className="mb-6">
+                <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 rounded-xl">
+                  <TabsTrigger
+                    value="history"
+                    className="flex items-center gap-2 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all"
+                  >
+                    <History className="h-4 w-4" />
+                    <span className="hidden sm:inline">Histórico</span>
+                    <span className="sm:hidden">Turnos</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="statistics"
+                    className="flex items-center gap-2 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Estatísticas</span>
+                    <span className="sm:hidden">Stats</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="characters"
+                    className="flex items-center gap-2 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg transition-all"
+                  >
+                    <Users className="h-4 w-4" />
+                    <span className="hidden sm:inline">Personagens</span>
+                    <span className="sm:hidden">Pers.</span>
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
