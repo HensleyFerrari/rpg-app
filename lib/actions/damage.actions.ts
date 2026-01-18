@@ -1,6 +1,7 @@
 "use server";
 
 import Damage, { DamageDocument } from "@/models/Damage";
+import User from "@/models/User";
 import { connectDB } from "../mongodb";
 import { getBattleById } from "./battle.actions";
 import { getCharacterById } from "./character.actions";
@@ -16,7 +17,7 @@ import { triggerBattleUpdate } from "../pusher";
 
 export const createDamage = async (damage: any) => {
   await connectDB();
-  
+
   const battleInfo = await getBattleById(damage.battle);
   if (!battleInfo.data.active) {
     return {
@@ -28,9 +29,9 @@ export const createDamage = async (damage: any) => {
   let characterInfo: any = null;
   if (damage.character) {
     characterInfo = await getCharacterById(damage.character);
-    
+
     const characterInBattle = battleInfo.data.characters.some(
-      (char: any) => char._id.toString() === damage.character
+      (char: any) => char._id.toString() === damage.character,
     );
 
     if (!characterInBattle) {
@@ -43,8 +44,12 @@ export const createDamage = async (damage: any) => {
 
   const payload = {
     ...damage,
-    owner: characterInfo ? characterInfo.data.owner._id : battleInfo.data.owner._id,
-    campaign: characterInfo ? characterInfo.data.campaign._id : battleInfo.data.campaign._id,
+    owner: characterInfo
+      ? characterInfo.data.owner._id
+      : battleInfo.data.owner._id,
+    campaign: characterInfo
+      ? characterInfo.data.campaign._id
+      : battleInfo.data.campaign._id,
     target: damage.target || null,
   };
   const newDamage = new Damage(payload);
@@ -82,6 +87,11 @@ export const getAllDamagesByBattleId = async (battleId: string) => {
   const damages = await Damage.find({ battle: battleId })
     .populate("character")
     .populate("target")
+    .populate({
+      path: "owner",
+      select: "name",
+      model: User,
+    })
     .sort({ createdAt: -1 });
 
   if (!damages) {

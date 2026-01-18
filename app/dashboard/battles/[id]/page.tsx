@@ -34,6 +34,7 @@ import {
   CalendarDays,
   MessageSquare,
   BarChart3,
+  Info,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
@@ -96,6 +97,10 @@ interface Battle {
     target?: {
       name: string;
     };
+    createdAt: string;
+    owner?: {
+      name: string;
+    }
   }>;
   createdAt: string;
   updatedAt: string;
@@ -104,6 +109,7 @@ interface Battle {
 
 
 import { EditBattleModal } from "../components/edit-battle-modal";
+import { TurnDetailsModal } from "./components/turn-details-modal";
 
 const BattlePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -111,6 +117,8 @@ const BattlePage = () => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTurn, setSelectedTurn] = useState<any>(null);
+  const [isTurnDetailsModalOpen, setIsTurnDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBattle = async () => {
@@ -271,6 +279,11 @@ const BattlePage = () => {
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
         battle={battle}
+      />
+      <TurnDetailsModal
+        open={isTurnDetailsModalOpen}
+        onOpenChange={setIsTurnDetailsModalOpen}
+        turn={selectedTurn}
       />
       {battle && (
         <Card className="w-full shadow-lg">
@@ -604,6 +617,17 @@ const BattlePage = () => {
                             >
                               <div className="grid grid-cols-3 gap-4 text-sm items-center min-w-0">
                                 <span className="font-medium flex items-center gap-2 shrink-0">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                                    onClick={() => {
+                                      setSelectedTurn(round);
+                                      setIsTurnDetailsModalOpen(true);
+                                    }}
+                                  >
+                                    <Info className="h-4 w-4" />
+                                  </Button>
                                   <Target className="h-4 w-4 text-muted-foreground" />
                                   Turno {round.round}
                                 </span>
