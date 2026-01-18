@@ -429,7 +429,7 @@ const BattlePage = () => {
                         </CardContent>
                       </Card>
 
-                      <Card className="bg-card/50 shadow-sm border-none">
+                      {/* <Card className="bg-card/50 shadow-sm border-none">
                         <CardContent className="p-3">
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-amber-500/10 rounded-lg">
@@ -453,7 +453,7 @@ const BattlePage = () => {
                             </div>
                           </div>
                         </CardContent>
-                      </Card>
+                      </Card> */}
 
                       <Card className="bg-card/50 shadow-sm border-none">
                         <CardContent className="p-3">
@@ -749,12 +749,18 @@ const BattlePage = () => {
                                   <span className="font-bold text-lg text-muted-foreground w-6 text-center">#{index + 1}</span>
                                   <div>
                                     <p className="font-medium">{name}</p>
-                                    <p className="text-xs text-muted-foreground">Maior turno: {stat.maxTurn}</p>
+                                    <div className="flex flex-wrap gap-x-3 gap-y-1">
+                                      <p className="text-[10px] text-muted-foreground">Maior: <span className="font-semibold text-foreground">{stat.maxTurn}</span></p>
+                                      <p className="text-[10px] text-muted-foreground">Média: <span className="font-semibold text-foreground">
+                                        {(stat.total / Object.keys(roundsByCharAndTurn[name]).length).toFixed(1)}
+                                      </span></p>
+                                      <p className="text-[10px] text-muted-foreground">Ações: <span className="font-semibold text-foreground">{Object.keys(roundsByCharAndTurn[name]).length}</span></p>
+                                    </div>
                                   </div>
                                 </div>
                                 <div className="text-right">
                                   <p className="text-lg font-bold">{stat.total}</p>
-                                  <p className="text-xs text-muted-foreground">Total</p>
+                                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Total</p>
                                 </div>
                               </div>
                             ));
@@ -811,12 +817,18 @@ const BattlePage = () => {
                                   <span className="font-bold text-lg text-muted-foreground w-6 text-center">#{index + 1}</span>
                                   <div>
                                     <p className="font-medium">{name}</p>
-                                    <p className="text-xs text-muted-foreground">Maior turno: {stat.maxTurn}</p>
+                                    <div className="flex flex-wrap gap-x-3 gap-y-1">
+                                      <p className="text-[10px] text-muted-foreground">Maior: <span className="font-semibold text-foreground">{stat.maxTurn}</span></p>
+                                      <p className="text-[10px] text-muted-foreground">Média: <span className="font-semibold text-foreground">
+                                        {(stat.total / Object.keys(roundsByCharAndTurn[name]).length).toFixed(1)}
+                                      </span></p>
+                                      <p className="text-[10px] text-muted-foreground">Ações: <span className="font-semibold text-foreground">{Object.keys(roundsByCharAndTurn[name]).length}</span></p>
+                                    </div>
                                   </div>
                                 </div>
                                 <div className="text-right">
                                   <p className="text-lg font-bold text-green-500">{stat.total}</p>
-                                  <p className="text-xs text-muted-foreground">Total</p>
+                                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Total</p>
                                 </div>
                               </div>
                             ));
