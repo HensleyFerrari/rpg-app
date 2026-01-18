@@ -341,6 +341,7 @@ const BattlePage = () => {
               <div className="flex items-center justify-between mb-4">
                 <TabsList>
                   <TabsTrigger value="history">Histórico</TabsTrigger>
+                  <TabsTrigger value="statistics">Estatísticas</TabsTrigger>
                   <TabsTrigger value="characters">Personagens</TabsTrigger>
                 </TabsList>
               </div>
@@ -678,6 +679,135 @@ const BattlePage = () => {
                   </div>
                 </div>
               </TabsContent>
+
+              <TabsContent value="statistics" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Damage Stats */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Swords className="h-5 w-5" />
+                        Estatísticas de Dano
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {(() => {
+                          const stats: Record<string, { total: number; maxTurn: number; maxTurnVal: number }> = {};
+
+                          // First pass: Calculate totals and per-turn sums
+                          const roundsByCharAndTurn: Record<string, Record<number, number>> = {};
+
+                          battle.rounds.forEach(round => {
+                            if (round.type === 'heal' || round.type === 'other' || !round.character?.name) return;
+
+                            const charName = round.character.name;
+                            if (!stats[charName]) {
+                              stats[charName] = { total: 0, maxTurn: 0, maxTurnVal: 0 };
+                            }
+                            stats[charName].total += round.damage;
+
+                            if (!roundsByCharAndTurn[charName]) roundsByCharAndTurn[charName] = {};
+                            roundsByCharAndTurn[charName][round.round] = (roundsByCharAndTurn[charName][round.round] || 0) + round.damage;
+                          });
+
+                          // Second pass: Calculate max turn damage
+                          Object.entries(roundsByCharAndTurn).forEach(([name, turns]) => {
+                            if (stats[name]) {
+                              const maxVal = Math.max(...Object.values(turns));
+                              stats[name].maxTurn = maxVal;
+                            }
+                          });
+
+                          return Object.entries(stats)
+                            .sort((a, b) => b[1].total - a[1].total)
+                            .map(([name, stat], index) => (
+                              <div key={name} className="flex items-center justify-between p-3 border rounded-lg bg-card/50">
+                                <div className="flex items-center gap-3">
+                                  <span className="font-bold text-lg text-muted-foreground w-6 text-center">#{index + 1}</span>
+                                  <div>
+                                    <p className="font-medium">{name}</p>
+                                    <p className="text-xs text-muted-foreground">Maior turno: {stat.maxTurn}</p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-lg font-bold">{stat.total}</p>
+                                  <p className="text-xs text-muted-foreground">Total</p>
+                                </div>
+                              </div>
+                            ));
+                        })()}
+                        {battle.rounds.filter(r => r.type !== 'heal' && r.type !== 'other').length === 0 && (
+                          <p className="text-muted-foreground text-center py-4">Nenhum dano registrado.</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Healing Stats */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Heart className="h-5 w-5 text-green-500" />
+                        Estatísticas de Cura
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {(() => {
+                          const stats: Record<string, { total: number; maxTurn: number }> = {};
+
+                          // First pass: Calculate totals and per-turn sums
+                          const roundsByCharAndTurn: Record<string, Record<number, number>> = {};
+
+                          battle.rounds.forEach(round => {
+                            if (round.type !== 'heal' || !round.character?.name) return;
+
+                            const charName = round.character.name;
+                            if (!stats[charName]) {
+                              stats[charName] = { total: 0, maxTurn: 0 };
+                            }
+                            stats[charName].total += round.damage;
+
+                            if (!roundsByCharAndTurn[charName]) roundsByCharAndTurn[charName] = {};
+                            roundsByCharAndTurn[charName][round.round] = (roundsByCharAndTurn[charName][round.round] || 0) + round.damage;
+                          });
+
+                          // Second pass: Calculate max turn damage
+                          Object.entries(roundsByCharAndTurn).forEach(([name, turns]) => {
+                            if (stats[name]) {
+                              const maxVal = Math.max(...Object.values(turns));
+                              stats[name].maxTurn = maxVal;
+                            }
+                          });
+
+                          return Object.entries(stats)
+                            .sort((a, b) => b[1].total - a[1].total)
+                            .map(([name, stat], index) => (
+                              <div key={name} className="flex items-center justify-between p-3 border rounded-lg bg-card/50">
+                                <div className="flex items-center gap-3">
+                                  <span className="font-bold text-lg text-muted-foreground w-6 text-center">#{index + 1}</span>
+                                  <div>
+                                    <p className="font-medium">{name}</p>
+                                    <p className="text-xs text-muted-foreground">Maior turno: {stat.maxTurn}</p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-lg font-bold text-green-500">{stat.total}</p>
+                                  <p className="text-xs text-muted-foreground">Total</p>
+                                </div>
+                              </div>
+                            ));
+                        })()}
+                        {battle.rounds.filter(r => r.type === 'heal').length === 0 && (
+                          <p className="text-muted-foreground text-center py-4">Nenhuma cura registrada.</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
 
               <TabsContent value="characters">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
