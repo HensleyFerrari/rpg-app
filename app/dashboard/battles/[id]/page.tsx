@@ -620,7 +620,7 @@ const BattlePage = () => {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                                    className="h-6 w-6 text-muted-foreground hover:text-foreground shrink-0"
                                     onClick={() => {
                                       setSelectedTurn(round);
                                       setIsTurnDetailsModalOpen(true);
@@ -628,8 +628,8 @@ const BattlePage = () => {
                                   >
                                     <Info className="h-4 w-4" />
                                   </Button>
-                                  <Target className="h-4 w-4 text-muted-foreground" />
-                                  Turno {round.round}
+                                  <Target className="h-4 w-4 text-muted-foreground shrink-0" />
+                                  <span className="shrink-0">Turno {round.round}</span>
                                 </span>
                                 {round.type === "other" ? (
                                   <span className={cn(
