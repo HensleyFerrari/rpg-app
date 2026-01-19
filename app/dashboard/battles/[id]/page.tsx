@@ -599,7 +599,7 @@ const BattlePage = () => {
                               {/* Avatar Section */}
                               <div className="shrink-0">
                                 <Link
-                                  href={`/dashboard/characters/${round.character?._id || ""
+                                  href={`/dashboard/personagens/${round.character?._id || ""
                                     }`}
                                   className="cursor-pointer"
                                   onClick={(e) => {
