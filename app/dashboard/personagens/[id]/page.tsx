@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   User2,
   Swords,
@@ -75,6 +75,7 @@ type Character = {
 const CharacterPage = () => {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params.id as string;
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,7 +105,7 @@ const CharacterPage = () => {
     };
 
     fetchCharacter();
-  }, [id]);
+  }, [id, searchParams]);
 
   const handleDelete = async () => {
     try {
@@ -178,7 +179,7 @@ const CharacterPage = () => {
         <div className="flex items-center gap-2">
           {hasEditPermission && (
             <>
-              <Link href={`?edit=${id}`}>
+              <Link href={`?editCharacter=${id}`}>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Edit className="w-4 h-4" /> Editar
                 </Button>

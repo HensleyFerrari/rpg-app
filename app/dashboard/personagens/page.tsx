@@ -9,6 +9,7 @@ import { CharacterFilters } from "./_components/character-filters";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/actions/user.actions";
+import { CharacterModal } from "./_components/character-modal";
 
 
 
@@ -174,6 +175,7 @@ export default async function Personagens({ searchParams }: PageProps) {
           </TabsContent>
         </Tabs>
       )}
+      <CharacterModal />
     </div>
   );
 }
