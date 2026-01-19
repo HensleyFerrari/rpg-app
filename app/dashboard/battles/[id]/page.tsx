@@ -710,6 +710,11 @@ const BattlePage = () => {
                                   </>
                                 )}
                               </div>
+                              {round.description && round.type !== "other" && (
+                                <div className="mt-2 text-sm text-muted-foreground italic border-l-2 border-primary/20 pl-2">
+                                  {round.description}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>

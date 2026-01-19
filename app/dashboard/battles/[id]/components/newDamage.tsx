@@ -119,7 +119,7 @@ const NewDamage = () => {
       const battle = await getBattleById(id as string);
 
       if (battle.data && battle.data.characters) {
-          setAllBattleCharacters(battle.data.characters);
+        setAllBattleCharacters(battle.data.characters);
       }
 
       if (user._id === battle.data.owner._id) {
@@ -181,7 +181,7 @@ const NewDamage = () => {
         target: data.type === "other" || data.target === "none" ? undefined : data.target,
         type: data.type,
         damage: data.type === "other" ? 0 : data.damage,
-        description: data.type === "other" ? data.description : undefined,
+        description: data.description,
         isCritical: data.type === "other" ? false : data.isCritical,
         round: battle.data.round,
       };
@@ -301,7 +301,7 @@ const NewDamage = () => {
                   />
                 )}
 
-                {form.watch("type") !== "other" ? (
+                {form.watch("type") !== "other" && (
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
@@ -310,7 +310,9 @@ const NewDamage = () => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              {form.watch("type") === "damage" ? "Valor do Dano" : "Valor da Cura"}
+                              {form.watch("type") === "damage"
+                                ? "Valor do Dano"
+                                : "Valor da Cura"}
                             </FormLabel>
                             <FormControl>
                               <Input
@@ -343,11 +345,16 @@ const NewDamage = () => {
                               </FormControl>
                               <SelectContent>
                                 <SelectItem value="none">Nenhum</SelectItem>
-                                {allBattleCharacters.map((character: Character) => (
-                                  <SelectItem key={character._id} value={character._id}>
-                                    {character.name}
-                                  </SelectItem>
-                                ))}
+                                {allBattleCharacters.map(
+                                  (character: Character) => (
+                                    <SelectItem
+                                      key={character._id}
+                                      value={character._id}
+                                    >
+                                      {character.name}
+                                    </SelectItem>
+                                  )
+                                )}
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -377,28 +384,34 @@ const NewDamage = () => {
                       )}
                     />
                   </>
-                ) : (
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Descrição do Evento</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Ex: A tempestade se intensifica, todos rolam com desvantagem..." 
-                            className="min-h-[100px] resize-none"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Descreva o evento narrativo para o histórico.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 )}
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descrição (Opcional)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={
+                            form.watch("type") === "other"
+                              ? "Ex: A tempestade se intensifica..."
+                              : "Ex: Um golpe poderoso que rasga a armadura..."
+                          }
+                          className="min-h-[100px] resize-none"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {form.watch("type") === "other"
+                          ? "Descreva o evento narrativo."
+                          : "Adicione detalhes narrativos à ação."}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <DialogFooter className="pt-4">
