@@ -1,23 +1,24 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import Damage, { DamageDocument } from "@/models/Damage";
 import User from "@/models/User";
 import { connectDB } from "../mongodb";
 import { getBattleById } from "./battle.actions";
 import { getCharacterById } from "./character.actions";
-import { revalidatePath } from "next/cache";
+import { getCurrentUser } from "./user.actions";
+import { triggerBattleUpdate } from "../pusher";
 
-const serializeData = (data: DamageDocument) => {
+const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
-
-import { triggerBattleUpdate } from "../pusher";
 
 // ... existing code ...
 
 export const createDamage = async (damage: any) => {
   await connectDB();
 
+  const user = await getCurrentUser();
   const battleInfo = await getBattleById(damage.battle);
   if (!battleInfo.data.active) {
     return {
@@ -44,9 +45,11 @@ export const createDamage = async (damage: any) => {
 
   const payload = {
     ...damage,
-    owner: characterInfo
-      ? characterInfo.data.owner._id
-      : battleInfo.data.owner._id,
+    owner: user
+      ? user._id
+      : characterInfo
+        ? characterInfo.data.owner._id
+        : battleInfo.data.owner._id,
     campaign: characterInfo
       ? characterInfo.data.campaign._id
       : battleInfo.data.campaign._id,

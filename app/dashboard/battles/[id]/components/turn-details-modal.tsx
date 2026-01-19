@@ -89,22 +89,24 @@ export function TurnDetailsModal({
           <Separator />
 
           {/* Involvement */}
-          {!isEvent && (
-            <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            {(turn.character || !isEvent) && (
               <div className="space-y-1">
                 <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                   <User className="w-3 h-3" /> Origem
                 </span>
                 <p className="text-sm font-medium truncate">{turn.character?.name || "Sistema"}</p>
               </div>
+            )}
+            {!isEvent && (
               <div className="space-y-1">
                 <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                   <Target className="w-3 h-3" /> Alvo
                 </span>
                 <p className="text-sm font-medium truncate">{turn.target?.name || "N/A"}</p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           <Separator />
 

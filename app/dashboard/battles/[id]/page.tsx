@@ -632,21 +632,28 @@ const BattlePage = () => {
                                   <span className="shrink-0">Turno {round.round}</span>
                                 </span>
                                 {round.type === "other" ? (
-                                  <span className={cn(
-                                    "col-span-2 flex items-start gap-2 break-all whitespace-pre-wrap min-w-0",
-                                    round.description?.startsWith("[TURNO_ALTERADO]")
-                                      ? "text-blue-600 dark:text-blue-400 font-semibold"
-                                      : "italic text-muted-foreground"
-                                  )}>
-                                    {round.description?.startsWith("[TURNO_ALTERADO]") ? (
-                                      <History className="h-4 w-4 shrink-0 mt-0.5" />
-                                    ) : (
-                                      <MessageSquare className="h-4 w-4 shrink-0 mt-0.5" />
-                                    )}
-                                    <span className="flex-1 min-w-0">
-                                      {round.description?.replace("[TURNO_ALTERADO] ", "").replace("[TURNO_ALTERADO]", "")}
-                                    </span>
-                                  </span>
+                                  <div className="col-span-2 min-w-0">
+                                    <div className="flex items-start gap-2 break-all whitespace-pre-wrap">
+                                      {round.description?.startsWith("[TURNO_ALTERADO]") ? (
+                                        <History className="h-4 w-4 shrink-0 mt-0.5" />
+                                      ) : (
+                                        <MessageSquare className="h-4 w-4 shrink-0 mt-0.5" />
+                                      )}
+                                      <span className={cn(
+                                        "flex-1 min-w-0",
+                                        round.description?.startsWith("[TURNO_ALTERADO]")
+                                          ? "text-blue-600 dark:text-blue-400 font-semibold"
+                                          : "italic text-muted-foreground"
+                                      )}>
+                                        {round.character && (
+                                          <span className="font-semibold not-italic mr-1 text-foreground">
+                                            {round.character.name}:
+                                          </span>
+                                        )}
+                                        {round.description?.replace("[TURNO_ALTERADO] ", "").replace("[TURNO_ALTERADO]", "")}
+                                      </span>
+                                    </div>
+                                  </div>
                                 ) : (
                                   <>
                                     <span
