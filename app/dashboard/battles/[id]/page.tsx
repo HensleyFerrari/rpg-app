@@ -562,6 +562,169 @@ const BattlePage = () => {
             </TabsContent>
 
             <TabsContent value="statistics" className="space-y-6 animate-in slide-in-from-bottom-2 duration-500">
+              {/* Records Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-amber-500" />
+                  Recordes da Batalha
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {(() => {
+                    let maxHit = { value: 0, label: "N/A", sub: "Nenhum" };
+                    let maxCharDmgInfo = { value: 0, label: "N/A", sub: "Turno -" };
+                    let maxCharHealInfo = { value: 0, label: "N/A", sub: "Turno -" };
+                    let maxAllyDmgInfo = { value: 0, sub: "Turno -" };
+                    let maxEnemyDmgInfo = { value: 0, sub: "Turno -" };
+
+                    const charTurnDamage: Record<string, Record<number, number>> = {};
+                    const charTurnHeal: Record<string, Record<number, number>> = {};
+                    const allyTurnDamage: Record<number, number> = {};
+                    const enemyTurnDamage: Record<number, number> = {};
+
+                    if (battle?.rounds) {
+                      battle.rounds.forEach((round) => {
+                        if (round.type === "other") return;
+                        const damage = round.damage || 0;
+                        const charName = round.character?.name || "Desconhecido";
+                        const roundNum = round.round;
+
+                        // 1. Max Hit
+                        if (round.type !== "heal" && damage > maxHit.value) {
+                          maxHit = {
+                            value: damage,
+                            label: charName,
+                            sub: `Turno ${roundNum}`,
+                          };
+                        }
+
+                        // Collect aggregates
+                        if (round.type === "heal") {
+                          if (!charTurnHeal[charName]) charTurnHeal[charName] = {};
+                          charTurnHeal[charName][roundNum] = (charTurnHeal[charName][roundNum] || 0) + damage;
+                        } else {
+                          if (!charTurnDamage[charName]) charTurnDamage[charName] = {};
+                          charTurnDamage[charName][roundNum] = (charTurnDamage[charName][roundNum] || 0) + damage;
+
+                          const align = round.character?.alignment;
+                          if (!align || align === "ally") {
+                            allyTurnDamage[roundNum] = (allyTurnDamage[roundNum] || 0) + damage;
+                          } else if (align === "enemy") {
+                            enemyTurnDamage[roundNum] = (enemyTurnDamage[roundNum] || 0) + damage;
+                          }
+                        }
+                      });
+
+                      // Process Max Char Turn Damage
+                      let charMaxVal = 0;
+                      Object.entries(charTurnDamage).forEach(([name, turns]) => {
+                        Object.entries(turns).forEach(([turn, val]) => {
+                          if (val > charMaxVal) {
+                            charMaxVal = val;
+                            maxCharDmgInfo = { value: val, label: name, sub: `Turno ${turn}` };
+                          }
+                        });
+                      });
+
+                      // Process Max Char Turn Heal
+                      let healMaxVal = 0;
+                      Object.entries(charTurnHeal).forEach(([name, turns]) => {
+                        Object.entries(turns).forEach(([turn, val]) => {
+                          if (val > healMaxVal) {
+                            healMaxVal = val;
+                            maxCharHealInfo = { value: val, label: name, sub: `Turno ${turn}` };
+                          }
+                        });
+                      });
+
+                      // Process Max Ally Turn Damage
+                      let allyMaxVal = 0;
+                      Object.entries(allyTurnDamage).forEach(([turn, val]) => {
+                        if (val > allyMaxVal) {
+                          allyMaxVal = val;
+                          maxAllyDmgInfo = { value: val, sub: `Turno ${turn}` };
+                        }
+                      });
+
+                      // Process Max Enemy Turn Damage
+                      let enemyMaxVal = 0;
+                      Object.entries(enemyTurnDamage).forEach(([turn, val]) => {
+                        if (val > enemyMaxVal) {
+                          enemyMaxVal = val;
+                          maxEnemyDmgInfo = { value: val, sub: `Turno ${turn}` };
+                        }
+                      });
+                    }
+
+                    const RecordCard = ({ title, value, label, sub, icon: Icon, color }: any) => (
+                      <Card className="bg-card/50 border-muted-foreground/10 overflow-hidden relative">
+                        <div className={cn("absolute right-2 top-2 opacity-10", color)}>
+                          <Icon className="h-12 w-12" />
+                        </div>
+                        <CardContent className="p-4 space-y-2">
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider line-clamp-1" title={title}>
+                            {title}
+                          </p>
+                          <div className="space-y-0.5">
+                            <span className={cn("text-2xl font-bold block", color)}>
+                              {value}
+                            </span>
+                            {label && (
+                              <p className="text-sm font-medium leading-none truncate" title={label}>
+                                {label}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">{sub}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+
+                    return (
+                      <>
+                        <RecordCard
+                          title="Maior Golpe"
+                          value={maxHit.value}
+                          label={maxHit.label}
+                          sub={maxHit.sub}
+                          icon={Swords}
+                          color="text-amber-500"
+                        />
+                        <RecordCard
+                          title="Melhor Turno (Personagem)"
+                          value={maxCharDmgInfo.value}
+                          label={maxCharDmgInfo.label}
+                          sub={maxCharDmgInfo.sub}
+                          icon={Zap}
+                          color="text-blue-500"
+                        />
+                        <RecordCard
+                          title="Maior Cura (Turno)"
+                          value={maxCharHealInfo.value}
+                          label={maxCharHealInfo.label}
+                          sub={maxCharHealInfo.sub}
+                          icon={Heart}
+                          color="text-green-500"
+                        />
+                        <RecordCard
+                          title="Turno Mais Forte (Aliados)"
+                          value={maxAllyDmgInfo.value}
+                          sub={maxAllyDmgInfo.sub}
+                          icon={Shield}
+                          color="text-indigo-500"
+                        />
+                        <RecordCard
+                          title="Turno Mais Forte (Inimigos)"
+                          value={maxEnemyDmgInfo.value}
+                          sub={maxEnemyDmgInfo.sub}
+                          icon={Skull}
+                          color="text-red-500"
+                        />
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Damage Stats */}
                 <div className="space-y-4">
