@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import Damage, { DamageDocument } from "@/models/Damage";
+import Battle from "@/models/Battle";
 import User from "@/models/User";
 import { connectDB } from "../mongodb";
 import { getBattleById } from "./battle.actions";
@@ -92,7 +93,7 @@ export const getAllDamagesByBattleId = async (battleId: string) => {
     .populate("target")
     .populate({
       path: "owner",
-      select: "name",
+      select: "name _id",
       model: User,
     })
     .sort({ createdAt: -1 });
@@ -143,6 +144,71 @@ export const deleteDamage = async (damageId: string, battleId: string) => {
     return {
       ok: false,
       message: "Erro ao remover dano",
+    };
+  }
+};
+
+export const updateDamage = async (id: string, data: any) => {
+  try {
+    await connectDB();
+
+    if (!id) {
+      return { ok: false, message: "ID do dano é obrigatório" };
+    }
+
+    const damage = await Damage.findById(id);
+    if (!damage) {
+      return { ok: false, message: "Dano não encontrado" };
+    }
+
+    const user = await getCurrentUser();
+    if (!user) {
+      return { ok: false, message: "Usuário não autenticado" };
+    }
+
+    const battle = await Battle.findById(damage.battle);
+    if (!battle) {
+      return { ok: false, message: "Batalha não encontrada" };
+    }
+
+    // Check permissions: Owner of damage OR Battle Owner (GM)
+    const isOwner = damage.owner.toString() === user._id.toString();
+    const isGM = battle.owner.toString() === user._id.toString();
+
+    if (!isOwner && !isGM) {
+      return {
+        ok: false,
+        message: "Você não tem permissão para editar este turno",
+      };
+    }
+
+    // Update fields
+    const updatedDamage = await Damage.findByIdAndUpdate(
+      id,
+      {
+        description: data.description,
+        damage: data.damage,
+        type: data.type,
+        isCritical: data.isCritical,
+        target: data.target || null,
+        character: data.character,
+      },
+      { new: true },
+    );
+
+    await triggerBattleUpdate(damage.battle.toString());
+    revalidatePath(`/dashboard/battles/${damage.battle}`);
+
+    return {
+      ok: true,
+      message: "Turno atualizado com sucesso",
+      data: serializeData(updatedDamage),
+    };
+  } catch (error) {
+    console.error("Error updating damage:", error);
+    return {
+      ok: false,
+      message: "Erro ao atualizar turno",
     };
   }
 };

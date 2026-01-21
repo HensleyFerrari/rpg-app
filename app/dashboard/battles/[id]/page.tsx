@@ -279,6 +279,8 @@ const BattlePage = () => {
         open={isTurnDetailsModalOpen}
         onOpenChange={setIsTurnDetailsModalOpen}
         turn={selectedTurn}
+        currentUser={currentUser}
+        battle={battle}
       />
       {battle && (
         <div className="flex flex-col gap-6 mb-8">
