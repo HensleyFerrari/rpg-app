@@ -14,7 +14,8 @@ import {
   Shield,
   Zap,
   BarChart3,
-  Heart
+  Heart,
+  ArrowRight
 } from "lucide-react";
 import { CharacterAvatar } from "@/components/CharacterAvatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -161,184 +162,180 @@ const CharacterPage = () => {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
+      day: 'numeric',
+      month: 'long',
       year: 'numeric'
     });
   };
 
   return (
     <div className="container max-w-7xl mx-auto p-4 md:p-8 space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <Breadcrumb
-            items={[
-              { label: "Dashboard", href: "/dashboard" },
-              { label: "Personagens", href: "/dashboard/personagens" },
-              { label: character.name },
-            ]}
-          />
-          <h1 className="text-4xl font-extrabold tracking-tight mt-2 flex items-center gap-3">
-            {character.name}
-            {character.isNpc && (
-              <Badge variant="outline" className="text-xs uppercase px-2 py-0 border-primary/30 text-primary">NPC</Badge>
-            )}
-          </h1>
-        </div>
+      <div className="flex flex-col gap-4">
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Personagens", href: "/dashboard/personagens" },
+            { label: character.name },
+          ]}
+        />
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-3">
+              {character.name}
+              {character.isNpc && (
+                <Badge variant="outline" className="text-xs uppercase px-2 py-0 border-primary/30 text-primary">NPC</Badge>
+              )}
+            </h1>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="font-mono text-xs">ID: #{character._id.slice(-6)}</span>
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                Criado em {formatDate(character.createdAt)}
+              </span>
+            </div>
+          </div>
 
-        <div className="flex items-center gap-2">
           {hasEditPermission && (
-            <>
+            <div className="flex items-center gap-2">
               <Link href={`?editCharacter=${id}`}>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Edit className="w-4 h-4" /> Editar
+                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+                  <Edit className="w-4 h-4 text-muted-foreground" />
                 </Button>
               </Link>
-
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm" className="gap-2">
-                    <Trash2 className="w-4 h-4" /> Excluir
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Essa ação não pode ser desfeita. Isso excluirá permanentemente o personagem
-                      <span className="font-semibold text-foreground"> {character.name} </span>
-                      e removerá todos os dados associados.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                      Excluir
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
+            </div>
           )}
         </div>
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 rounded-xl mb-6">
-          <TabsTrigger value="overview" className="flex items-center gap-2 py-2.5">
-            <User2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Visão Geral</span>
+        <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0 mb-8">
+          <TabsTrigger
+            value="overview"
+            className="rounded-none border-b-2 border-transparent px-4 py-3 font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground bg-transparent transition-all shadow-none"
+          >
+            Visão Geral
           </TabsTrigger>
-          <TabsTrigger value="statistics" className="flex items-center gap-2 py-2.5">
-            <BarChart3 className="h-4 w-4" />
-            <span className="hidden sm:inline">Estatísticas</span>
+          <TabsTrigger
+            value="statistics"
+            className="rounded-none border-b-2 border-transparent px-4 py-3 font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground bg-transparent transition-all shadow-none"
+          >
+            Estatísticas
           </TabsTrigger>
-          <TabsTrigger value="battles" className="flex items-center gap-2 py-2.5">
-            <Swords className="h-4 w-4" />
-            <span className="hidden sm:inline">Batalhas</span>
+          <TabsTrigger
+            value="battles"
+            className="rounded-none border-b-2 border-transparent px-4 py-3 font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground bg-transparent transition-all shadow-none"
+          >
+            Batalhas <span className="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded-full">{character.battles?.length || 0}</span>
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-            {/* Left Column: Image and Status */}
-            <div className="md:col-span-4 space-y-6">
-              <div className="overflow-hidden border-none shadow-lg">
-                <CardContent className="p-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">História</h3>
+                <div className="overflow-hidden rounded-xl border bg-card shadow-sm aspect-video relative group">
                   <CharacterAvatar
                     src={character.characterUrl}
                     alt={character.name}
                     isNpc={character.isNpc}
-                    className="w-full h-full rounded-lg"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
                     autoHeight
                   />
                   <div className="absolute top-4 left-4">
                     <CharacterStatusBadge status={character.status} />
                   </div>
-                </CardContent>
+                </div>
               </div>
 
-              <Card className="border-none shadow-md ring-1 ring-border">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Status Rápido</CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="flex flex-col items-center justify-center p-4 bg-primary/5 rounded-xl border border-primary/10">
-                    <Swords className="w-5 h-5 text-primary mb-2" />
-                    <span className="text-2xl font-bold">{character.battles?.length || 0}</span>
-                    <span className="text-xs text-muted-foreground">Batalhas</span>
-                  </div>
-                  <div className="flex flex-col items-center justify-center p-4 bg-secondary/30 rounded-xl border border-border/50">
-                    <Shield className="w-5 h-5 text-secondary-foreground mb-2" />
-                    <span className="text-sm font-semibold capitalize">
-                      {character.alignment === 'ally' ? 'Aliado' :
-                        character.alignment === 'enemy' ? 'Inimigo' : 'Neutro'}
-                    </span>
-                    <span className="text-xs text-muted-foreground">Alinhamento</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right Column: Details and Biography */}
-            <div className="md:col-span-8 space-y-8">
-              {/* Main Info Card */}
-              <Card className="border-none shadow-md ring-1 ring-border">
-                <CardHeader>
-                  <div className="flex items-center gap-2 text-primary">
-                    <Book className="w-5 h-5" />
-                    <CardTitle>Visão Geral</CardTitle>
-                  </div>
-                  <CardDescription>Informações fundamentais desta ficha.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground flex items-center gap-2">
-                        <Book className="w-3 h-3" /> Campanha
-                      </p>
-                      <p className="font-semibold text-lg">{character.campaign.name}</p>
-                    </div>
-
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground flex items-center gap-2">
-                        <User className="w-3 h-3" /> Criador por
-                      </p>
-                      <p className="font-semibold text-lg">{character.owner.name || character.owner.username}</p>
-                    </div>
-
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground flex items-center gap-2">
-                        <Calendar className="w-3 h-3" /> Criado em
-                      </p>
-                      <p className="font-semibold">{formatDate(character.createdAt)}</p>
-                    </div>
-
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground flex items-center gap-2">
-                        <Clock className="w-3 h-3" /> Última atualização
-                      </p>
-                      <p className="font-semibold">{formatDate(character.updatedAt)}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Biography Card */}
-              <Card className="border-none shadow-md ring-1 ring-border">
-                <CardHeader>
-                  <div className="flex items-center gap-2 text-primary">
-                    <User2 className="w-5 h-5" />
-                    <CardTitle>História e Descrição</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="prose dark:prose-invert max-w-none">
-                  <Separator className="mb-6 opacity-30" />
-                  <div className="rounded-lg bg-muted/30 p-4 border border-border/50">
+              <div className="space-y-4">
+                {character.message ? (
+                  <div className="prose dark:prose-invert max-w-none">
                     <ReadOnlyRichTextViewer content={character.message} />
                   </div>
-                </CardContent>
-              </Card>
+                ) : (
+                  <p className="text-muted-foreground italic">Nenhuma descrição fornecida.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Criador</h3>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                    {(character.owner.name || character.owner.username).charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">{character.owner.name || character.owner.username}</p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Campaign Info */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Campanha</h3>
+                <Link href={`/dashboard/campaigns/${character.campaign._id}`} className="block group">
+                  <div className="flex items-center justify-between p-3 rounded-lg border bg-card/50 hover:bg-card hover:border-primary/50 transition-all">
+                    <span className="font-medium truncate">{character.campaign.name}</span>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                </Link>
+              </div>
+
+              <Separator />
+
+              {/* Character Details Sidebar */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Metadados</h3>
+
+                <div className="grid gap-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground flex items-center gap-2"><Shield className="w-4 h-4" /> Alinhamento</span>
+                    <span className="capitalize font-medium">{character.alignment === 'ally' ? 'Aliado' : character.alignment === 'enemy' ? 'Inimigo' : 'Neutro'}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground flex items-center gap-2"><Swords className="w-4 h-4" /> Batalhas</span>
+                    <span className="font-medium">{character.battles?.length || 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              {hasEditPermission && (
+                <div className="pt-4 flex flex-col gap-2">
+                  <Link href={`?editCharacter=${id}`}>
+                    <Button variant="outline" className="w-full justify-start gap-2 h-10">
+                      <Edit className="w-4 h-4" /> Editar Personagem
+                    </Button>
+                  </Link>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start gap-2 h-10 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/20">
+                        <Trash2 className="w-4 h-4" /> Excluir Personagem
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Essa ação não pode ser desfeita. Isso excluirá permanentemente o personagem
+                          <span className="font-semibold text-foreground"> {character.name} </span>
+                          e removerá todos os dados associados.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          Excluir
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              )}
+
             </div>
           </div>
         </TabsContent>
