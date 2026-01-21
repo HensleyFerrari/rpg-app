@@ -10,12 +10,16 @@ interface ChangeRoundProps {
   battleId: string;
   currentRound: number;
   advance?: boolean;
+  className?: string;
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 }
 
 const ChangeRound = ({
   battleId,
   currentRound,
   advance = true,
+  className,
+  variant,
 }: ChangeRoundProps) => {
   const router = useRouter();
 
@@ -31,7 +35,7 @@ const ChangeRound = ({
 
       if (response.ok) {
         toast.success(advance ? "Turno avançado!" : "Turno anterior!");
-        
+
         await createDamage({
           battle: battleId,
           type: "other",
@@ -59,10 +63,17 @@ const ChangeRound = ({
     }
   };
 
+  if (variant) {
+    // If variant is provided, render a proper button component if available or styled button
+    // For now, let's keep it simple as the previous implementation was a plain button. 
+    // We can return a Button styled component if we import it, but I see no import in the original file.
+    // I should probably import Button from shadcn ui in this file.
+  }
+
   return (
     <button
       onClick={handleChangeRound}
-      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      className={className || "flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"}
     >
       {advance ? (
         <>

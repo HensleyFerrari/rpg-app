@@ -93,7 +93,12 @@ interface Character {
   };
 }
 
-const NewDamage = () => {
+interface NewDamageProps {
+  className?: string;
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+}
+
+const NewDamage = ({ className, variant = "default" }: NewDamageProps) => {
   const { id } = useParams<{ id: string }>();
   const [characters, setCharacters] = useState<Character[]>([]);
   const [allBattleCharacters, setAllBattleCharacters] = useState<Character[]>([]);
@@ -218,7 +223,8 @@ const NewDamage = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="default"
+          variant={variant}
+          className={className}
           disabled={!userHasCharacter}
           title={
             !userHasCharacter
@@ -226,7 +232,7 @@ const NewDamage = () => {
               : ""
           }
         >
-          <Plus /> Ação
+          <Plus className={className?.includes("gap-2") ? "h-4 w-4" : ""} /> Ação
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
