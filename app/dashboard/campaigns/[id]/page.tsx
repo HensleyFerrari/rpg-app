@@ -174,6 +174,14 @@ const CampaignDetail = async ({ params }: any) => {
                         </Button>
                       </Link>
                       {isOwner && (
+                        <Link href={`?action=new-character&campaign=${campaign._id}&isNpc=true`} className="w-full">
+                          <Button variant="outline" className="w-full justify-start gap-2 h-9 text-sm">
+                            <PlusCircle className="h-4 w-4" />
+                            Adicionar NPC
+                          </Button>
+                        </Link>
+                      )}
+                      {isOwner && (
                         <Link href={`/dashboard/campaigns/${id}/manage`} className="w-full">
                           <Button variant="outline" className="w-full justify-start gap-2 h-9 text-sm">
                             <Users className="h-4 w-4" />
