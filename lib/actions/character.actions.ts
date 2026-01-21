@@ -8,6 +8,7 @@ import Campaign from "@/models/Campaign";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
 import { getAllBattlesByCharacterId } from "./battle.actions";
+import Damage from "@/models/Damage";
 import { triggerBattleUpdate } from "../pusher";
 
 const serializeData = (data: any) => {
@@ -97,7 +98,7 @@ export async function createCharacter({
     } else {
       console.log(
         "Campaign IS accepting characters (or field is missing/true). Value:",
-        campaignData.isAccepptingCharacters
+        campaignData.isAccepptingCharacters,
       );
     }
 
@@ -122,7 +123,7 @@ export async function createCharacter({
     const updatedUser = await User.findByIdAndUpdate(
       ownerData._id,
       { $push: { characters: newCharacterData._id } },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedUser) {
@@ -200,9 +201,15 @@ export async function getCharacterById(id: string) {
       };
     }
 
+    const damagesData = await Damage.find({ character: id }).sort({
+      createdAt: -1,
+    });
+    const damages = serializeData(damagesData);
+
     const data = {
       ...characterData.toObject(),
       battles: battles.data,
+      damages: damages,
     };
 
     return {
@@ -221,7 +228,7 @@ export async function getCharacterById(id: string) {
 }
 
 export async function getCharactersByCampaign(
-  campaignId: string
+  campaignId: string,
 ): Promise<CharacterResponse> {
   try {
     if (!campaignId) {
@@ -309,7 +316,7 @@ export async function getCharactersByOwner(): Promise<CharacterResponse> {
 
 export async function updateCharacter(
   id: string,
-  updates: Partial<CharacterParams>
+  updates: Partial<CharacterParams>,
 ): Promise<CharacterResponse> {
   try {
     if (!id) {
@@ -389,7 +396,7 @@ export async function updateCharacter(
     const updatedCharacterData = await Character.findByIdAndUpdate(
       id,
       { ...updates },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedCharacterData) {
@@ -562,7 +569,7 @@ export const getCharacterByActualUser = async () => {
 };
 
 export const getCharactersByActualUserAndCampaign = async (
-  campaignId: string
+  campaignId: string,
 ) => {
   await connectDB();
 
@@ -576,7 +583,7 @@ export const getCharactersByActualUserAndCampaign = async (
 };
 export async function updateCharacterStatus(
   characterId: string,
-  status: "alive" | "dead"
+  status: "alive" | "dead",
 ): Promise<CharacterResponse> {
   try {
     if (!characterId) {
@@ -598,7 +605,7 @@ export async function updateCharacterStatus(
     const updatedCharacter = await Character.findByIdAndUpdate(
       characterId,
       { status },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedCharacter) {
@@ -613,7 +620,7 @@ export async function updateCharacterStatus(
     if (battles.ok && battles.data) {
       const activeBattles = battles.data.filter((b: any) => b.active);
       await Promise.all(
-        activeBattles.map((battle: any) => triggerBattleUpdate(battle._id))
+        activeBattles.map((battle: any) => triggerBattleUpdate(battle._id)),
       );
     }
 

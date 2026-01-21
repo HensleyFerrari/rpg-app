@@ -11,9 +11,13 @@ import {
   Trash2,
   Clock,
   User,
-  Shield
+  Shield,
+  Zap,
+  BarChart3,
+  Heart
 } from "lucide-react";
 import { CharacterAvatar } from "@/components/CharacterAvatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -70,6 +74,12 @@ type Character = {
   updatedAt: string;
   isNpc: boolean;
   alignment: "ally" | "enemy";
+  damages?: Array<{
+    _id: string;
+    damage: number;
+    type: "damage" | "heal";
+    isCritical: boolean;
+  }>;
 };
 
 const CharacterPage = () => {
@@ -213,107 +223,232 @@ const CharacterPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-        {/* Left Column: Image and Status */}
-        <div className="md:col-span-4 space-y-6">
-          <div className="overflow-hidden border-none shadow-lg">
-            <CardContent className="p-0">
-              <CharacterAvatar
-                src={character.characterUrl}
-                alt={character.name}
-                isNpc={character.isNpc}
-                className="w-full h-full rounded-lg"
-                autoHeight
-              />
-              <div className="absolute top-4 left-4">
-                <CharacterStatusBadge status={character.status} />
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 rounded-xl mb-6">
+          <TabsTrigger value="overview" className="flex items-center gap-2 py-2.5">
+            <User2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Visão Geral</span>
+          </TabsTrigger>
+          <TabsTrigger value="statistics" className="flex items-center gap-2 py-2.5">
+            <BarChart3 className="h-4 w-4" />
+            <span className="hidden sm:inline">Estatísticas</span>
+          </TabsTrigger>
+          <TabsTrigger value="battles" className="flex items-center gap-2 py-2.5">
+            <Swords className="h-4 w-4" />
+            <span className="hidden sm:inline">Batalhas</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            {/* Left Column: Image and Status */}
+            <div className="md:col-span-4 space-y-6">
+              <div className="overflow-hidden border-none shadow-lg">
+                <CardContent className="p-0">
+                  <CharacterAvatar
+                    src={character.characterUrl}
+                    alt={character.name}
+                    isNpc={character.isNpc}
+                    className="w-full h-full rounded-lg"
+                    autoHeight
+                  />
+                  <div className="absolute top-4 left-4">
+                    <CharacterStatusBadge status={character.status} />
+                  </div>
+                </CardContent>
               </div>
-            </CardContent>
+
+              <Card className="border-none shadow-md ring-1 ring-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Status Rápido</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-4 pt-2">
+                  <div className="flex flex-col items-center justify-center p-4 bg-primary/5 rounded-xl border border-primary/10">
+                    <Swords className="w-5 h-5 text-primary mb-2" />
+                    <span className="text-2xl font-bold">{character.battles?.length || 0}</span>
+                    <span className="text-xs text-muted-foreground">Batalhas</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center p-4 bg-secondary/30 rounded-xl border border-border/50">
+                    <Shield className="w-5 h-5 text-secondary-foreground mb-2" />
+                    <span className="text-sm font-semibold capitalize">
+                      {character.alignment === 'ally' ? 'Aliado' :
+                        character.alignment === 'enemy' ? 'Inimigo' : 'Neutro'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">Alinhamento</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column: Details and Biography */}
+            <div className="md:col-span-8 space-y-8">
+              {/* Main Info Card */}
+              <Card className="border-none shadow-md ring-1 ring-border">
+                <CardHeader>
+                  <div className="flex items-center gap-2 text-primary">
+                    <Book className="w-5 h-5" />
+                    <CardTitle>Visão Geral</CardTitle>
+                  </div>
+                  <CardDescription>Informações fundamentais desta ficha.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground flex items-center gap-2">
+                        <Book className="w-3 h-3" /> Campanha
+                      </p>
+                      <p className="font-semibold text-lg">{character.campaign.name}</p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground flex items-center gap-2">
+                        <User className="w-3 h-3" /> Criador por
+                      </p>
+                      <p className="font-semibold text-lg">{character.owner.name || character.owner.username}</p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground flex items-center gap-2">
+                        <Calendar className="w-3 h-3" /> Criado em
+                      </p>
+                      <p className="font-semibold">{formatDate(character.createdAt)}</p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground flex items-center gap-2">
+                        <Clock className="w-3 h-3" /> Última atualização
+                      </p>
+                      <p className="font-semibold">{formatDate(character.updatedAt)}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Biography Card */}
+              <Card className="border-none shadow-md ring-1 ring-border">
+                <CardHeader>
+                  <div className="flex items-center gap-2 text-primary">
+                    <User2 className="w-5 h-5" />
+                    <CardTitle>História e Descrição</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="prose dark:prose-invert max-w-none">
+                  <Separator className="mb-6 opacity-30" />
+                  <div className="rounded-lg bg-muted/30 p-4 border border-border/50">
+                    <ReadOnlyRichTextViewer content={character.message} />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
+        </TabsContent>
 
-          <Card className="border-none shadow-md ring-1 ring-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Status Rápido</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4 pt-2">
-              <div className="flex flex-col items-center justify-center p-4 bg-primary/5 rounded-xl border border-primary/10">
-                <Swords className="w-5 h-5 text-primary mb-2" />
-                <span className="text-2xl font-bold">{character.battles?.length || 0}</span>
-                <span className="text-xs text-muted-foreground">Batalhas</span>
-              </div>
-              <div className="flex flex-col items-center justify-center p-4 bg-secondary/30 rounded-xl border border-border/50">
-                <Shield className="w-5 h-5 text-secondary-foreground mb-2" />
-                <span className="text-sm font-semibold capitalize">
-                  {character.alignment === 'ally' ? 'Aliado' :
-                    character.alignment === 'enemy' ? 'Inimigo' : 'Neutro'}
-                </span>
-                <span className="text-xs text-muted-foreground">Alinhamento</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Column: Details and Biography */}
-        <div className="md:col-span-8 space-y-8">
-          {/* Main Info Card */}
-          <Card className="border-none shadow-md ring-1 ring-border">
-            <CardHeader>
-              <div className="flex items-center gap-2 text-primary">
-                <Book className="w-5 h-5" />
-                <CardTitle>Visão Geral</CardTitle>
-              </div>
-              <CardDescription>Informações fundamentais desta ficha.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground flex items-center gap-2">
-                    <Book className="w-3 h-3" /> Campanha
+        <TabsContent value="statistics" className="space-y-6">
+          {character.damages && character.damages.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <div className="p-3 bg-red-500/10 rounded-full">
+                    <Swords className="h-6 w-6 text-red-500" />
+                  </div>
+                  <h3 className="text-sm font-medium text-muted-foreground mt-2">Dano Total Causado</h3>
+                  <p className="text-3xl font-bold">
+                    {character.damages
+                      .filter(d => d.type !== 'heal')
+                      .reduce((acc, curr) => acc + curr.damage, 0)
+                    }
                   </p>
-                  <p className="font-semibold text-lg">{character.campaign.name}</p>
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground flex items-center gap-2">
-                    <User className="w-3 h-3" /> Criador por
+              <Card>
+                <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <div className="p-3 bg-green-500/10 rounded-full">
+                    <Heart className="h-6 w-6 text-green-500" />
+                  </div>
+                  <h3 className="text-sm font-medium text-muted-foreground mt-2">Cura Total Realizada</h3>
+                  <p className="text-3xl font-bold text-green-500">
+                    {character.damages
+                      .filter(d => d.type === 'heal')
+                      .reduce((acc, curr) => acc + curr.damage, 0)
+                    }
                   </p>
-                  <p className="font-semibold text-lg">{character.owner.name || character.owner.username}</p>
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground flex items-center gap-2">
-                    <Calendar className="w-3 h-3" /> Criado em
+              <Card>
+                <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <div className="p-3 bg-amber-500/10 rounded-full">
+                    <Zap className="h-6 w-6 text-amber-500" />
+                  </div>
+                  <h3 className="text-sm font-medium text-muted-foreground mt-2">Maior Dano/Cura</h3>
+                  <p className="text-3xl font-bold">
+                    {Math.max(...character.damages.map(d => d.damage))}
                   </p>
-                  <p className="font-semibold">{formatDate(character.createdAt)}</p>
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground flex items-center gap-2">
-                    <Clock className="w-3 h-3" /> Última atualização
+              <Card>
+                <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <div className="p-3 bg-blue-500/10 rounded-full">
+                    <BarChart3 className="h-6 w-6 text-blue-500" />
+                  </div>
+                  <h3 className="text-sm font-medium text-muted-foreground mt-2">Média por Ação</h3>
+                  <p className="text-3xl font-bold">
+                    {(character.damages.reduce((acc, curr) => acc + curr.damage, 0) / character.damages.length).toFixed(1)}
                   </p>
-                  <p className="font-semibold">{formatDate(character.updatedAt)}</p>
-                </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center border-2 border-dashed rounded-xl bg-muted/20">
+              <div className="bg-muted p-4 rounded-full mb-4">
+                <BarChart3 className="h-8 w-8 text-muted-foreground" />
               </div>
-            </CardContent>
-          </Card>
+              <h3 className="font-semibold text-lg mb-1">
+                Sem dados estatísticos
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-sm">
+                Este personagem ainda não realizou ações em batalha.
+              </p>
+            </div>
+          )}
+        </TabsContent>
 
-          {/* Biography Card */}
-          <Card className="border-none shadow-md ring-1 ring-border">
-            <CardHeader>
-              <div className="flex items-center gap-2 text-primary">
-                <User2 className="w-5 h-5" />
-                <CardTitle>História e Descrição</CardTitle>
+        <TabsContent value="battles" className="space-y-4">
+          {character.battles && character.battles.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {character.battles.map((battle) => (
+                <Link href={`/dashboard/battles/${battle._id}`} key={battle._id}>
+                  <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Swords className="h-4 w-4 text-muted-foreground" />
+                        {battle.name}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-xs text-muted-foreground">Clique para ver detalhes desta batalha.</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center border-2 border-dashed rounded-xl bg-muted/20">
+              <div className="bg-muted p-4 rounded-full mb-4">
+                <Swords className="h-8 w-8 text-muted-foreground" />
               </div>
-            </CardHeader>
-            <CardContent className="prose dark:prose-invert max-w-none">
-              <Separator className="mb-6 opacity-30" />
-              <div className="rounded-lg bg-muted/30 p-4 border border-border/50">
-                <ReadOnlyRichTextViewer content={character.message} />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              <h3 className="font-semibold text-lg mb-1">
+                Nenhuma batalha encontrada
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-sm">
+                Este personagem ainda não participou de nenhuma batalha.
+              </p>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
       <CharacterModal />
     </div>
   );
