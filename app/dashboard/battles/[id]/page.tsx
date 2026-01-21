@@ -562,7 +562,6 @@ const BattlePage = () => {
             </TabsContent>
 
             <TabsContent value="statistics" className="space-y-6 animate-in slide-in-from-bottom-2 duration-500">
-              {/* Records Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Crown className="h-5 w-5 text-amber-500" />
