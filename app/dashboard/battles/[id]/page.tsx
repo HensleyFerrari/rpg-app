@@ -8,42 +8,29 @@ import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   CalendarIcon,
-  UsersIcon,
   SwordsIcon,
-  LayersIcon,
   Shield,
   Users,
   Zap,
   History,
   Crown,
-  MoreVertical,
   Pencil,
   Settings,
   Swords,
   ScrollText,
   CalendarDays,
-  BarChart3,
   Info,
   ArrowRight,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import NewDamage from "./components/newDamage";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import ChangeRound from "./components/changeRound";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -52,14 +39,11 @@ import { updateCharacterStatus } from "@/lib/actions/character.actions";
 import { toast } from "sonner";
 import { Skull, Heart } from "lucide-react";
 
-// Define type for User object
 interface User {
   _id: string;
   name: string;
   email: string;
 }
-
-// Define type for Battle object
 interface Battle {
   _id: string;
   name: string;

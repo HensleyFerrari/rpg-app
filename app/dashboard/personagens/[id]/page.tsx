@@ -3,14 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
-  User2,
   Swords,
   Edit,
-  Book,
-  Calendar,
   Trash2,
   Clock,
-  User,
   Shield,
   Zap,
   BarChart3,

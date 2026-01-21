@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import Damage, { DamageDocument } from "@/models/Damage";
+import Damage from "@/models/Damage";
 import Battle from "@/models/Battle";
 import User from "@/models/User";
 import { connectDB } from "../mongodb";
@@ -13,8 +13,6 @@ import { triggerBattleUpdate } from "../pusher";
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
-
-// ... existing code ...
 
 export const createDamage = async (damage: any) => {
   await connectDB();
