@@ -20,14 +20,13 @@ import {
 import { CharacterAvatar } from "@/components/CharacterAvatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { getCharacterById, deleteCharacter } from "@/lib/actions/character.actions";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { CharacterStatusBadge } from "@/components/ui/character-status-badge";
 import { ReadOnlyRichTextViewer } from "@/components/ui/rich-text-editor";
 import { Badge } from "@/components/ui/badge";
@@ -171,13 +170,6 @@ const CharacterPage = () => {
   return (
     <div className="container max-w-7xl mx-auto p-4 md:p-8 space-y-8">
       <div className="flex flex-col gap-4">
-        <Breadcrumb
-          items={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Personagens", href: "/dashboard/personagens" },
-            { label: character.name },
-          ]}
-        />
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-3">

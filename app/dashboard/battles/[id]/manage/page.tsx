@@ -29,7 +29,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -203,15 +202,6 @@ const ManageBattlePage = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-5xl space-y-6 animate-in fade-in duration-500">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: "/dashboard" },
-          { label: "Batalhas", href: "/dashboard/battles" },
-          { label: battle.name, href: `/dashboard/battles/${battle._id}` },
-          { label: "Gerenciar" },
-        ]}
-      />
-
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-4xl font-extrabold tracking-tight">Painel de Gerenciamento</h1>

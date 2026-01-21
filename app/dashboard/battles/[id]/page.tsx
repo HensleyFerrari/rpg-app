@@ -51,7 +51,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { updateCharacterStatus } from "@/lib/actions/character.actions";
 import { toast } from "sonner";
 import { Skull, Heart } from "lucide-react";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Define type for User object
 interface User {
@@ -271,13 +270,6 @@ const BattlePage = () => {
 
   return (
     <div className="container mx-auto p-2 sm:p-4 max-w-7xl">
-      <Breadcrumb
-        items={[
-          { label: "Dashboard", href: "/dashboard" },
-          { label: "Batalhas", href: "/dashboard/battles" },
-          { label: battle?.name || "Detalhes da Batalha" },
-        ]}
-      />
       <EditBattleModal
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}

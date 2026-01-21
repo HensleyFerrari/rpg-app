@@ -23,7 +23,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 export default function ManageCampaign() {
   const { id } = useParams();
@@ -80,20 +79,6 @@ export default function ManageCampaign() {
   return (
     <div className="container mx-auto py-8 max-w-7xl">
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <Breadcrumb
-            items={[
-              { label: "Dashboard", href: "/dashboard" },
-              { label: "Campanhas", href: "/dashboard/campaigns" },
-              {
-                label: campaign.name,
-                href: `/dashboard/campaigns/${campaign._id}`,
-              },
-              { label: "Gerenciar Personagens" },
-            ]}
-          />
-        </div>
-
         <Card>
           <CardHeader>
             <CardTitle className="text-xl font-semibold">
