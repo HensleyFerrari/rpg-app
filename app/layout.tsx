@@ -3,11 +3,11 @@ import { Provider } from "./provider";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
-import { Montserrat } from "next/font/google";
+import { Geist } from "next/font/google";
 
-const montserrat = Montserrat({
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-montserrat",
+  variable: "--font-geist",
   display: "swap",
 });
 
@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning>
-      <body className={montserrat.className}>
+      <body className={geist.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

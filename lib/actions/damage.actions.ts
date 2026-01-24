@@ -1,23 +1,23 @@
 "use server";
 
-import Damage, { DamageDocument } from "@/models/Damage";
+import { revalidatePath } from "next/cache";
+import Damage from "@/models/Damage";
+import Battle from "@/models/Battle";
 import User from "@/models/User";
 import { connectDB } from "../mongodb";
 import { getBattleById } from "./battle.actions";
 import { getCharacterById } from "./character.actions";
-import { revalidatePath } from "next/cache";
-
-const serializeData = (data: DamageDocument) => {
-  return JSON.parse(JSON.stringify(data));
-};
-
+import { getCurrentUser } from "./user.actions";
 import { triggerBattleUpdate } from "../pusher";
 
-// ... existing code ...
+const serializeData = (data: any) => {
+  return JSON.parse(JSON.stringify(data));
+};
 
 export const createDamage = async (damage: any) => {
   await connectDB();
 
+  const user = await getCurrentUser();
   const battleInfo = await getBattleById(damage.battle);
   if (!battleInfo.data.active) {
     return {
@@ -44,9 +44,11 @@ export const createDamage = async (damage: any) => {
 
   const payload = {
     ...damage,
-    owner: characterInfo
-      ? characterInfo.data.owner._id
-      : battleInfo.data.owner._id,
+    owner: user
+      ? user._id
+      : characterInfo
+        ? characterInfo.data.owner._id
+        : battleInfo.data.owner._id,
     campaign: characterInfo
       ? characterInfo.data.campaign._id
       : battleInfo.data.campaign._id,
@@ -89,7 +91,7 @@ export const getAllDamagesByBattleId = async (battleId: string) => {
     .populate("target")
     .populate({
       path: "owner",
-      select: "name",
+      select: "name _id",
       model: User,
     })
     .sort({ createdAt: -1 });
@@ -140,6 +142,71 @@ export const deleteDamage = async (damageId: string, battleId: string) => {
     return {
       ok: false,
       message: "Erro ao remover dano",
+    };
+  }
+};
+
+export const updateDamage = async (id: string, data: any) => {
+  try {
+    await connectDB();
+
+    if (!id) {
+      return { ok: false, message: "ID do dano é obrigatório" };
+    }
+
+    const damage = await Damage.findById(id);
+    if (!damage) {
+      return { ok: false, message: "Dano não encontrado" };
+    }
+
+    const user = await getCurrentUser();
+    if (!user) {
+      return { ok: false, message: "Usuário não autenticado" };
+    }
+
+    const battle = await Battle.findById(damage.battle);
+    if (!battle) {
+      return { ok: false, message: "Batalha não encontrada" };
+    }
+
+    // Check permissions: Owner of damage OR Battle Owner (GM)
+    const isOwner = damage.owner.toString() === user._id.toString();
+    const isGM = battle.owner.toString() === user._id.toString();
+
+    if (!isOwner && !isGM) {
+      return {
+        ok: false,
+        message: "Você não tem permissão para editar este turno",
+      };
+    }
+
+    // Update fields
+    const updatedDamage = await Damage.findByIdAndUpdate(
+      id,
+      {
+        description: data.description,
+        damage: data.damage,
+        type: data.type,
+        isCritical: data.isCritical,
+        target: data.target || null,
+        character: data.character,
+      },
+      { new: true },
+    );
+
+    await triggerBattleUpdate(damage.battle.toString());
+    revalidatePath(`/dashboard/battles/${damage.battle}`);
+
+    return {
+      ok: true,
+      message: "Turno atualizado com sucesso",
+      data: serializeData(updatedDamage),
+    };
+  } catch (error) {
+    console.error("Error updating damage:", error);
+    return {
+      ok: false,
+      message: "Erro ao atualizar turno",
     };
   }
 };

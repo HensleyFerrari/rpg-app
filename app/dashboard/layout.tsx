@@ -3,6 +3,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/app-sidebar";
 import { cookies } from "next/headers";
 import { GlobalModals } from "./_components/global-modals";
+import { DashboardBreadcrumb } from "@/components/dashboard-breadcrumb";
 
 export const metadata: Metadata = {
   title: "Drpg - Dashboard",
@@ -23,6 +24,8 @@ export default async function RootLayout({
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger />
+          <div className="h-4 w-px bg-border mx-2" />
+          <DashboardBreadcrumb />
         </header>
         <div className="flex flex-1 flex-col gap-4 p-8">
           <GlobalModals />

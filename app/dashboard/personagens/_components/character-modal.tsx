@@ -169,7 +169,6 @@ export function CharacterModal() {
     };
 
     loadData();
-    loadData();
   }, [isOpen, editId, isCreateMode, campaignParam, isNpcFromUrl, form, defaultValues, handleClose]);
   // Wait, handleClose is used inside loadData? No.
   // Oh, wait, in one error message it said handleClose missing deps in effect at line 163?

@@ -93,7 +93,12 @@ interface Character {
   };
 }
 
-const NewDamage = () => {
+interface NewDamageProps {
+  className?: string;
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+}
+
+const NewDamage = ({ className, variant = "default" }: NewDamageProps) => {
   const { id } = useParams<{ id: string }>();
   const [characters, setCharacters] = useState<Character[]>([]);
   const [allBattleCharacters, setAllBattleCharacters] = useState<Character[]>([]);
@@ -119,7 +124,7 @@ const NewDamage = () => {
       const battle = await getBattleById(id as string);
 
       if (battle.data && battle.data.characters) {
-          setAllBattleCharacters(battle.data.characters);
+        setAllBattleCharacters(battle.data.characters);
       }
 
       if (user._id === battle.data.owner._id) {
@@ -177,11 +182,11 @@ const NewDamage = () => {
         battle: id as string,
         campaign: battle.data.campaign._id,
         owner: battle.data.owner._id,
-        character: data.type === "other" ? undefined : data.character,
+        character: data.character || undefined,
         target: data.type === "other" || data.target === "none" ? undefined : data.target,
         type: data.type,
         damage: data.type === "other" ? 0 : data.damage,
-        description: data.type === "other" ? data.description : undefined,
+        description: data.description,
         isCritical: data.type === "other" ? false : data.isCritical,
         round: battle.data.round,
       };
@@ -215,202 +220,210 @@ const NewDamage = () => {
   };
 
   return (
-    <div>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="default"
-            disabled={!userHasCharacter}
-            title={
-              !userHasCharacter
-                ? "Você precisa ter um personagem ativo na batalha para registrar ação"
-                : ""
-            }
-          >
-            <Plus /> Ação
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Registre uma nova ação</DialogTitle>
-            <DialogDescription>
-              Adicione um novo dano ou cura à batalha.
-            </DialogDescription>
-          </DialogHeader>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant={variant}
+          className={className}
+          disabled={!userHasCharacter}
+          title={
+            !userHasCharacter
+              ? "Você precisa ter um personagem ativo na batalha para registrar ação"
+              : ""
+          }
+        >
+          <Plus className={className?.includes("gap-2") ? "h-4 w-4" : ""} /> Ação
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Registre uma nova ação</DialogTitle>
+          <DialogDescription>
+            Adicione um novo dano ou cura à batalha.
+          </DialogDescription>
+        </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Tipo de Ação</FormLabel>
+                  <FormControl>
+                    <Tabs
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="w-full"
+                    >
+                      <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="damage" className="flex items-center gap-2">
+                          <Swords className="h-4 w-4" /> Dano
+                        </TabsTrigger>
+                        <TabsTrigger value="heal" className="flex items-center gap-2">
+                          <Heart className="h-4 w-4" /> Cura
+                        </TabsTrigger>
+                        <TabsTrigger value="other" className="flex items-center gap-2">
+                          <MessageSquare className="h-4 w-4" /> Evento
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-4">
               <FormField
                 control={form.control}
-                name="type"
+                name="character"
                 render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Tipo de Ação</FormLabel>
-                    <FormControl>
-                      <Tabs
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="w-full"
-                      >
-                        <TabsList className="grid w-full grid-cols-3">
-                          <TabsTrigger value="damage" className="flex items-center gap-2">
-                            <Swords className="h-4 w-4" /> Dano
-                          </TabsTrigger>
-                          <TabsTrigger value="heal" className="flex items-center gap-2">
-                            <Heart className="h-4 w-4" /> Cura
-                          </TabsTrigger>
-                          <TabsTrigger value="other" className="flex items-center gap-2">
-                            <MessageSquare className="h-4 w-4" /> Evento
-                          </TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                    </FormControl>
+                  <FormItem>
+                    <FormLabel>Quem está agindo? {form.watch("type") === "other" && "(Opcional)"}</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um personagem..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {characters.map((character: Character) => (
+                          <SelectItem key={character._id} value={character._id}>
+                            {character.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="space-y-4">
-                {form.watch("type") !== "other" && (
+              {form.watch("type") !== "other" && (
+                <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="character"
+                    name="damage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Quem está agindo?</FormLabel>
+                        <FormLabel>
+                          {form.watch("type") === "damage"
+                            ? "Valor do Dano"
+                            : "Valor da Cura"}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value) || 0)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="target"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Alvo</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecione um personagem..." />
+                              <SelectValue placeholder="Nenhum" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {characters.map((character: Character) => (
-                              <SelectItem key={character._id} value={character._id}>
-                                {character.name}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="none">Nenhum</SelectItem>
+                            {allBattleCharacters.map(
+                              (character: Character) => (
+                                <SelectItem
+                                  key={character._id}
+                                  value={character._id}
+                                >
+                                  {character.name}
+                                </SelectItem>
+                              )
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                )}
 
-                {form.watch("type") !== "other" ? (
-                  <>
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="damage"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {form.watch("type") === "damage" ? "Valor do Dano" : "Valor da Cura"}
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                {...field}
-                                onChange={(e) =>
-                                  field.onChange(parseInt(e.target.value) || 0)
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="target"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Alvo</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Nenhum" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="none">Nenhum</SelectItem>
-                                {allBattleCharacters.map((character: Character) => (
-                                  <SelectItem key={character._id} value={character._id}>
-                                    {character.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="isCritical"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>Ação Crítica</FormLabel>
-                            <FormDescription>
-                              Dobre o efeito da ação.
-                            </FormDescription>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                ) : (
                   <FormField
                     control={form.control}
-                    name="description"
+                    name="isCritical"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Descrição do Evento</FormLabel>
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 shadow-sm col-span-2">
                         <FormControl>
-                          <Textarea 
-                            placeholder="Ex: A tempestade se intensifica, todos rolam com desvantagem..." 
-                            className="min-h-[100px] resize-none"
-                            {...field} 
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
                           />
                         </FormControl>
-                        <FormDescription>
-                          Descreva o evento narrativo para o histórico.
-                        </FormDescription>
-                        <FormMessage />
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Ação Crítica</FormLabel>
+                          <FormDescription>
+                            Dobre o efeito da ação.
+                          </FormDescription>
+                        </div>
                       </FormItem>
                     )}
                   />
-                )}
-              </div>
+                </div>
+              )}
 
-              <DialogFooter className="pt-4">
-                <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
-                  {isSubmitting ? "Registrando..." : "Confirmar Ação"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição (Opcional)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder={
+                          form.watch("type") === "other"
+                            ? "Ex: A tempestade se intensifica..."
+                            : "Ex: Um golpe poderoso que rasga a armadura..."
+                        }
+                        className="min-h-[100px] resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {form.watch("type") === "other"
+                        ? "Descreva o evento narrativo."
+                        : "Adicione detalhes narrativos à ação."}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <DialogFooter className="pt-4">
+              <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+                {isSubmitting ? "Registrando..." : "Confirmar Ação"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
