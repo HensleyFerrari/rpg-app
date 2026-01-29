@@ -3,9 +3,10 @@ import mongoose, { Schema, model } from "mongoose";
 export interface UserDocument {
   _id: string;
   email: string;
-  password: string;
+  password?: string;
   name: string;
   avatarUrl: string;
+  googleId?: string;
   role: string;
   createdAt: Date;
   updatedAt: Date;
@@ -24,13 +25,15 @@ const UserSchema = new Schema<UserDocument>(
     },
     password: {
       type: String,
-      required: true,
     },
     name: {
       type: String,
       required: [true, "Name is required"],
     },
     avatarUrl: {
+      type: String,
+    },
+    googleId: {
       type: String,
     },
     role: {

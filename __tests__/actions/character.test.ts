@@ -15,12 +15,11 @@ jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
 
+import * as userActions from "@/lib/actions/user.actions";
+
 // Mock getCurrentUser
 jest.mock("@/lib/actions/user.actions", () => ({
-  getCurrentUser: jest.fn(() => ({
-    _id: new mongoose.Types.ObjectId(),
-    email: "test@test.com",
-  })),
+  getCurrentUser: jest.fn(),
 }));
 
 describe("Character Actions", () => {
@@ -34,6 +33,12 @@ describe("Character Actions", () => {
       username: "testuser",
       name: "Test User",
       password: "testpassword", // Added password field
+    });
+
+    // Setup mock to return the created test user
+    (userActions.getCurrentUser as jest.Mock).mockResolvedValue({
+      _id: testUser._id,
+      email: testUser.email,
     });
 
     // Create a test campaign

@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, Bell, User, UserCircle } from "lucide-react";
 import { getCurrentUser, updateAvatar } from "@/lib/actions/user.actions";
 import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 export default function SettingsPage() {
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -129,6 +130,35 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Vincular Conta Google</Label>
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <Label className="text-base">Google</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {user?.googleId
+                            ? "Sua conta está vinculada ao Google."
+                            : "Vincule sua conta ao Google para maior segurança."}
+                        </p>
+                      </div>
+                      {user?.googleId ? (
+                        <Button variant="outline" disabled>
+                          Vinculado
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            signIn("google", {
+                              callbackUrl: "/dashboard/settings",
+                            })
+                          }
+                        >
+                          Vincular
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                   {/* TODO: Adicionar opção de alteração de senha */}
                   {/* TODO: Adicionar opção de exclusão de conta */}
                   {/* TODO: Adicionar histórico de sessões ativas */}
