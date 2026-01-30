@@ -31,21 +31,23 @@ export function CampaignList({ campaigns }: CampaignListProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {campaigns.map((campaign) => (
         <Card key={campaign._id} className="overflow-hidden flex flex-col hover:border-primary/50 transition-colors">
-          <div className="relative aspect-video w-full bg-muted">
-            {campaign.imageUrl ? (
-              <Image
-                src={campaign.imageUrl}
-                alt={campaign.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                unoptimized
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <Crown className="h-12 w-12 text-muted-foreground/20" />
-              </div>
-            )}
+          <div className="p-4">
+            <div className="relative aspect-video w-full bg-muted rounded-md overflow-hidden">
+              {campaign.imageUrl ? (
+                <Image
+                  src={campaign.imageUrl}
+                  alt={campaign.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  unoptimized
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <Crown className="h-12 w-12 text-muted-foreground/20" />
+                </div>
+              )}
+            </div>
           </div>
           <CardHeader>
             <CardTitle className="line-clamp-1">{campaign.name}</CardTitle>
