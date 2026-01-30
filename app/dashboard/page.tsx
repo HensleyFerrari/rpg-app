@@ -27,10 +27,13 @@ import { CampaignModal } from "./campaigns/components/campaign-modal";
 export const dynamic = 'force-dynamic';
 
 const Dashboard = async () => {
-  const actualUser = await getCurrentUser();
-  const battlesData = await getAllBattlesByUser();
-  const charactersData = await getCharactersByOwner();
-  const campaignsData = await getMyCampaigns();
+  const [actualUser, battlesData, charactersData, campaignsData] =
+    await Promise.all([
+      getCurrentUser(),
+      getAllBattlesByUser(),
+      getCharactersByOwner(),
+      getMyCampaigns(),
+    ]);
 
   const battles = battlesData.ok ? (battlesData.data as any[]) || [] : [];
   const characters = charactersData.ok ? (charactersData.data as any[]) || [] : [];
