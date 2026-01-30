@@ -33,6 +33,7 @@ import {
   UsersRound,
   Cog,
   Sparkles,
+  UserCircle,
 } from "lucide-react";
 import { ModeToggle } from "./theme-toggle";
 import {
@@ -46,6 +47,7 @@ import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const items = [
   {
@@ -70,7 +72,11 @@ const items = [
     icons: Swords,
     id: "battles",
   },
-
+  {
+    title: "Perfil",
+    url: "/dashboard/profile",
+    icons: UserCircle,
+  },
   {
     title: `Configurações`,
     url: "/dashboard/settings",
@@ -286,6 +292,12 @@ export function AppSidebar() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem asChild>
+                  <a href="/dashboard/profile" className="flex items-center gap-3 px-3 py-2 cursor-pointer">
+                    <UserCircle className="h-4 w-4" />
+                    <span>Perfil</span>
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <a href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2 cursor-pointer">
                     <Cog className="h-4 w-4" />
                     <span>Configurações</span>
@@ -316,19 +328,19 @@ export function AppSidebar() {
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 overflow-hidden">
-                <Avatar className="h-9 w-9 shrink-0 border border-blue-500/20 ring-2 ring-blue-500/10">
+              <Link href="/dashboard/profile" className="flex items-center gap-3 overflow-hidden group">
+                <Avatar className="h-9 w-9 shrink-0 border border-blue-500/20 ring-2 ring-blue-500/10 transition-transform group-hover:scale-105">
                   <AvatarImage src={actualUser?.avatarUrl} />
                   <AvatarFallback className="bg-blue-50 text-blue-600 dark:bg-blue-950/30">
                     <User className="h-5 w-5" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col truncate">
-                  <span className="text-sm font-semibold truncate max-w-[120px]">
+                  <span className="text-sm font-semibold truncate max-w-[120px] group-hover:text-blue-500 transition-colors">
                     {actualUser?.name || "Usuário"}
                   </span>
                 </div>
-              </div>
+              </Link>
               <ModeToggle />
             </div>
 
