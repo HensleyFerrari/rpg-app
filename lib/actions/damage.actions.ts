@@ -73,7 +73,7 @@ export const getAllDamagesByCampaignId = async (campaignId: string) => {
     .populate("battle")
     .populate("target")
     .sort({ createdAt: -1 });
-  return damages.map(serializeData);
+  return serializeData(damages);
 };
 
 export const getAllDamages = async () => {
@@ -81,7 +81,7 @@ export const getAllDamages = async () => {
   const damages = await Damage.find()
     .populate("character")
     .sort({ createdAt: -1 });
-  return damages.map(serializeData);
+  return serializeData(damages);
 };
 
 export const getAllDamagesByBattleId = async (battleId: string) => {
@@ -114,7 +114,7 @@ export const getAllDamagesByBattleId = async (battleId: string) => {
   return {
     ok: true,
     message: "Danos encontrados com sucesso",
-    data: damages.map(serializeData),
+    data: serializeData(damages),
   };
 };
 
@@ -123,7 +123,7 @@ export const getAllDamagesByCharacterId = async (characterId: string) => {
   const damages = await Damage.find({ character: characterId })
     .populate("character")
     .sort({ createdAt: -1 });
-  return damages.map(serializeData);
+  return serializeData(damages);
 };
 
 export const deleteDamage = async (damageId: string, battleId: string) => {
