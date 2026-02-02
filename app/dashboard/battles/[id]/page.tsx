@@ -4,7 +4,7 @@ import Pusher from "pusher-js";
 
 import { getBattleById } from "@/lib/actions/battle.actions";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -96,6 +96,39 @@ interface Battle {
 import { CharacterAvatar } from "@/components/CharacterAvatar";
 import { EditBattleModal } from "../components/edit-battle-modal";
 import { TurnDetailsModal } from "./components/turn-details-modal";
+import {
+  calculateBattleRecords,
+  calculateDamageStats,
+  calculateHealingStats,
+} from "./battle-stats";
+
+const RecordCard = ({ title, value, label, sub, icon: Icon, color }: any) => (
+  <Card className="bg-card/50 border-muted-foreground/10 overflow-hidden relative">
+    <div className={cn("absolute right-2 top-2 opacity-10", color)}>
+      <Icon className="h-12 w-12" />
+    </div>
+    <CardContent className="p-4 space-y-2">
+      <p
+        className="text-xs font-semibold text-muted-foreground uppercase tracking-wider line-clamp-1"
+        title={title}
+      >
+        {title}
+      </p>
+      <div className="space-y-0.5">
+        <span className={cn("text-2xl font-bold block", color)}>{value}</span>
+        {label && (
+          <p
+            className="text-sm font-medium leading-none truncate"
+            title={label}
+          >
+            {label}
+          </p>
+        )}
+        <p className="text-xs text-muted-foreground">{sub}</p>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 const BattlePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -105,6 +138,18 @@ const BattlePage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTurn, setSelectedTurn] = useState<any>(null);
   const [isTurnDetailsModalOpen, setIsTurnDetailsModalOpen] = useState(false);
+
+  const battleRecords = useMemo(() => {
+    return calculateBattleRecords(battle?.rounds || []);
+  }, [battle?.rounds]);
+
+  const damageStats = useMemo(() => {
+    return calculateDamageStats(battle?.rounds || []);
+  }, [battle?.rounds]);
+
+  const healingStats = useMemo(() => {
+    return calculateHealingStats(battle?.rounds || []);
+  }, [battle?.rounds]);
 
   useEffect(() => {
     const fetchBattle = async () => {
@@ -554,159 +599,44 @@ const BattlePage = () => {
                   Recordes da Batalha
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                  {(() => {
-                    let maxHit = { value: 0, label: "N/A", sub: "Nenhum" };
-                    let maxCharDmgInfo = { value: 0, label: "N/A", sub: "Turno -" };
-                    let maxCharHealInfo = { value: 0, label: "N/A", sub: "Turno -" };
-                    let maxAllyDmgInfo = { value: 0, sub: "Turno -" };
-                    let maxEnemyDmgInfo = { value: 0, sub: "Turno -" };
-
-                    const charTurnDamage: Record<string, Record<number, number>> = {};
-                    const charTurnHeal: Record<string, Record<number, number>> = {};
-                    const allyTurnDamage: Record<number, number> = {};
-                    const enemyTurnDamage: Record<number, number> = {};
-
-                    if (battle?.rounds) {
-                      battle.rounds.forEach((round) => {
-                        if (round.type === "other") return;
-                        const damage = round.damage || 0;
-                        const charName = round.character?.name || "Desconhecido";
-                        const roundNum = round.round;
-
-                        // 1. Max Hit
-                        if (round.type !== "heal" && damage > maxHit.value) {
-                          maxHit = {
-                            value: damage,
-                            label: charName,
-                            sub: `Turno ${roundNum}`,
-                          };
-                        }
-
-                        // Collect aggregates
-                        if (round.type === "heal") {
-                          if (!charTurnHeal[charName]) charTurnHeal[charName] = {};
-                          charTurnHeal[charName][roundNum] = (charTurnHeal[charName][roundNum] || 0) + damage;
-                        } else {
-                          if (!charTurnDamage[charName]) charTurnDamage[charName] = {};
-                          charTurnDamage[charName][roundNum] = (charTurnDamage[charName][roundNum] || 0) + damage;
-
-                          const align = round.character?.alignment;
-                          if (!align || align === "ally") {
-                            allyTurnDamage[roundNum] = (allyTurnDamage[roundNum] || 0) + damage;
-                          } else if (align === "enemy") {
-                            enemyTurnDamage[roundNum] = (enemyTurnDamage[roundNum] || 0) + damage;
-                          }
-                        }
-                      });
-
-                      // Process Max Char Turn Damage
-                      let charMaxVal = 0;
-                      Object.entries(charTurnDamage).forEach(([name, turns]) => {
-                        Object.entries(turns).forEach(([turn, val]) => {
-                          if (val > charMaxVal) {
-                            charMaxVal = val;
-                            maxCharDmgInfo = { value: val, label: name, sub: `Turno ${turn}` };
-                          }
-                        });
-                      });
-
-                      // Process Max Char Turn Heal
-                      let healMaxVal = 0;
-                      Object.entries(charTurnHeal).forEach(([name, turns]) => {
-                        Object.entries(turns).forEach(([turn, val]) => {
-                          if (val > healMaxVal) {
-                            healMaxVal = val;
-                            maxCharHealInfo = { value: val, label: name, sub: `Turno ${turn}` };
-                          }
-                        });
-                      });
-
-                      // Process Max Ally Turn Damage
-                      let allyMaxVal = 0;
-                      Object.entries(allyTurnDamage).forEach(([turn, val]) => {
-                        if (val > allyMaxVal) {
-                          allyMaxVal = val;
-                          maxAllyDmgInfo = { value: val, sub: `Turno ${turn}` };
-                        }
-                      });
-
-                      // Process Max Enemy Turn Damage
-                      let enemyMaxVal = 0;
-                      Object.entries(enemyTurnDamage).forEach(([turn, val]) => {
-                        if (val > enemyMaxVal) {
-                          enemyMaxVal = val;
-                          maxEnemyDmgInfo = { value: val, sub: `Turno ${turn}` };
-                        }
-                      });
-                    }
-
-                    const RecordCard = ({ title, value, label, sub, icon: Icon, color }: any) => (
-                      <Card className="bg-card/50 border-muted-foreground/10 overflow-hidden relative">
-                        <div className={cn("absolute right-2 top-2 opacity-10", color)}>
-                          <Icon className="h-12 w-12" />
-                        </div>
-                        <CardContent className="p-4 space-y-2">
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider line-clamp-1" title={title}>
-                            {title}
-                          </p>
-                          <div className="space-y-0.5">
-                            <span className={cn("text-2xl font-bold block", color)}>
-                              {value}
-                            </span>
-                            {label && (
-                              <p className="text-sm font-medium leading-none truncate" title={label}>
-                                {label}
-                              </p>
-                            )}
-                            <p className="text-xs text-muted-foreground">{sub}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-
-                    return (
-                      <>
-                        <RecordCard
-                          title="Maior Golpe"
-                          value={maxHit.value}
-                          label={maxHit.label}
-                          sub={maxHit.sub}
-                          icon={Swords}
-                          color="text-amber-500"
-                        />
-                        <RecordCard
-                          title="Melhor Turno (Personagem)"
-                          value={maxCharDmgInfo.value}
-                          label={maxCharDmgInfo.label}
-                          sub={maxCharDmgInfo.sub}
-                          icon={Zap}
-                          color="text-blue-500"
-                        />
-                        <RecordCard
-                          title="Maior Cura (Turno)"
-                          value={maxCharHealInfo.value}
-                          label={maxCharHealInfo.label}
-                          sub={maxCharHealInfo.sub}
-                          icon={Heart}
-                          color="text-green-500"
-                        />
-                        <RecordCard
-                          title="Turno Mais Forte (Aliados)"
-                          value={maxAllyDmgInfo.value}
-                          sub={maxAllyDmgInfo.sub}
-                          icon={Shield}
-                          color="text-indigo-500"
-                        />
-                        <RecordCard
-                          title="Turno Mais Forte (Inimigos)"
-                          value={maxEnemyDmgInfo.value}
-                          sub={maxEnemyDmgInfo.sub}
-                          icon={Skull}
-                          color="text-red-500"
-                        />
-                      </>
-                    );
-                  })()}
+                  <RecordCard
+                    title="Maior Golpe"
+                    value={battleRecords.maxHit.value}
+                    label={battleRecords.maxHit.label}
+                    sub={battleRecords.maxHit.sub}
+                    icon={Swords}
+                    color="text-amber-500"
+                  />
+                  <RecordCard
+                    title="Melhor Turno (Personagem)"
+                    value={battleRecords.maxCharDmgInfo.value}
+                    label={battleRecords.maxCharDmgInfo.label}
+                    sub={battleRecords.maxCharDmgInfo.sub}
+                    icon={Zap}
+                    color="text-blue-500"
+                  />
+                  <RecordCard
+                    title="Maior Cura (Turno)"
+                    value={battleRecords.maxCharHealInfo.value}
+                    label={battleRecords.maxCharHealInfo.label}
+                    sub={battleRecords.maxCharHealInfo.sub}
+                    icon={Heart}
+                    color="text-green-500"
+                  />
+                  <RecordCard
+                    title="Turno Mais Forte (Aliados)"
+                    value={battleRecords.maxAllyDmgInfo.value}
+                    sub={battleRecords.maxAllyDmgInfo.sub}
+                    icon={Shield}
+                    color="text-indigo-500"
+                  />
+                  <RecordCard
+                    title="Turno Mais Forte (Inimigos)"
+                    value={battleRecords.maxEnemyDmgInfo.value}
+                    sub={battleRecords.maxEnemyDmgInfo.sub}
+                    icon={Skull}
+                    color="text-red-500"
+                  />
                 </div>
               </div>
 
@@ -718,61 +648,53 @@ const BattlePage = () => {
                     Estatísticas de Dano
                   </h3>
                   <div className="space-y-4">
-                    {(() => {
-                      const stats: Record<string, { total: number; maxTurn: number; maxTurnVal: number }> = {};
-
-                      // First pass: Calculate totals and per-turn sums
-                      const roundsByCharAndTurn: Record<string, Record<number, number>> = {};
-
-                      battle.rounds.forEach(round => {
-                        if (round.type === 'heal' || round.type === 'other' || !round.character?.name) return;
-
-                        const charName = round.character.name;
-                        if (!stats[charName]) {
-                          stats[charName] = { total: 0, maxTurn: 0, maxTurnVal: 0 };
-                        }
-                        stats[charName].total += round.damage;
-
-                        if (!roundsByCharAndTurn[charName]) roundsByCharAndTurn[charName] = {};
-                        roundsByCharAndTurn[charName][round.round] = (roundsByCharAndTurn[charName][round.round] || 0) + round.damage;
-                      });
-
-                      // Second pass: Calculate max turn damage
-                      Object.entries(roundsByCharAndTurn).forEach(([name, turns]) => {
-                        if (stats[name]) {
-                          const maxVal = Math.max(...Object.values(turns));
-                          stats[name].maxTurn = maxVal;
-                        }
-                      });
-
-                      return Object.entries(stats)
-                        .sort((a, b) => b[1].total - a[1].total)
-                        .map(([name, stat], index) => (
-                          <div key={name} className="flex items-center justify-between p-3 border rounded-lg bg-card/50">
-                            <div className="flex items-center gap-3">
-                              <span className="font-bold text-lg text-muted-foreground w-6 text-center">#{index + 1}</span>
-                              <div>
-                                <p className="font-medium">{name}</p>
-                                <div className="flex flex-wrap gap-x-3 gap-y-1">
-                                  <p className="text-[10px] text-muted-foreground">Maior: <span className="font-semibold text-foreground">{stat.maxTurn}</span></p>
-                                  <p className="text-[10px] text-muted-foreground">Média: <span className="font-semibold text-foreground">
-                                    {(stat.total / Object.keys(roundsByCharAndTurn[name]).length).toFixed(1)}
-                                  </span></p>
-                                  <p className="text-[10px] text-muted-foreground">Ações: <span className="font-semibold text-foreground">{Object.keys(roundsByCharAndTurn[name]).length}</span></p>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-lg font-bold">{stat.total}</p>
-                              <p className="text-[10px] text-muted-foreground uppercase font-bold">Total</p>
+                    {damageStats.map((stat, index) => (
+                      <div
+                        key={stat.name}
+                        className="flex items-center justify-between p-3 border rounded-lg bg-card/50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-lg text-muted-foreground w-6 text-center">
+                            #{index + 1}
+                          </span>
+                          <div>
+                            <p className="font-medium">{stat.name}</p>
+                            <div className="flex flex-wrap gap-x-3 gap-y-1">
+                              <p className="text-[10px] text-muted-foreground">
+                                Maior:{" "}
+                                <span className="font-semibold text-foreground">
+                                  {stat.maxTurn}
+                                </span>
+                              </p>
+                              <p className="text-[10px] text-muted-foreground">
+                                Média:{" "}
+                                <span className="font-semibold text-foreground">
+                                  {stat.average.toFixed(1)}
+                                </span>
+                              </p>
+                              <p className="text-[10px] text-muted-foreground">
+                                Ações:{" "}
+                                <span className="font-semibold text-foreground">
+                                  {stat.actions}
+                                </span>
+                              </p>
                             </div>
                           </div>
-                        ));
-                    })()}
-                    {battle.rounds.filter(r => r.type !== 'heal' && r.type !== 'other').length === 0 && (
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold">{stat.total}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase font-bold">
+                            Total
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    {damageStats.length === 0 && (
                       <div className="flex flex-col items-center justify-center py-8 text-center border rounded-lg bg-muted/20 border-dashed">
                         <Swords className="h-6 w-6 text-muted-foreground mb-2 opacity-50" />
-                        <p className="text-sm text-muted-foreground">Nenhum dano registrado.</p>
+                        <p className="text-sm text-muted-foreground">
+                          Nenhum dano registrado.
+                        </p>
                       </div>
                     )}
                   </div>
@@ -785,35 +707,36 @@ const BattlePage = () => {
                     Estatísticas de Cura
                   </h3>
                   <div className="space-y-4">
-                    {(() => {
-                      const healStats: Record<string, number> = {};
-                      battle.rounds.forEach(round => {
-                        if (round.type !== 'heal' || !round.character?.name) return;
-                        healStats[round.character.name] = (healStats[round.character.name] || 0) + round.damage;
-                      });
-
-                      const sortedHealers = Object.entries(healStats).sort((a, b) => b[1] - a[1]);
-
-                      if (sortedHealers.length === 0) return (
-                        <div className="flex flex-col items-center justify-center py-8 text-center border rounded-lg bg-muted/20 border-dashed">
-                          <Heart className="h-6 w-6 text-muted-foreground mb-2 opacity-50" />
-                          <p className="text-sm text-muted-foreground">Nenhuma cura registrada.</p>
-                        </div>
-                      );
-
-                      return sortedHealers.map(([name, total], index) => (
-                        <div key={name} className="flex items-center justify-between p-3 border rounded-lg bg-card/50">
+                    {healingStats.length > 0 ? (
+                      healingStats.map((stat, index) => (
+                        <div
+                          key={stat.name}
+                          className="flex items-center justify-between p-3 border rounded-lg bg-card/50"
+                        >
                           <div className="flex items-center gap-3">
-                            <span className="font-bold text-lg text-muted-foreground w-6 text-center">#{index + 1}</span>
-                            <p className="font-medium">{name}</p>
+                            <span className="font-bold text-lg text-muted-foreground w-6 text-center">
+                              #{index + 1}
+                            </span>
+                            <p className="font-medium">{stat.name}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-bold text-green-500">{total}</p>
-                            <p className="text-[10px] text-muted-foreground uppercase font-bold">Healed</p>
+                            <p className="text-lg font-bold text-green-500">
+                              {stat.total}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground uppercase font-bold">
+                              Healed
+                            </p>
                           </div>
                         </div>
-                      ));
-                    })()}
+                      ))
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-8 text-center border rounded-lg bg-muted/20 border-dashed">
+                        <Heart className="h-6 w-6 text-muted-foreground mb-2 opacity-50" />
+                        <p className="text-sm text-muted-foreground">
+                          Nenhuma cura registrada.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
