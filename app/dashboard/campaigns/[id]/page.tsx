@@ -169,12 +169,14 @@ const CampaignDetail = async ({ params }: any) => {
 
                   <div className="pt-4 border-t">
                     <div className="flex flex-col gap-3">
-                      <Link href={`?action=new-character&campaign=${campaign._id}`} className="w-full">
-                        <Button variant="outline" className="w-full justify-start gap-2 h-9 text-sm">
-                          <PlusCircle className="h-4 w-4" />
-                          Adicionar Personagem
-                        </Button>
-                      </Link>
+                      {campaign.isAccepptingCharacters && (
+                        <Link href={`?action=new-character&campaign=${campaign._id}`} className="w-full">
+                          <Button variant="outline" className="w-full justify-start gap-2 h-9 text-sm">
+                            <PlusCircle className="h-4 w-4" />
+                            Adicionar Personagem
+                          </Button>
+                        </Link>
+                      )}
                       {isOwner && (
                         <Link href={`?action=new-character&campaign=${campaign._id}&isNpc=true`} className="w-full">
                           <Button variant="outline" className="w-full justify-start gap-2 h-9 text-sm">
@@ -217,6 +219,7 @@ const CampaignDetail = async ({ params }: any) => {
                 isOwner={isOwner}
                 campaignId={campaign._id}
                 isNpc={false}
+                isAcceptingCharacters={campaign.isAccepptingCharacters}
               />
             </TabsContent>
 
@@ -240,6 +243,7 @@ const CampaignDetail = async ({ params }: any) => {
                 isOwner={isOwner}
                 campaignId={campaign._id}
                 isNpc={true}
+                isAcceptingCharacters={campaign.isAccepptingCharacters}
               />
             </TabsContent>
 

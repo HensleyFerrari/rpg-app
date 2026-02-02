@@ -12,6 +12,7 @@ interface CharacterListProps {
   isOwner: boolean;
   isNpc?: boolean;
   campaignId: string;
+  isAcceptingCharacters: boolean;
 }
 
 export function CharacterList({
@@ -19,21 +20,24 @@ export function CharacterList({
   isOwner,
   isNpc = false,
   campaignId,
+  isAcceptingCharacters,
 }: CharacterListProps) {
   if (characters.length === 0) {
     return (
       <Card className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground bg-muted/10 border-dashed">
         <Users className="h-12 w-12 mb-4 opacity-20" />
         <p>Nenhum {isNpc ? "NPC" : "personagem"} nesta campanha.</p>
-        <Link
-          href={`/dashboard/personagens/new?campaign=${campaignId}${isNpc ? "&isNpc=true" : ""
-            }`}
-          className="mt-4"
-        >
-          <Button variant="outline">
-            Criar {isNpc ? "NPC" : "Personagem"}
-          </Button>
-        </Link>
+        {((!isNpc && isAcceptingCharacters) || (isNpc && isOwner)) && (
+          <Link
+            href={`?action=new-character&campaign=${campaignId}${isNpc ? "&isNpc=true" : ""
+              }`}
+            className="mt-4"
+          >
+            <Button variant="outline">
+              Criar {isNpc ? "NPC" : "Personagem"}
+            </Button>
+          </Link>
+        )}
       </Card>
     );
   }

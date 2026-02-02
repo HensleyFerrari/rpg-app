@@ -57,6 +57,7 @@ type CharacterFormValues = z.infer<typeof characterFormSchema>;
 interface Campaign {
   _id: string;
   name: string;
+  isAccepptingCharacters: boolean;
 }
 
 export function CharacterModal() {
@@ -198,6 +199,17 @@ export function CharacterModal() {
         }
       } else {
         // Create
+
+        // Validate if campaign is accepting characters
+        const selectedCampaign = campaigns.find(c => c._id === values.campaign);
+        if (selectedCampaign && !selectedCampaign.isAccepptingCharacters && !values.isNpc) {
+          toast.error("Erro", {
+            description: "Esta campanha não está aceitando personagens no momento"
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
         const response = await createCharacter({
           name: values.name,
           owner: session?.user?.email || "",
