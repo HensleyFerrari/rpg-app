@@ -169,7 +169,7 @@ const CampaignDetail = async ({ params }: any) => {
 
                   <div className="pt-4 border-t">
                     <div className="flex flex-col gap-3">
-                      {campaign.isAccepptingCharacters && (
+                      {(campaign.isAccepptingCharacters || isOwner) && (
                         <Link href={`?action=new-character&campaign=${campaign._id}`} className="w-full">
                           <Button variant="outline" className="w-full justify-start gap-2 h-9 text-sm">
                             <PlusCircle className="h-4 w-4" />
@@ -213,6 +213,14 @@ const CampaignDetail = async ({ params }: any) => {
                   <h3 className="text-lg font-semibold">Personagens ativos</h3>
                   <p className="text-sm text-muted-foreground">Gerencie personagens da campanha.</p>
                 </div>
+                {(campaign.isAccepptingCharacters || isOwner) && (
+                  <Link href={`?action=new-character&campaign=${campaign._id}`}>
+                    <Button size="sm" className="gap-2">
+                      <PlusCircle className="h-4 w-4" />
+                      Adicionar
+                    </Button>
+                  </Link>
+                )}
               </div>
               <CharacterList
                 characters={characters}

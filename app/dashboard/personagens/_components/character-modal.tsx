@@ -58,6 +58,10 @@ interface Campaign {
   _id: string;
   name: string;
   isAccepptingCharacters: boolean;
+  owner?: {
+    _id: string;
+    name: string;
+  };
 }
 
 export function CharacterModal() {
@@ -203,11 +207,29 @@ export function CharacterModal() {
         // Validate if campaign is accepting characters
         const selectedCampaign = campaigns.find(c => c._id === values.campaign);
         if (selectedCampaign && !selectedCampaign.isAccepptingCharacters && !values.isNpc) {
-          toast.error("Erro", {
-            description: "Esta campanha não está aceitando personagens no momento"
-          });
-          setIsSubmitting(false);
-          return;
+          // Check if current user is owner
+          // Note: using session.user.email isn't enough for ID check unless we have it.
+          // But we can allow if we can verify ownership.
+          // We can fetch current user ID.
+          try {
+            // Optimized: Assuming we might not have user ID handy synchronously correctly without fetching.
+            // But let's use the valid check.
+            const currentUser = await getCurrentUser();
+            if (selectedCampaign.owner?._id !== currentUser?._id) {
+              toast.error("Erro", {
+                description: "Esta campanha não está aceitando personagens no momento"
+              });
+              setIsSubmitting(false);
+              return;
+            }
+          } catch (e) {
+            // Fallback if auth check fails
+            toast.error("Erro", {
+              description: "Esta campanha não está aceitando personagens no momento"
+            });
+            setIsSubmitting(false);
+            return;
+          }
         }
 
         const response = await createCharacter({
