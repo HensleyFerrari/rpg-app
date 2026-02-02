@@ -227,6 +227,7 @@ export function CharacterModal() {
               return;
             }
           } catch (e) {
+            console.error(e);
             // Fallback if auth check fails
             toast.error("Erro", {
               description: "Esta campanha não está aceitando personagens no momento"
