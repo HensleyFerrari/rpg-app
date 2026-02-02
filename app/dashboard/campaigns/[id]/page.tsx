@@ -135,7 +135,7 @@ const CampaignDetail = async ({ params }: any) => {
                         <div className="prose max-w-none dark:prose-invert text-muted-foreground">
                           <ReadOnlyRichTextViewer content={campaign.description} />
                         </div>
-                      ) || "The internal project aims to optimize user experience and interface for the PM System Core. The goal is to standardize UX, enhance usability, and create a design content repository for daily publication on social media."}
+                      ) || "Nenhuma descrição fornecida."}
                     </p>
                   </div>
                 </div>
