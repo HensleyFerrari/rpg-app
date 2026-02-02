@@ -218,6 +218,29 @@ export const updateBattle = async (
       };
     }
 
+    const userData = await getCurrentUser();
+    if (!userData) {
+      return {
+        ok: false,
+        message: "Usuário não autenticado",
+      };
+    }
+
+    const existingBattle = await Battle.findById(id);
+    if (!existingBattle) {
+      return {
+        ok: false,
+        message: "Batalha não encontrada",
+      };
+    }
+
+    if (existingBattle.owner.toString() !== userData._id.toString()) {
+      return {
+        ok: false,
+        message: "Apenas o mestre pode atualizar esta batalha",
+      };
+    }
+
     const battle = await Battle.findByIdAndUpdate(id, battleParams, {
       new: true,
     });
@@ -270,6 +293,14 @@ export const deleteBattle = async (id: string) => {
       return {
         ok: false,
         message: "Batalha não encontrada",
+      };
+    }
+
+    const userData = await getCurrentUser();
+    if (!userData || battle.owner.toString() !== userData._id.toString()) {
+      return {
+        ok: false,
+        message: "Apenas o mestre pode deletar esta batalha",
       };
     }
 
@@ -555,11 +586,19 @@ export const createQuickCharacters = async (
     await connectDB();
 
     const battle = await Battle.findById(battleId);
+    const userData = await getCurrentUser();
 
     if (!battle) {
       return {
         ok: false,
         message: "Batalha não encontrada",
+      };
+    }
+
+    if (!userData || battle.owner.toString() !== userData._id.toString()) {
+      return {
+        ok: false,
+        message: "Apenas o mestre pode criar personagens rápidos",
       };
     }
 

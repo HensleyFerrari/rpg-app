@@ -517,22 +517,26 @@ const BattlePage = () => {
                         {battle.active && (
                           <>
                             <NewDamage variant="outline" className="w-full justify-start gap-2 h-9 text-sm" />
-                            <div className="flex items-center gap-2">
-                              <ChangeRound
-                                battleId={battle._id}
-                                currentRound={battle.round}
-                                advance={true}
-                                className="w-full justify-start gap-2 h-9 text-sm inline-flex items-center whitespace-nowrap rounded-md border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground px-4 py-2"
-                              />
-                            </div>
+                            {currentUser?._id === battle.owner._id && (
+                              <div className="flex items-center gap-2">
+                                <ChangeRound
+                                  battleId={battle._id}
+                                  currentRound={battle.round}
+                                  advance={true}
+                                  className="w-full justify-start gap-2 h-9 text-sm inline-flex items-center whitespace-nowrap rounded-md border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground px-4 py-2"
+                                />
+                              </div>
+                            )}
                           </>
                         )}
-                        <Link href={`/dashboard/battles/${battle._id}/manage`} className="w-full">
-                          <Button variant="outline" className="w-full justify-start gap-2 h-9 text-sm">
-                            <Settings className="h-4 w-4" />
-                            Gerenciar Batalha
-                          </Button>
-                        </Link>
+                        {currentUser?._id === battle.owner._id && (
+                          <Link href={`/dashboard/battles/${battle._id}/manage`} className="w-full">
+                            <Button variant="outline" className="w-full justify-start gap-2 h-9 text-sm">
+                              <Settings className="h-4 w-4" />
+                              Gerenciar Batalha
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </div>
 
