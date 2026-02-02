@@ -15,8 +15,109 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, Bell, User, UserCircle } from "lucide-react";
-import { getCurrentUser, updateAvatar } from "@/lib/actions/user.actions";
+import {
+  changePassword,
+  getCurrentUser,
+  updateAvatar,
+} from "@/lib/actions/user.actions";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "A senha atual é obrigatória"),
+    newPassword: z
+      .string()
+      .min(6, "A nova senha deve ter no mínimo 6 caracteres"),
+    confirmPassword: z.string().min(1, "Confirme a nova senha"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "As senhas não coincidem",
+    path: ["confirmPassword"],
+  });
+
+type PasswordFormValues = z.infer<typeof passwordSchema>;
+
+function ChangePasswordForm() {
+  const form = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
+
+  async function onSubmit(data: PasswordFormValues) {
+    const result = await changePassword(data.currentPassword, data.newPassword);
+
+    if (result.ok) {
+      toast.success(result.message);
+      form.reset();
+    } else {
+      toast.error(result.message);
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="currentPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Senha Atual</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="********" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="newPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nova Senha</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="********" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirmar Nova Senha</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="********" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Alterando..." : "Alterar Senha"}
+        </Button>
+      </form>
+    </Form>
+  );
+}
 
 export default function SettingsPage() {
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -129,7 +230,11 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4">
-                  {/* TODO: Adicionar opção de alteração de senha */}
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-medium">Alterar Senha</h3>
+                    <ChangePasswordForm />
+                  </div>
+                  <Separator />
                   {/* TODO: Adicionar opção de exclusão de conta */}
                   {/* TODO: Adicionar histórico de sessões ativas */}
                 </div>
