@@ -3,6 +3,7 @@
 import { connectDB } from "../mongodb";
 import User from "@/models/User";
 import { auth } from "@/auth";
+import { cache } from "react";
 import bcrypt from "bcryptjs";
 
 const serializeData = (data: any) => {
@@ -17,7 +18,7 @@ export const findByEmail = async (email: string) => {
   return user;
 };
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = cache(async () => {
   try {
     const session = await auth();
     // If no session or no user, return null
@@ -39,7 +40,7 @@ export const getCurrentUser = async () => {
     console.error("Error getting current user:", error);
     return null;
   }
-};
+});
 
 export async function updateAvatar(userId: string, avatarUrl: string) {
   try {
