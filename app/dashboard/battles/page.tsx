@@ -11,13 +11,14 @@ const BattlesDashboard = async ({
   searchParams: Promise<{ q?: string; filter?: "all" | "my"; campaign?: string }>;
 }) => {
   const { q: query, filter: filterType, campaign: campaignId } = await searchParams;
-  const currentUser = await getCurrentUser();
 
-  const battles = await getBattles({ query, filterType, campaignId });
+  const [currentUser, battles, campaigns] = await Promise.all([
+    getCurrentUser(),
+    getBattles({ query, filterType, campaignId }),
+    getCampaigns()
+  ]);
+
   const allBattles = battles.ok ? battles.data : [];
-
-  // Fetch campaigns for the filter dropdown
-  const campaigns = await getCampaigns(); 
 
   return (
     <div className="container mx-auto py-8 px-4 space-y-8 max-w-7xl">
