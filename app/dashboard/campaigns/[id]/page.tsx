@@ -47,6 +47,8 @@ const CampaignDetail = async ({ params }: any) => {
   const characters = campaign.characters?.filter((c: any) => !c.isNpc) || [];
   const npcs = campaign.characters?.filter((c: any) => c.isNpc) || [];
 
+  const visibleBattles = battles.filter((battle: any) => isOwner || battle.is_visible_to_players);
+
   return (
     <div className="container mx-auto py-8 max-w-7xl animate-in fade-in duration-500">
       <CampaignModal />
@@ -105,7 +107,7 @@ const CampaignDetail = async ({ params }: any) => {
                 value="battles"
                 className="relative h-10 rounded-none border-b-2 border-transparent bg-transparent px-2 pb-3 pt-2 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-purple-500 data-[state=active]:text-foreground data-[state=active]:shadow-none hover:text-foreground hover:text-purple-500"
               >
-                Batalhas ({battles.length})
+                Batalhas ({visibleBattles.length})
               </TabsTrigger>
             </TabsList>
           </div>
@@ -265,11 +267,11 @@ const CampaignDetail = async ({ params }: any) => {
               <div className="border rounded-lg overflow-hidden">
                 <div className="bg-muted/40 px-4 py-3 border-b flex items-center justify-between">
                   <span className="text-sm font-medium">Lista de Batalhas</span>
-                  <span className="text-xs text-muted-foreground">{battles.length} batalhas</span>
+                  <span className="text-xs text-muted-foreground">{visibleBattles.length} batalhas</span>
                 </div>
-                {battles && battles.length > 0 ? (
+                {visibleBattles && visibleBattles.length > 0 ? (
                   <div className="divide-y">
-                    {battles.map((battle: any) => (
+                    {visibleBattles.map((battle: any) => (
                       <Link
                         key={battle._id}
                         href={`/dashboard/battles/${battle._id}`}
