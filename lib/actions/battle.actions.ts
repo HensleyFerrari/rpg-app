@@ -28,6 +28,7 @@ export const createBattle = async (BattleParams: any) => {
       round: 1,
       characters: BattleParams.characters || [],
       owner: userData._id,
+      is_visible_to_players: BattleParams.is_visible_to_players || false,
     });
 
     revalidatePath("/dashboard/battles");
@@ -132,7 +133,7 @@ export const getBattlesByCampaign = async (campaignId: string) => {
     }
 
     const battles = await Battle.find({ campaign: campaignId }).populate(
-      "characters"
+      "characters",
     );
 
     return {
@@ -191,7 +192,7 @@ export const getAllBattlesByCharacterId = async (characterId: string) => {
 
 export const updateBattle = async (
   id: string,
-  battleParams: Partial<BattleDocument>
+  battleParams: Partial<BattleDocument>,
 ) => {
   try {
     if (!id) {
@@ -316,7 +317,7 @@ export const getBattles = async ({
     }
 
     if (campaignId && campaignId !== "all") {
-       if (mongoose.isValidObjectId(campaignId)) {
+      if (mongoose.isValidObjectId(campaignId)) {
         queryObj.campaign = campaignId;
       }
     }
@@ -348,7 +349,6 @@ export const getBattles = async ({
   }
 };
 
-
 export const getAllBattles = async () => {
   await connectDB();
 
@@ -372,7 +372,7 @@ export const getAllBattles = async () => {
 
 export const addCharacterToBattle = async (
   battleId: string,
-  characterId: string
+  characterId: string,
 ) => {
   try {
     if (!battleId || !characterId) {
@@ -407,7 +407,7 @@ export const addCharacterToBattle = async (
       };
     }
     const characterExists = battleVerify.characters.some(
-      (character: CharacterDocument) => character.toString() === characterId
+      (character: CharacterDocument) => character.toString() === characterId,
     );
     if (characterExists) {
       return {
@@ -419,7 +419,7 @@ export const addCharacterToBattle = async (
     const battle = await Battle.findByIdAndUpdate(
       battleId,
       { $addToSet: { characters: characterId } },
-      { new: true }
+      { new: true },
     );
 
     if (!battle) {
@@ -447,7 +447,7 @@ export const addCharacterToBattle = async (
 
 export const removeCharacterFromBattle = async (
   characterId: string,
-  battleId: string
+  battleId: string,
 ) => {
   try {
     if (!battleId || !characterId) {
@@ -476,7 +476,7 @@ export const removeCharacterFromBattle = async (
     const battle = await Battle.findByIdAndUpdate(
       battleId,
       { $pull: { characters: characterId } },
-      { new: true }
+      { new: true },
     );
 
     if (!battle) {
@@ -535,7 +535,7 @@ export const getAllBattlesByUser = async () => {
 export const createQuickCharacters = async (
   battleId: string,
   names: string[],
-  alignment: "ally" | "enemy" = "ally"
+  alignment: "ally" | "enemy" = "ally",
 ) => {
   try {
     if (!battleId) {
@@ -578,7 +578,7 @@ export const createQuickCharacters = async (
     const updatedBattle = await Battle.findByIdAndUpdate(
       battleId,
       { $addToSet: { characters: { $each: characterIds } } },
-      { new: true }
+      { new: true },
     );
 
     await triggerBattleUpdate(battleId);

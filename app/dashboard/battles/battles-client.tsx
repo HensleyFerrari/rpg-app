@@ -33,6 +33,7 @@ import {
 import { BattleFilters } from "./components/battle-filters";
 
 import { useState } from "react";
+import { useSearchParams, usePathname } from "next/navigation";
 
 const StatCard = ({ title, value, icon: Icon, description, colorClass }: any) => (
   <Card className="overflow-hidden border-none shadow-md bg-card/50 backdrop-blur-sm">
@@ -86,7 +87,12 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
     </div>
 
     <div className="divide-y divide-border">
-      {battles.map((battle) => (
+      {battles.filter(battle => {
+        // Owner looks at everything
+        if (currentUser?._id === battle.owner?._id) return true;
+        // Players only see what is visible
+        return battle.is_visible_to_players;
+      }).map((battle) => (
         <div
           key={battle._id}
           className="group relative flex flex-col md:grid md:grid-cols-12 gap-4 px-4 md:px-6 py-4 hover:bg-muted/30 transition-colors border-b border-border last:border-0 md:items-center"
@@ -106,12 +112,19 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
                 </p>
               </div>
             </div>
-            <Badge
-              variant={battle.active ? "default" : "secondary"}
-              className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] font-medium border px-2 py-0.5 rounded-full flex-shrink-0 h-fit`}
-            >
-              {battle.active ? "Ativa" : "Finalizada"}
-            </Badge>
+            <div className="flex flex-col gap-1 items-end">
+              <Badge
+                variant={battle.active ? "default" : "secondary"}
+                className={`${battle.active ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-muted text-muted-foreground border-border"} text-[10px] font-medium border px-2 py-0.5 rounded-full flex-shrink-0 h-fit`}
+              >
+                {battle.active ? "Ativa" : "Finalizada"}
+              </Badge>
+              {currentUser?._id === battle.owner?._id && (
+                <Badge variant="outline" className="text-[10px] py-0 h-5 border-dashed">
+                  {battle.is_visible_to_players ? "Público" : "Privado"}
+                </Badge>
+              )}
+            </div>
           </div>
 
           {/* Desktop: Battle / Campaign */}
@@ -119,8 +132,13 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
             <CampaignImage src={battle.campaign?.imageUrl} name={battle.campaign?.name} />
             <div className="min-w-0">
               <Link href={`/dashboard/battles/${battle._id}`}>
-                <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer">
+                <h3 className="text-sm font-bold text-foreground truncate hover:text-primary transition-colors cursor-pointer flex items-center gap-2">
                   {battle.name || "Sem Nome"}
+                  {currentUser?._id === battle.owner?._id && (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded border ${battle.is_visible_to_players ? "border-sky-500/30 text-sky-500 bg-sky-500/10" : "border-slate-500/30 text-slate-500 bg-slate-500/10"}`}>
+                      {battle.is_visible_to_players ? "Público" : "Privado"}
+                    </span>
+                  )}
                 </h3>
               </Link>
               <p className="text-xs text-muted-foreground truncate">
@@ -209,13 +227,20 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
   </div>
 );
 
-import { useSearchParams } from "next/navigation";
-
 export default function BattlesDashboardClient({ allBattles, currentUser, campaigns }: { allBattles: any[], currentUser: any, campaigns: any[] }) {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  const totalActive = allBattles.filter((b) => b.active).length;
-  const totalInactive = allBattles.filter((b) => !b.active).length;
+  const currentParams = searchParams ? Object.fromEntries(searchParams.entries()) : {};
+
+  // Filter for counters: active/inactive should also respect visibility for players
+  const visibleBattles = allBattles.filter(b => {
+    if (currentUser?._id === b.owner?._id) return true;
+    return b.is_visible_to_players;
+  });
+
+  const totalActive = visibleBattles.filter((b) => b.active).length;
+  const totalInactive = visibleBattles.filter((b) => !b.active).length;
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBattle, setSelectedBattle] = useState<any>(null);
@@ -245,18 +270,18 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
             Gerencie e acompanhe o progresso de todos os combates épicos.
           </p>
         </div>
-        <Link href={{ query: { ...Object.fromEntries(searchParams.entries()), action: "new-battle" } }}>
+        <Link href={{ pathname, query: { ...currentParams, action: "new-battle" } }}>
           <Button className="gap-2 shadow-sm">
             <Plus className="h-4 w-4 mr-2" />
             Nova Batalha
           </Button>
         </Link>
-      </div >
+      </div>
 
-      < div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
           title="Batalhas Listadas"
-          value={allBattles.length}
+          value={visibleBattles.length}
           icon={History}
           description="Quantidade na visualização atual"
           colorClass="bg-slate-400"
@@ -275,10 +300,10 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
           description="Finalizadas nesta lista"
           colorClass="bg-indigo-500"
         />
-      </div >
+      </div>
 
       {/* Main Content */}
-      < div className="space-y-6" >
+      <div className="space-y-6">
 
         <BattleFilters campaigns={campaigns} />
 
@@ -301,14 +326,14 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
                 <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">
                   Tente ajustar os filtros ou iniciar uma nova jornada.
                 </p>
-                <Link href={{ query: { ...Object.fromEntries(searchParams.entries()), action: "new-battle" } }}>
+                <Link href={{ pathname, query: { ...currentParams, action: "new-battle" } }}>
                   Criar Batalha
                 </Link>
               </CardContent>
-            </Card >
+            </Card>
           )
         }
-      </div >
+      </div>
     </>
   );
 }

@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { getMyCampaigns } from "@/lib/actions/campaign.actions";
 import { createBattle } from "@/lib/actions/battle.actions";
@@ -41,6 +42,7 @@ const formSchema = zod.object({
   campaign: zod.string().min(2, {
     message: "Selecione uma campanha.",
   }),
+  is_visible_to_players: zod.boolean().default(false),
 });
 
 interface CreateBattleModalProps {
@@ -67,6 +69,7 @@ export function CreateBattleModal({
   const defaultValues = {
     name: draftData?.name || "",
     campaign: draftData?.campaign || campaignIdParam || "",
+    is_visible_to_players: draftData?.is_visible_to_players || false,
   };
 
   const form = useForm<zod.infer<typeof formSchema>>({
@@ -115,6 +118,7 @@ export function CreateBattleModal({
         characters: [],
         active: true,
         round: 1,
+        is_visible_to_players: values.is_visible_to_players,
       };
 
       const response = await createBattle(battleData);
@@ -206,6 +210,29 @@ export function CreateBattleModal({
                     </SelectContent>
                   </Select>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="is_visible_to_players"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      Visível para Jogadores
+                    </FormLabel>
+                    <p className="text-sm text-muted-foreground">
+                      Dá permissão para os jogadores visualizarem o status da batalha.
+                    </p>
+                  </div>
                 </FormItem>
               )}
             />

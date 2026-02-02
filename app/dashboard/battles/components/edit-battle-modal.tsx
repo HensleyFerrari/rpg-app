@@ -29,6 +29,7 @@ import {
 const formSchema = zod.object({
   name: zod.string().min(1, "Nome é obrigatório"),
   active: zod.boolean(),
+  is_visible_to_players: zod.boolean(),
 });
 
 interface EditBattleModalProps {
@@ -39,6 +40,7 @@ interface EditBattleModalProps {
     name: string;
     round: number;
     active: boolean;
+    is_visible_to_players: boolean;
   } | null;
 }
 
@@ -54,6 +56,7 @@ export function EditBattleModal({
     defaultValues: {
       name: "",
       active: true,
+      is_visible_to_players: false,
     },
   });
 
@@ -62,6 +65,7 @@ export function EditBattleModal({
       form.reset({
         name: battle.name,
         active: battle.active,
+        is_visible_to_players: battle.is_visible_to_players || false,
       });
     }
   }, [battle, form]);
@@ -130,6 +134,26 @@ export function EditBattleModal({
             />
 
             <div>
+              <FormField
+                control={form.control}
+                name="is_visible_to_players"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm mb-4">
+                    <div className="space-y-0.5">
+                      <FormLabel>Visível para Jogadores</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Jogadores podem ver esta batalha
+                      </p>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
