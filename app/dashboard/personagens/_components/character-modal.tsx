@@ -36,6 +36,7 @@ import { useSession } from "next-auth/react";
 import { createCharacter, updateCharacter, getCharacterById } from "@/lib/actions/character.actions";
 import { getCampaigns } from "@/lib/actions/campaign.actions";
 import { getCurrentUser } from "@/lib/actions/user.actions";
+import { Switch } from "@/components/ui/switch";
 
 // Schema unificado
 const characterFormSchema = z.object({
@@ -50,6 +51,7 @@ const characterFormSchema = z.object({
   status: z.enum(["alive", "dead"]).default("alive"),
   isNpc: z.boolean().default(false),
   alignment: z.enum(["ally", "enemy"]).default("ally"),
+  isVisible: z.boolean().default(true),
 });
 
 type CharacterFormValues = z.infer<typeof characterFormSchema>;
@@ -99,6 +101,7 @@ export function CharacterModal() {
     status: "alive",
     isNpc: isNpcFromUrl,
     alignment: "ally",
+    isVisible: true,
   }), [isNpcFromUrl]);
 
   const form = useForm<CharacterFormValues>({
@@ -151,6 +154,7 @@ export function CharacterModal() {
               status: char.status,
               isNpc: char.isNpc,
               alignment: char.alignment || "ally",
+              isVisible: char.isVisible !== false,
             });
           } else {
             toast.error("Personagem não encontrado");
@@ -241,6 +245,7 @@ export function CharacterModal() {
           status: values.status,
           isNpc: values.isNpc,
           alignment: values.alignment,
+          isVisible: values.isVisible,
         });
 
         if (response.ok) {
@@ -386,6 +391,30 @@ export function CharacterModal() {
                   )}
                 />
               </div>
+
+              {/* Visibility Toggle - Only for NPCs */}
+              {form.watch("isNpc") && (
+                <FormField
+                  control={form.control}
+                  name="isVisible"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Visível para Jogadores</FormLabel>
+                        <FormDescription>
+                          Se desativado, este personagem será visível apenas para o Mestre.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
 
 
               <FormField

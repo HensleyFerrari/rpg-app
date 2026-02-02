@@ -23,7 +23,9 @@ interface CharacterParams {
   message?: string;
   status: string;
   isNpc?: boolean;
+
   alignment?: "ally" | "enemy";
+  isVisible?: boolean;
 }
 
 interface CharacterResponse {
@@ -40,7 +42,9 @@ export async function createCharacter({
   message = "",
   status,
   isNpc = false,
+
   alignment = "ally",
+  isVisible = true,
 }: CharacterParams) {
   try {
     if (!name || !owner || !campaign) {
@@ -110,7 +114,9 @@ export async function createCharacter({
       message,
       status,
       isNpc,
+
       alignment,
+      isVisible,
     });
 
     if (!newCharacterData) {
@@ -191,6 +197,29 @@ export async function getCharacterById(id: string) {
       };
     }
 
+    // Security Check: Visibility
+    // If I cast to any here to avoid TS issues with populated fields not matching generic Document type effortlessly
+    const charObj = characterData.toObject() as any;
+
+    if (charObj.isVisible === false) {
+      const currentUser = await getCurrentUser();
+      const isCharacterOwner =
+        currentUser &&
+        charObj.owner._id.toString() === currentUser._id.toString();
+      const isCampaignOwner =
+        currentUser &&
+        charObj.campaign &&
+        charObj.campaign.owner._id.toString() === currentUser._id.toString();
+
+      if (!isCharacterOwner && !isCampaignOwner) {
+        return {
+          ok: false,
+          message: "Você não tem permissão para visualizar este personagem.",
+          data: null, // Act as if not found or private
+        };
+      }
+    }
+
     const battles = await getAllBattlesByCharacterId(id);
 
     if (!battles.ok) {
@@ -207,7 +236,7 @@ export async function getCharacterById(id: string) {
     const damages = serializeData(damagesData);
 
     const data = {
-      ...characterData.toObject(),
+      ...charObj,
       battles: battles.data,
       damages: damages,
     };
@@ -260,10 +289,41 @@ export async function getCharactersByCampaign(
       };
     }
 
+    // Check if the current user is the owner of the campaign
+    // Since we populate "campaign" in getCharacterById but here we just have campaignId,
+    // we assume the caller context or we check against current user.
+    // However, getCharactersByCampaign is used in the public campaign page logic too potentially.
+    // Let's get the campaign owner first.
+
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) {
+      // Should have been caught before but just in case
+      return {
+        ok: true,
+        message: "Campanha não encontrada",
+        data: serializeData(characters), // Fallback return all? Or none?
+      };
+    }
+
+    const currentUser = await getCurrentUser();
+    const isOwner =
+      currentUser && campaign.owner.toString() === currentUser._id.toString();
+
+    let filteredCharacters = characters;
+
+    if (!isOwner) {
+      filteredCharacters = characters.filter((char) => {
+        // If character uses the new model field isVisible (default true)
+        // If isVisible is explicitly false, hide it.
+        // Assuming default is true if undefined.
+        return char.isVisible !== false;
+      });
+    }
+
     return {
       ok: true,
       message: "Personagens encontrados",
-      data: serializeData(characters),
+      data: serializeData(filteredCharacters),
     };
   } catch (error: any) {
     console.error("Error fetching campaign characters:", error);
