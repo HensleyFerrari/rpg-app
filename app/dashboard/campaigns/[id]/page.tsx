@@ -22,9 +22,11 @@ import { CampaignModal } from "../components/campaign-modal";
 
 const CampaignDetail = async ({ params }: any) => {
   const { id } = await params;
-  const campaignResponse = await getCampaignById(id);
-  const currentUser = await getCurrentUser();
-  const battlesResponse = await getBattlesByCampaign(id);
+  const [campaignResponse, currentUser, battlesResponse] = await Promise.all([
+    getCampaignById(id),
+    getCurrentUser(),
+    getBattlesByCampaign(id),
+  ]);
 
   if (!campaignResponse.ok || !campaignResponse.data) {
     notFound();
