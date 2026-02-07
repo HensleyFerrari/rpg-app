@@ -406,3 +406,24 @@ export const joinCampaign = async ({
     };
   }
 };
+
+export const getCampaignStatsByUser = async () => {
+  await connectDB();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      message: "Usuário não encontrado",
+    };
+  }
+
+  const [total] = await Promise.all([
+    Campaign.countDocuments({ owner: user._id }),
+  ]);
+
+  return {
+    ok: true,
+    data: serializeData({ total }),
+  };
+};
