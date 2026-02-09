@@ -1,4 +1,4 @@
-import { getAllCharacters, getCharactersByOwner, getCharactersByCampaign } from "@/lib/actions/character.actions";
+import { getAccessibleCharacters, getCharactersByOwner, getCharactersByCampaign } from "@/lib/actions/character.actions";
 import { getCampaigns } from "@/lib/actions/campaign.actions";
 import { UserPlus, Heart, AlertCircle, Users, VenetianMask, Skull } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,7 +46,7 @@ export default async function Personagens({ searchParams }: PageProps) {
     title = campaign ? `Personagens: ${campaign.name}` : "Personagens da Campanha";
     description = "Personagens vinculados a esta campanha specific.";
   } else {
-    response = await getAllCharacters();
+    response = await getAccessibleCharacters();
   }
 
   const characters = response.ok ? (response.data as any[]) || [] : [];

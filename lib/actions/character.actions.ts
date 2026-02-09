@@ -604,6 +604,59 @@ export async function getAllCharacters(): Promise<CharacterResponse> {
   }
 }
 
+export async function getAccessibleCharacters(): Promise<CharacterResponse> {
+  try {
+    await connectDB();
+
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return {
+        ok: false,
+        message: "Usuário não autenticado",
+        data: [],
+      };
+    }
+
+    // Find campaigns owned by the user
+    const ownedCampaigns = await Campaign.find({
+      owner: currentUser._id,
+    }).select("_id");
+    const campaignIds = ownedCampaigns.map((c) => c._id);
+
+    // Find characters that are either owned by the user OR belong to one of their campaigns
+    const charactersData = await Character.find({
+      $or: [{ owner: currentUser._id }, { campaign: { $in: campaignIds } }],
+    })
+      .populate("owner", "username name _id")
+      .populate("campaign", "name _id")
+      .sort({ createdAt: -1 });
+
+    const characters = serializeData(charactersData);
+
+    if (characters.length === 0) {
+      return {
+        ok: true,
+        message: "Nenhum personagem encontrado",
+        data: [],
+      };
+    }
+
+    return {
+      ok: true,
+      message: "Personagens encontrados",
+      data: characters,
+    };
+  } catch (error: any) {
+    console.error("Error fetching accessible characters:", error);
+
+    return {
+      ok: false,
+      message: error.message || "Falha ao buscar personagens acessíveis",
+    };
+  }
+}
+
 export async function countCharacters() {
   try {
     await connectDB();
