@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/actions/user.actions";
-import { getAllBattlesByUser } from "@/lib/actions/battle.actions";
-import { getCharactersByOwner } from "@/lib/actions/character.actions";
-import { getMyCampaigns } from "@/lib/actions/campaign.actions";
+import { getBattleStatsByUser } from "@/lib/actions/battle.actions";
+import { getCharacterStatsByOwner } from "@/lib/actions/character.actions";
+import { getCampaignStatsByUser } from "@/lib/actions/campaign.actions";
 import Link from "next/link";
 import {
   Swords,
@@ -30,33 +30,28 @@ const Dashboard = async () => {
   const [actualUser, battlesData, charactersData, campaignsData] =
     await Promise.all([
       getCurrentUser(),
-      getAllBattlesByUser(),
-      getCharactersByOwner(),
-      getMyCampaigns(),
+      getBattleStatsByUser(),
+      getCharacterStatsByOwner(),
+      getCampaignStatsByUser(),
     ]);
 
-  const battles = battlesData.ok ? (battlesData.data as any[]) || [] : [];
-  const characters = charactersData.ok ? (charactersData.data as any[]) || [] : [];
-  const campaigns = campaignsData.ok ? (campaignsData.data as any[]) || [] : [];
+  const battles = battlesData.ok ? battlesData.data : { total: 0, active: 0, recent: [] };
+  const characters = charactersData.ok ? charactersData.data : { total: 0, alive: 0, dead: 0, recent: [] };
+  const campaigns = campaignsData.ok ? campaignsData.data : { total: 0 };
 
   // Stats calculation
-  const totalBattles = battles.length;
-  const activeBattles = battles.filter((b) => b.active).length;
+  const totalBattles = battles.total;
+  const activeBattles = battles.active;
 
-  const totalCharacters = characters.length;
-  const aliveCharacters = characters.filter((c) => c.status === "alive").length;
-  const deadCharacters = characters.filter((c) => c.status === "dead").length;
+  const totalCharacters = characters.total;
+  const aliveCharacters = characters.alive;
+  const deadCharacters = characters.dead;
 
-  const totalCampaigns = campaigns.length;
+  const totalCampaigns = campaigns.total;
 
   // Recent Activity
-  const recentBattles = [...battles]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 3);
-
-  const recentCharacters = [...characters]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 3);
+  const recentBattles = battles.recent || [];
+  const recentCharacters = characters.recent || [];
 
   return (
     <div className="flex flex-col gap-8 p-6 max-w-7xl mx-auto w-full">
@@ -191,7 +186,7 @@ const Dashboard = async () => {
           <CardContent className="flex-1">
             {recentBattles.length > 0 ? (
               <div className="space-y-4">
-                {recentBattles.map((battle) => (
+                {recentBattles.map((battle: any) => (
                   <div key={battle._id} className="flex items-center justify-between border-b last:border-0 pb-4 last:pb-0">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
@@ -247,7 +242,7 @@ const Dashboard = async () => {
           <CardContent className="flex-1">
             {recentCharacters.length > 0 ? (
               <div className="space-y-4">
-                {recentCharacters.map((char) => (
+                {recentCharacters.map((char: any) => (
                   <div key={char._id} className="flex items-center justify-between border-b last:border-0 pb-4 last:pb-0">
                     <div className="flex items-center gap-3">
                       <CharacterAvatar

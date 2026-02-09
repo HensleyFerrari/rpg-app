@@ -706,3 +706,34 @@ export async function updateCharacterStatus(
     };
   }
 }
+
+export const getCharacterStatsByOwner = async () => {
+  await connectDB();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      message: "Usuário não encontrado",
+    };
+  }
+
+  const [total, alive, dead, recent] = await Promise.all([
+    Character.countDocuments({ owner: user._id }),
+    Character.countDocuments({ owner: user._id, status: "alive" }),
+    Character.countDocuments({ owner: user._id, status: "dead" }),
+    Character.find({ owner: user._id })
+      .populate({
+        path: "campaign",
+        select: "name _id",
+        model: Campaign,
+      })
+      .sort({ createdAt: -1 })
+      .limit(3),
+  ]);
+
+  return {
+    ok: true,
+    data: serializeData({ total, alive, dead, recent }),
+  };
+};

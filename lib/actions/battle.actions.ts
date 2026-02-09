@@ -11,7 +11,7 @@ import { getCurrentUser } from "./user.actions";
 import { getAllDamagesByBattleId } from "./damage.actions";
 import { triggerBattleUpdate } from "../pusher";
 
-const serializeData = (data: BattleDocument[]) => {
+const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
 
@@ -671,4 +671,39 @@ export const createQuickCharacters = async (
       message: "Erro ao criar personagens rápidos",
     };
   }
+};
+
+export const getBattleStatsByUser = async () => {
+  await connectDB();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      message: "Usuário não encontrado",
+    };
+  }
+
+  const [total, active, recent] = await Promise.all([
+    Battle.countDocuments({ owner: user._id }),
+    Battle.countDocuments({ owner: user._id, active: true }),
+    Battle.find({ owner: user._id })
+      .populate({
+        path: "owner",
+        select: "name",
+        model: User,
+      })
+      .populate({
+        path: "campaign",
+        select: "name imageUrl",
+        model: Campaign,
+      })
+      .sort({ createdAt: -1 })
+      .limit(3),
+  ]);
+
+  return {
+    ok: true,
+    data: serializeData({ total, active, recent }),
+  };
 };
