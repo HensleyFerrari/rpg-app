@@ -7,7 +7,10 @@ import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
-import { getAllBattlesByCharacterId } from "./battle.actions";
+import {
+  getAllBattlesByCharacterId,
+  getActiveBattlesByCharacterId,
+} from "./battle.actions";
 import Damage from "@/models/Damage";
 import { triggerBattleUpdate } from "../pusher";
 
@@ -676,11 +679,12 @@ export async function updateCharacterStatus(
     }
 
     // Trigger update for battles involving this character
-    const battles = await getAllBattlesByCharacterId(characterId);
-    if (battles.ok && battles.data) {
-      const activeBattles = battles.data.filter((b: any) => b.active);
+    const activeBattlesRes = await getActiveBattlesByCharacterId(characterId);
+    if (activeBattlesRes.ok && activeBattlesRes.data) {
       await Promise.all(
-        activeBattles.map((battle: any) => triggerBattleUpdate(battle._id)),
+        activeBattlesRes.data.map((battle: any) =>
+          triggerBattleUpdate(battle._id),
+        ),
       );
     }
 

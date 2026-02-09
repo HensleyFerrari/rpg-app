@@ -190,6 +190,42 @@ export const getAllBattlesByCharacterId = async (characterId: string) => {
   }
 };
 
+export const getActiveBattlesByCharacterId = async (characterId: string) => {
+  try {
+    if (!characterId) {
+      return {
+        ok: false,
+        message: "ID do personagem é obrigatório",
+      };
+    }
+
+    await connectDB();
+
+    if (!mongoose.isValidObjectId(characterId)) {
+      return {
+        ok: false,
+        message: "ID de personagem inválido",
+      };
+    }
+
+    const battles = await Battle.find({
+      characters: characterId,
+      active: true,
+    });
+
+    return {
+      ok: true,
+      data: serializeData(battles),
+    };
+  } catch (error) {
+    console.error("Error getting active battles by character:", error);
+    return {
+      ok: false,
+      message: "Erro ao obter batalhas ativas por personagem",
+    };
+  }
+};
+
 export const updateBattle = async (
   id: string,
   battleParams: Partial<BattleDocument>,
