@@ -36,6 +36,7 @@ import { useSession } from "next-auth/react";
 import { createCharacter, updateCharacter, getCharacterById } from "@/lib/actions/character.actions";
 import { getCampaigns } from "@/lib/actions/campaign.actions";
 import { getCurrentUser } from "@/lib/actions/user.actions";
+import { Switch } from "@/components/ui/switch";
 
 // Schema unificado
 const characterFormSchema = z.object({
@@ -50,6 +51,7 @@ const characterFormSchema = z.object({
   status: z.enum(["alive", "dead"]).default("alive"),
   isNpc: z.boolean().default(false),
   alignment: z.enum(["ally", "enemy"]).default("ally"),
+  isVisible: z.boolean().default(true),
 });
 
 type CharacterFormValues = z.infer<typeof characterFormSchema>;
@@ -57,6 +59,11 @@ type CharacterFormValues = z.infer<typeof characterFormSchema>;
 interface Campaign {
   _id: string;
   name: string;
+  isAccepptingCharacters: boolean;
+  owner?: {
+    _id: string;
+    name: string;
+  };
 }
 
 export function CharacterModal() {
@@ -94,6 +101,7 @@ export function CharacterModal() {
     status: "alive",
     isNpc: isNpcFromUrl,
     alignment: "ally",
+    isVisible: true,
   }), [isNpcFromUrl]);
 
   const form = useForm<CharacterFormValues>({
@@ -146,6 +154,7 @@ export function CharacterModal() {
               status: char.status,
               isNpc: char.isNpc,
               alignment: char.alignment || "ally",
+              isVisible: char.isVisible !== false,
             });
           } else {
             toast.error("Personagem não encontrado");
@@ -198,6 +207,36 @@ export function CharacterModal() {
         }
       } else {
         // Create
+
+        // Validate if campaign is accepting characters
+        const selectedCampaign = campaigns.find(c => c._id === values.campaign);
+        if (selectedCampaign && !selectedCampaign.isAccepptingCharacters && !values.isNpc) {
+          // Check if current user is owner
+          // Note: using session.user.email isn't enough for ID check unless we have it.
+          // But we can allow if we can verify ownership.
+          // We can fetch current user ID.
+          try {
+            // Optimized: Assuming we might not have user ID handy synchronously correctly without fetching.
+            // But let's use the valid check.
+            const currentUser = await getCurrentUser();
+            if (selectedCampaign.owner?._id !== currentUser?._id) {
+              toast.error("Erro", {
+                description: "Esta campanha não está aceitando personagens no momento"
+              });
+              setIsSubmitting(false);
+              return;
+            }
+          } catch (e) {
+            console.error(e);
+            // Fallback if auth check fails
+            toast.error("Erro", {
+              description: "Esta campanha não está aceitando personagens no momento"
+            });
+            setIsSubmitting(false);
+            return;
+          }
+        }
+
         const response = await createCharacter({
           name: values.name,
           owner: session?.user?.email || "",
@@ -207,6 +246,7 @@ export function CharacterModal() {
           status: values.status,
           isNpc: values.isNpc,
           alignment: values.alignment,
+          isVisible: values.isVisible,
         });
 
         if (response.ok) {
@@ -352,6 +392,30 @@ export function CharacterModal() {
                   )}
                 />
               </div>
+
+              {/* Visibility Toggle - Only for NPCs */}
+              {form.watch("isNpc") && (
+                <FormField
+                  control={form.control}
+                  name="isVisible"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Visível para Jogadores</FormLabel>
+                        <FormDescription>
+                          Se desativado, este personagem será visível apenas para o Mestre.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
 
 
               <FormField

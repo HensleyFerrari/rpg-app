@@ -11,7 +11,7 @@ import { getCurrentUser } from "./user.actions";
 import { getAllDamagesByBattleId } from "./damage.actions";
 import { triggerBattleUpdate } from "../pusher";
 
-const serializeData = (data: BattleDocument[]) => {
+const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
 
@@ -28,6 +28,7 @@ export const createBattle = async (BattleParams: any) => {
       round: 1,
       characters: BattleParams.characters || [],
       owner: userData._id,
+      is_visible_to_players: BattleParams.is_visible_to_players || false,
     });
 
     revalidatePath("/dashboard/battles");
@@ -132,7 +133,7 @@ export const getBattlesByCampaign = async (campaignId: string) => {
     }
 
     const battles = await Battle.find({ campaign: campaignId }).populate(
-      "characters"
+      "characters",
     );
 
     return {
@@ -189,9 +190,45 @@ export const getAllBattlesByCharacterId = async (characterId: string) => {
   }
 };
 
+export const getActiveBattlesByCharacterId = async (characterId: string) => {
+  try {
+    if (!characterId) {
+      return {
+        ok: false,
+        message: "ID do personagem é obrigatório",
+      };
+    }
+
+    await connectDB();
+
+    if (!mongoose.isValidObjectId(characterId)) {
+      return {
+        ok: false,
+        message: "ID de personagem inválido",
+      };
+    }
+
+    const battles = await Battle.find({
+      characters: characterId,
+      active: true,
+    });
+
+    return {
+      ok: true,
+      data: serializeData(battles),
+    };
+  } catch (error) {
+    console.error("Error getting active battles by character:", error);
+    return {
+      ok: false,
+      message: "Erro ao obter batalhas ativas por personagem",
+    };
+  }
+};
+
 export const updateBattle = async (
   id: string,
-  battleParams: Partial<BattleDocument>
+  battleParams: Partial<BattleDocument>,
 ) => {
   try {
     if (!id) {
@@ -214,6 +251,29 @@ export const updateBattle = async (
       return {
         ok: false,
         message: "ID de batalha inválido",
+      };
+    }
+
+    const userData = await getCurrentUser();
+    if (!userData) {
+      return {
+        ok: false,
+        message: "Usuário não autenticado",
+      };
+    }
+
+    const existingBattle = await Battle.findById(id);
+    if (!existingBattle) {
+      return {
+        ok: false,
+        message: "Batalha não encontrada",
+      };
+    }
+
+    if (existingBattle.owner.toString() !== userData._id.toString()) {
+      return {
+        ok: false,
+        message: "Apenas o mestre pode atualizar esta batalha",
       };
     }
 
@@ -272,6 +332,14 @@ export const deleteBattle = async (id: string) => {
       };
     }
 
+    const userData = await getCurrentUser();
+    if (!userData || battle.owner.toString() !== userData._id.toString()) {
+      return {
+        ok: false,
+        message: "Apenas o mestre pode deletar esta batalha",
+      };
+    }
+
     await Battle.findByIdAndDelete(id);
 
     revalidatePath("/dashboard/campaigns");
@@ -316,7 +384,7 @@ export const getBattles = async ({
     }
 
     if (campaignId && campaignId !== "all") {
-       if (mongoose.isValidObjectId(campaignId)) {
+      if (mongoose.isValidObjectId(campaignId)) {
         queryObj.campaign = campaignId;
       }
     }
@@ -348,7 +416,6 @@ export const getBattles = async ({
   }
 };
 
-
 export const getAllBattles = async () => {
   await connectDB();
 
@@ -372,7 +439,7 @@ export const getAllBattles = async () => {
 
 export const addCharacterToBattle = async (
   battleId: string,
-  characterId: string
+  characterId: string,
 ) => {
   try {
     if (!battleId || !characterId) {
@@ -407,7 +474,7 @@ export const addCharacterToBattle = async (
       };
     }
     const characterExists = battleVerify.characters.some(
-      (character: CharacterDocument) => character.toString() === characterId
+      (character: CharacterDocument) => character.toString() === characterId,
     );
     if (characterExists) {
       return {
@@ -419,7 +486,7 @@ export const addCharacterToBattle = async (
     const battle = await Battle.findByIdAndUpdate(
       battleId,
       { $addToSet: { characters: characterId } },
-      { new: true }
+      { new: true },
     );
 
     if (!battle) {
@@ -447,7 +514,7 @@ export const addCharacterToBattle = async (
 
 export const removeCharacterFromBattle = async (
   characterId: string,
-  battleId: string
+  battleId: string,
 ) => {
   try {
     if (!battleId || !characterId) {
@@ -476,7 +543,7 @@ export const removeCharacterFromBattle = async (
     const battle = await Battle.findByIdAndUpdate(
       battleId,
       { $pull: { characters: characterId } },
-      { new: true }
+      { new: true },
     );
 
     if (!battle) {
@@ -535,7 +602,7 @@ export const getAllBattlesByUser = async () => {
 export const createQuickCharacters = async (
   battleId: string,
   names: string[],
-  alignment: "ally" | "enemy" = "ally"
+  alignment: "ally" | "enemy" = "ally",
 ) => {
   try {
     if (!battleId) {
@@ -555,11 +622,19 @@ export const createQuickCharacters = async (
     await connectDB();
 
     const battle = await Battle.findById(battleId);
+    const userData = await getCurrentUser();
 
     if (!battle) {
       return {
         ok: false,
         message: "Batalha não encontrada",
+      };
+    }
+
+    if (!userData || battle.owner.toString() !== userData._id.toString()) {
+      return {
+        ok: false,
+        message: "Apenas o mestre pode criar personagens rápidos",
       };
     }
 
@@ -578,7 +653,7 @@ export const createQuickCharacters = async (
     const updatedBattle = await Battle.findByIdAndUpdate(
       battleId,
       { $addToSet: { characters: { $each: characterIds } } },
-      { new: true }
+      { new: true },
     );
 
     await triggerBattleUpdate(battleId);
@@ -596,4 +671,39 @@ export const createQuickCharacters = async (
       message: "Erro ao criar personagens rápidos",
     };
   }
+};
+
+export const getBattleStatsByUser = async () => {
+  await connectDB();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      message: "Usuário não encontrado",
+    };
+  }
+
+  const [total, active, recent] = await Promise.all([
+    Battle.countDocuments({ owner: user._id }),
+    Battle.countDocuments({ owner: user._id, active: true }),
+    Battle.find({ owner: user._id })
+      .populate({
+        path: "owner",
+        select: "name",
+        model: User,
+      })
+      .populate({
+        path: "campaign",
+        select: "name imageUrl",
+        model: Campaign,
+      })
+      .sort({ createdAt: -1 })
+      .limit(3),
+  ]);
+
+  return {
+    ok: true,
+    data: serializeData({ total, active, recent }),
+  };
 };

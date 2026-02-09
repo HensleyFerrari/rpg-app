@@ -10,6 +10,7 @@ export interface BattleDocument {
   active: boolean;
   createdAt: Date;
   updateAt: Date;
+  is_visible_to_players: boolean;
 }
 
 const BattleSchema = new Schema<BattleDocument>(
@@ -17,6 +18,10 @@ const BattleSchema = new Schema<BattleDocument>(
     name: {
       type: String,
       required: [true, "Name is required"],
+    },
+    is_visible_to_players: {
+      type: Boolean,
+      default: false,
     },
     owner: {
       type: Schema.Types.ObjectId,
@@ -45,7 +50,7 @@ const BattleSchema = new Schema<BattleDocument>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Battle =

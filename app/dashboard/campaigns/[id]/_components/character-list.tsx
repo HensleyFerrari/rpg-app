@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Skull, Users } from "lucide-react";
+import { Skull, Users, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { CharacterCardActions } from "./character-card-actions";
 
@@ -12,6 +12,7 @@ interface CharacterListProps {
   isOwner: boolean;
   isNpc?: boolean;
   campaignId: string;
+  isAcceptingCharacters: boolean;
 }
 
 export function CharacterList({
@@ -19,21 +20,24 @@ export function CharacterList({
   isOwner,
   isNpc = false,
   campaignId,
+  isAcceptingCharacters,
 }: CharacterListProps) {
   if (characters.length === 0) {
     return (
       <Card className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground bg-muted/10 border-dashed">
         <Users className="h-12 w-12 mb-4 opacity-20" />
         <p>Nenhum {isNpc ? "NPC" : "personagem"} nesta campanha.</p>
-        <Link
-          href={`/dashboard/personagens/new?campaign=${campaignId}${isNpc ? "&isNpc=true" : ""
-            }`}
-          className="mt-4"
-        >
-          <Button variant="outline">
-            Criar {isNpc ? "NPC" : "Personagem"}
-          </Button>
-        </Link>
+        {((!isNpc && isAcceptingCharacters) || (isNpc && isOwner)) && (
+          <Link
+            href={`?action=new-character&campaign=${campaignId}${isNpc ? "&isNpc=true" : ""
+              }`}
+            className="mt-4"
+          >
+            <Button variant="outline">
+              Criar {isNpc ? "NPC" : "Personagem"}
+            </Button>
+          </Link>
+        )}
       </Card>
     );
   }
@@ -68,14 +72,20 @@ export function CharacterList({
                 <p className="font-medium text-sm group-hover:text-primary transition-colors">
                   {character.name}
                 </p>
+
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   {character.status === "dead" && (
                     <>
-                      <span>•</span>
                       <span className="text-destructive flex items-center gap-1">
                         <Skull className="h-3 w-3" /> Morto
                       </span>
+                      {((character.isVisible === false && isOwner) || (character.status === "dead")) && <span>•</span>}
                     </>
+                  )}
+                  {character.isVisible === false && isOwner && (
+                    <span className="text-muted-foreground flex items-center gap-1 bg-muted px-1.5 py-0.5 rounded text-[10px] border">
+                      <EyeOff className="h-3 w-3" /> Oculto
+                    </span>
                   )}
                 </div>
               </div>
@@ -90,8 +100,9 @@ export function CharacterList({
               />
             </div>
           </div>
-        ))}
-      </div>
-    </div>
+        ))
+        }
+      </div >
+    </div >
   );
 }

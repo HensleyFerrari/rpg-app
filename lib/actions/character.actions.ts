@@ -7,7 +7,10 @@ import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
-import { getAllBattlesByCharacterId } from "./battle.actions";
+import {
+  getAllBattlesByCharacterId,
+  getActiveBattlesByCharacterId,
+} from "./battle.actions";
 import Damage from "@/models/Damage";
 import { triggerBattleUpdate } from "../pusher";
 
@@ -23,7 +26,9 @@ interface CharacterParams {
   message?: string;
   status: string;
   isNpc?: boolean;
+
   alignment?: "ally" | "enemy";
+  isVisible?: boolean;
 }
 
 interface CharacterResponse {
@@ -40,7 +45,9 @@ export async function createCharacter({
   message = "",
   status,
   isNpc = false,
+
   alignment = "ally",
+  isVisible = true,
 }: CharacterParams) {
   try {
     if (!name || !owner || !campaign) {
@@ -110,7 +117,9 @@ export async function createCharacter({
       message,
       status,
       isNpc,
+
       alignment,
+      isVisible,
     });
 
     if (!newCharacterData) {
@@ -191,6 +200,29 @@ export async function getCharacterById(id: string) {
       };
     }
 
+    // Security Check: Visibility
+    // If I cast to any here to avoid TS issues with populated fields not matching generic Document type effortlessly
+    const charObj = characterData.toObject() as any;
+
+    if (charObj.isVisible === false) {
+      const currentUser = await getCurrentUser();
+      const isCharacterOwner =
+        currentUser &&
+        charObj.owner._id.toString() === currentUser._id.toString();
+      const isCampaignOwner =
+        currentUser &&
+        charObj.campaign &&
+        charObj.campaign.owner._id.toString() === currentUser._id.toString();
+
+      if (!isCharacterOwner && !isCampaignOwner) {
+        return {
+          ok: false,
+          message: "Você não tem permissão para visualizar este personagem.",
+          data: null, // Act as if not found or private
+        };
+      }
+    }
+
     const battles = await getAllBattlesByCharacterId(id);
 
     if (!battles.ok) {
@@ -207,7 +239,7 @@ export async function getCharacterById(id: string) {
     const damages = serializeData(damagesData);
 
     const data = {
-      ...characterData.toObject(),
+      ...charObj,
       battles: battles.data,
       damages: damages,
     };
@@ -260,10 +292,41 @@ export async function getCharactersByCampaign(
       };
     }
 
+    // Check if the current user is the owner of the campaign
+    // Since we populate "campaign" in getCharacterById but here we just have campaignId,
+    // we assume the caller context or we check against current user.
+    // However, getCharactersByCampaign is used in the public campaign page logic too potentially.
+    // Let's get the campaign owner first.
+
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) {
+      // Should have been caught before but just in case
+      return {
+        ok: true,
+        message: "Campanha não encontrada",
+        data: serializeData(characters), // Fallback return all? Or none?
+      };
+    }
+
+    const currentUser = await getCurrentUser();
+    const isOwner =
+      currentUser && campaign.owner.toString() === currentUser._id.toString();
+
+    let filteredCharacters = characters;
+
+    if (!isOwner) {
+      filteredCharacters = characters.filter((char) => {
+        // If character uses the new model field isVisible (default true)
+        // If isVisible is explicitly false, hide it.
+        // Assuming default is true if undefined.
+        return char.isVisible !== false;
+      });
+    }
+
     return {
       ok: true,
       message: "Personagens encontrados",
-      data: serializeData(characters),
+      data: serializeData(filteredCharacters),
     };
   } catch (error: any) {
     console.error("Error fetching campaign characters:", error);
@@ -541,6 +604,59 @@ export async function getAllCharacters(): Promise<CharacterResponse> {
   }
 }
 
+export async function getAccessibleCharacters(): Promise<CharacterResponse> {
+  try {
+    await connectDB();
+
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return {
+        ok: false,
+        message: "Usuário não autenticado",
+        data: [],
+      };
+    }
+
+    // Find campaigns owned by the user
+    const ownedCampaigns = await Campaign.find({
+      owner: currentUser._id,
+    }).select("_id");
+    const campaignIds = ownedCampaigns.map((c) => c._id);
+
+    // Find characters that are either owned by the user OR belong to one of their campaigns
+    const charactersData = await Character.find({
+      $or: [{ owner: currentUser._id }, { campaign: { $in: campaignIds } }],
+    })
+      .populate("owner", "username name _id")
+      .populate("campaign", "name _id")
+      .sort({ createdAt: -1 });
+
+    const characters = serializeData(charactersData);
+
+    if (characters.length === 0) {
+      return {
+        ok: true,
+        message: "Nenhum personagem encontrado",
+        data: [],
+      };
+    }
+
+    return {
+      ok: true,
+      message: "Personagens encontrados",
+      data: characters,
+    };
+  } catch (error: any) {
+    console.error("Error fetching accessible characters:", error);
+
+    return {
+      ok: false,
+      message: error.message || "Falha ao buscar personagens acessíveis",
+    };
+  }
+}
+
 export async function countCharacters() {
   try {
     await connectDB();
@@ -616,11 +732,12 @@ export async function updateCharacterStatus(
     }
 
     // Trigger update for battles involving this character
-    const battles = await getAllBattlesByCharacterId(characterId);
-    if (battles.ok && battles.data) {
-      const activeBattles = battles.data.filter((b: any) => b.active);
+    const activeBattlesRes = await getActiveBattlesByCharacterId(characterId);
+    if (activeBattlesRes.ok && activeBattlesRes.data) {
       await Promise.all(
-        activeBattles.map((battle: any) => triggerBattleUpdate(battle._id)),
+        activeBattlesRes.data.map((battle: any) =>
+          triggerBattleUpdate(battle._id),
+        ),
       );
     }
 
@@ -642,3 +759,34 @@ export async function updateCharacterStatus(
     };
   }
 }
+
+export const getCharacterStatsByOwner = async () => {
+  await connectDB();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      message: "Usuário não encontrado",
+    };
+  }
+
+  const [total, alive, dead, recent] = await Promise.all([
+    Character.countDocuments({ owner: user._id }),
+    Character.countDocuments({ owner: user._id, status: "alive" }),
+    Character.countDocuments({ owner: user._id, status: "dead" }),
+    Character.find({ owner: user._id })
+      .populate({
+        path: "campaign",
+        select: "name _id",
+        model: Campaign,
+      })
+      .sort({ createdAt: -1 })
+      .limit(3),
+  ]);
+
+  return {
+    ok: true,
+    data: serializeData({ total, alive, dead, recent }),
+  };
+};

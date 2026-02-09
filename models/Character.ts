@@ -10,6 +10,7 @@ export interface CharacterDocument {
   status: string;
   alignment: string;
   isNpc: boolean;
+  isVisible: boolean;
   createdAt: Date;
   updateAt: Date;
 }
@@ -52,10 +53,14 @@ const CharacterSchema = new Schema<CharacterDocument>(
       enum: ["ally", "enemy"],
       default: "ally",
     },
+    isVisible: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Character =

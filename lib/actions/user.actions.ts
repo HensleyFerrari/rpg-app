@@ -3,6 +3,8 @@
 import { connectDB } from "../mongodb";
 import User from "@/models/User";
 import { auth } from "@/auth";
+import { cache } from "react";
+import bcrypt from "bcryptjs";
 
 const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
@@ -16,7 +18,7 @@ export const findByEmail = async (email: string) => {
   return user;
 };
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = cache(async () => {
   try {
     const session = await auth();
     // If no session or no user, return null
@@ -38,7 +40,7 @@ export const getCurrentUser = async () => {
     console.error("Error getting current user:", error);
     return null;
   }
-};
+});
 
 export async function updateAvatar(userId: string, avatarUrl: string) {
   try {
@@ -58,5 +60,43 @@ export async function updateAvatar(userId: string, avatarUrl: string) {
   } catch (error) {
     console.error("Error updating avatar:", error);
     return { ok: false, message: "Failed to update avatar" };
+  }
+}
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string
+) {
+  try {
+    const session = await auth();
+    if (!session || !session.user || !session.user.email) {
+      return { ok: false, message: "Não autenticado" };
+    }
+
+    await connectDB();
+
+    const user = await User.findOne({ email: session.user.email }).select(
+      "+password"
+    );
+
+    if (!user) {
+      return { ok: false, message: "Usuário não encontrado" };
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      return { ok: false, message: "Senha atual incorreta" };
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    return { ok: true, message: "Senha atualizada com sucesso" };
+  } catch (error) {
+    console.error("Error changing password:", error);
+    return { ok: false, message: "Erro ao atualizar senha" };
   }
 }
