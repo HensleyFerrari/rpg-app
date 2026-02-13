@@ -264,8 +264,8 @@ export async function deleteNPC(id: string): Promise<NPCResponse> {
       };
     }
 
-    // First get the NPC to know its campaign for revalidation
-    const npcData = await NPC.findById(id);
+    // Delete the NPC and get the deleted document
+    const npcData = await NPC.findByIdAndDelete(id);
 
     if (!npcData) {
       return {
@@ -277,9 +277,6 @@ export async function deleteNPC(id: string): Promise<NPCResponse> {
 
     const npc = serializeData(npcData);
     const campaignId = npc.campaign;
-
-    // Delete the NPC
-    await NPC.findByIdAndDelete(id);
 
     // Revalidate the campaign page
     revalidatePath(`/dashboard/campaigns/${campaignId}`);
