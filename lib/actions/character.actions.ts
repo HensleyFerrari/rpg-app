@@ -129,18 +129,7 @@ export async function createCharacter({
       };
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      ownerData._id,
-      { $push: { characters: newCharacterData._id } },
-      { new: true },
-    );
 
-    if (!updatedUser) {
-      return {
-        ok: false,
-        message: "Falha ao atualizar proprietário",
-      };
-    }
 
     const newCharacter = serializeData(newCharacterData);
 
