@@ -5,6 +5,7 @@ import {
   updateCampaign,
   deleteCampaign,
 } from "@/lib/actions/campaign.actions";
+import { getCurrentUser } from "@/lib/actions/user.actions";
 import User from "@/models/User";
 import Campaign from "@/models/Campaign";
 import mongoose from "mongoose";
@@ -41,6 +42,11 @@ describe("Campaign Actions", () => {
       name: "Test User",
       password: "testpassword", // Added password field
     });
+
+    // Update mock to return the created test user
+    (getCurrentUser as jest.Mock).mockResolvedValue(
+      JSON.parse(JSON.stringify(testUser))
+    );
   });
 
   describe("createCampaign", () => {

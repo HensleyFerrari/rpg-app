@@ -182,7 +182,7 @@ export const getMyCampaigns = async () => {
     const userData = await getCurrentUser();
     await connectDB();
 
-    const user = await findByEmail(userData.email);
+    const user = userData;
 
     if (!user || !user._id) {
       return {
