@@ -79,15 +79,13 @@ export async function updateSystemFields(
 
      await connectDB();
      
-     // Verify ownership
-     const system = await RPGSystem.findOne({ _id: systemId, owner: user._id });
-     if (!system) return { error: "System not found or unauthorized" };
-
-     const updatedSystem = await RPGSystem.findByIdAndUpdate(
-       systemId,
+     const updatedSystem = await RPGSystem.findOneAndUpdate(
+       { _id: systemId, owner: user._id },
        { $set: updateData },
        { new: true }
      );
+
+     if (!updatedSystem) return { error: "System not found or unauthorized" };
      
      revalidatePath(`/dashboard/systems/${systemId}`);
      return { success: true, data: serializeData(updatedSystem) };
