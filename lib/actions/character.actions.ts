@@ -13,10 +13,13 @@ import {
 } from "./battle.actions";
 import Damage from "@/models/Damage";
 import { triggerBattleUpdate } from "../pusher";
-
-const serializeData = (data: any) => {
-  return JSON.parse(JSON.stringify(data));
-};
+import { safeAction } from "./safe-action";
+import { serializeData } from "../utils";
+import {
+  canEditCharacter,
+  canViewCharacter,
+  verifyCampaignOwner,
+} from "../auth";
 
 interface CharacterParams {
   name: string;
@@ -37,19 +40,20 @@ interface CharacterResponse {
   data?: CharacterDocument | CharacterDocument[] | null;
 }
 
-export async function createCharacter({
-  name,
-  owner,
-  campaign,
-  characterUrl = "",
-  message = "",
-  status,
-  isNpc = false,
+export async function createCharacter(params: CharacterParams) {
+  return safeAction(async () => {
+    const {
+      name,
+      owner,
+      campaign,
+      characterUrl = "",
+      message = "",
+      status,
+      isNpc = false,
+      alignment = "ally",
+      isVisible = true,
+    } = params;
 
-  alignment = "ally",
-  isVisible = true,
-}: CharacterParams) {
-  try {
     if (!name || !owner || !campaign) {
       return {
         ok: false,
@@ -57,7 +61,7 @@ export async function createCharacter({
       };
     }
 
-    await connectDB();
+    // connectDB() is handled by safeAction
 
     if (!mongoose.isValidObjectId(campaign)) {
       return {
@@ -85,28 +89,14 @@ export async function createCharacter({
     // Check if campaign is accepting characters
     if (campaignData.isAccepptingCharacters === false) {
       console.log("Campaign is NOT accepting characters. Checking owner...");
-      console.log("Campaign Owner:", campaignData.owner.toString());
-      console.log("Request Owner:", ownerData._id.toString());
 
-      const isCampaignOwner =
-        campaignData.owner.toString() === ownerData._id.toString();
-
-      console.log("Is Campaign Owner?", isCampaignOwner);
-
-      if (!isCampaignOwner) {
+      if (!verifyCampaignOwner(campaignData, ownerData._id)) {
         return {
           ok: false,
           message:
             "Esta campanha não está aceitando novos personagens no momento.",
         };
-      } else {
-        console.log("Allowed because user is owner.");
       }
-    } else {
-      console.log(
-        "Campaign IS accepting characters (or field is missing/true). Value:",
-        campaignData.isAccepptingCharacters,
-      );
     }
 
     const newCharacterData = await Character.create({
@@ -117,7 +107,6 @@ export async function createCharacter({
       message,
       status,
       isNpc,
-
       alignment,
       isVisible,
     });
@@ -129,18 +118,11 @@ export async function createCharacter({
       };
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
       ownerData._id,
       { $push: { characters: newCharacterData._id } },
       { new: true },
     );
-
-    if (!updatedUser) {
-      return {
-        ok: false,
-        message: "Falha ao atualizar proprietário",
-      };
-    }
 
     const newCharacter = serializeData(newCharacterData);
 
@@ -153,26 +135,17 @@ export async function createCharacter({
       message: "Personagem criado com sucesso!",
       data: newCharacter,
     };
-  } catch (error: any) {
-    console.error("Error creating character:", error);
-
-    return {
-      ok: false,
-      message: error.message || "Falha ao criar personagem",
-    };
-  }
+  });
 }
 
 export async function getCharacterById(id: string) {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
         message: "ID do personagem é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {
       return {
@@ -201,27 +174,18 @@ export async function getCharacterById(id: string) {
     }
 
     // Security Check: Visibility
-    // If I cast to any here to avoid TS issues with populated fields not matching generic Document type effortlessly
-    const charObj = characterData.toObject() as any;
-
-    if (charObj.isVisible === false) {
-      const currentUser = await getCurrentUser();
-      const isCharacterOwner =
-        currentUser &&
-        charObj.owner._id.toString() === currentUser._id.toString();
-      const isCampaignOwner =
-        currentUser &&
-        charObj.campaign &&
-        charObj.campaign.owner._id.toString() === currentUser._id.toString();
-
-      if (!isCharacterOwner && !isCampaignOwner) {
-        return {
-          ok: false,
-          message: "Você não tem permissão para visualizar este personagem.",
-          data: null, // Act as if not found or private
-        };
-      }
+    // We pass the mongoose document which has populated fields.
+    // canViewCharacter handles checking owner and campaign owner.
+    const currentUser = await getCurrentUser();
+    if (!canViewCharacter(characterData, currentUser?._id)) {
+      return {
+        ok: false,
+        message: "Você não tem permissão para visualizar este personagem.",
+        data: null,
+      };
     }
+
+    const charObj = characterData.toObject();
 
     const battles = await getAllBattlesByCharacterId(id);
 
@@ -249,28 +213,19 @@ export async function getCharacterById(id: string) {
       message: "Personagem encontrado",
       data: serializeData(data),
     };
-  } catch (error: any) {
-    console.error("Error fetching character:", error);
-
-    return {
-      ok: false,
-      message: error.message || "Falha ao buscar personagem",
-    };
-  }
+  });
 }
 
 export async function getCharactersByCampaign(
   campaignId: string,
 ): Promise<CharacterResponse> {
-  try {
+  return safeAction(async () => {
     if (!campaignId) {
       return {
         ok: false,
         message: "ID da campanha é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(campaignId)) {
       return {
@@ -292,50 +247,30 @@ export async function getCharactersByCampaign(
       };
     }
 
-    // Check if the current user is the owner of the campaign
-    // Since we populate "campaign" in getCharacterById but here we just have campaignId,
-    // we assume the caller context or we check against current user.
-    // However, getCharactersByCampaign is used in the public campaign page logic too potentially.
-    // Let's get the campaign owner first.
-
     const campaign = await Campaign.findById(campaignId);
     if (!campaign) {
-      // Should have been caught before but just in case
       return {
         ok: true,
         message: "Campanha não encontrada",
-        data: serializeData(characters), // Fallback return all? Or none?
+        data: serializeData(characters),
       };
     }
 
     const currentUser = await getCurrentUser();
-    const isOwner =
-      currentUser && campaign.owner.toString() === currentUser._id.toString();
 
-    let filteredCharacters = characters;
-
-    if (!isOwner) {
-      filteredCharacters = characters.filter((char) => {
-        // If character uses the new model field isVisible (default true)
-        // If isVisible is explicitly false, hide it.
-        // Assuming default is true if undefined.
-        return char.isVisible !== false;
-      });
-    }
+    // Filter characters based on visibility
+    // If user is campaign owner, they see everything (handled by canViewCharacter)
+    // If not, they only see visible ones or their own
+    const filteredCharacters = characters.filter((char) =>
+      canViewCharacter(char, currentUser?._id),
+    );
 
     return {
       ok: true,
       message: "Personagens encontrados",
       data: serializeData(filteredCharacters),
     };
-  } catch (error: any) {
-    console.error("Error fetching campaign characters:", error);
-
-    return {
-      ok: false,
-      message: error.message || "Falha ao buscar personagens da campanha",
-    };
-  }
+  });
 }
 
 export async function getCharactersByOwner(): Promise<CharacterResponse> {
@@ -381,7 +316,7 @@ export async function updateCharacter(
   id: string,
   updates: Partial<CharacterParams>,
 ): Promise<CharacterResponse> {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
@@ -395,8 +330,6 @@ export async function updateCharacter(
         message: "Nenhuma atualização fornecida",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {
       return {
@@ -421,10 +354,7 @@ export async function updateCharacter(
 
       if (newCampaign.isAccepptingCharacters === false) {
         const actualUser = await getCurrentUser();
-        const isCampaignOwner =
-          newCampaign.owner.toString() === actualUser?._id.toString();
-
-        if (!isCampaignOwner) {
+        if (!verifyCampaignOwner(newCampaign, actualUser?._id)) {
           return {
             ok: false,
             message:
@@ -444,12 +374,7 @@ export async function updateCharacter(
       return { ok: false, message: "Personagem não encontrado" };
     }
 
-    const isCharacterOwner =
-      characterToUpdate.owner.toString() === actualUser._id.toString();
-    const isCampaignOwner =
-      characterToUpdate.campaign.owner.toString() === actualUser._id.toString();
-
-    if (!isCharacterOwner && !isCampaignOwner) {
+    if (!canEditCharacter(characterToUpdate, actualUser._id)) {
       return {
         ok: false,
         message: "Você não tem permissão para editar este personagem",
@@ -482,14 +407,7 @@ export async function updateCharacter(
       message: "Personagem atualizado com sucesso",
       data: updatedCharacter,
     };
-  } catch (error: any) {
-    console.error("Error updating character:", error);
-
-    return {
-      ok: false,
-      message: error.message || "Falha ao atualizar personagem",
-    };
-  }
+  });
 }
 
 export async function deleteCharacter(id: string): Promise<CharacterResponse> {
@@ -526,12 +444,7 @@ export async function deleteCharacter(id: string): Promise<CharacterResponse> {
       };
     }
 
-    const isCharacterOwner =
-      characterData.owner.toString() === actualUser._id.toString();
-    const isCampaignOwner =
-      characterData.campaign.owner.toString() === actualUser._id.toString();
-
-    if (!isCharacterOwner && !isCampaignOwner) {
+    if (!canEditCharacter(characterData, actualUser._id)) {
       return {
         ok: false,
         message: "Você não tem permissão para excluir este personagem",

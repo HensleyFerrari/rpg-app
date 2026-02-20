@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import Battle, { BattleDocument } from "@/models/Battle";
-import { connectDB } from "../mongodb";
 import mongoose from "mongoose";
 import User from "@/models/User";
 import Campaign from "@/models/Campaign";
@@ -10,15 +9,12 @@ import Character, { CharacterDocument } from "@/models/Character";
 import { getCurrentUser } from "./user.actions";
 import { getAllDamagesByBattleId } from "./damage.actions";
 import { triggerBattleUpdate } from "../pusher";
-
-const serializeData = (data: any) => {
-  return JSON.parse(JSON.stringify(data));
-};
+import { safeAction } from "./safe-action";
+import { serializeData } from "../utils";
+import { verifyBattleMaster } from "../auth";
 
 export const createBattle = async (BattleParams: any) => {
-  try {
-    await connectDB();
-
+  return safeAction(async () => {
     const userData = await getCurrentUser();
 
     const newBattle = await Battle.create({
@@ -38,25 +34,17 @@ export const createBattle = async (BattleParams: any) => {
       message: "Batalha criada com sucesso",
       data: serializeData(newBattle),
     };
-  } catch (error) {
-    console.error("Error creating battle:", error);
-    return {
-      ok: false,
-      message: "Erro ao criar batalha",
-    };
-  }
+  });
 };
 
 export const getBattleById = async (id: any) => {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
         message: "ID da batalha é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {
       return {
@@ -105,25 +93,17 @@ export const getBattleById = async (id: any) => {
       ok: true,
       data: serializeData(data),
     };
-  } catch (error) {
-    console.error("Error getting battle:", error);
-    return {
-      ok: false,
-      message: "Erro ao obter batalha",
-    };
-  }
+  });
 };
 
 export const getBattlesByCampaign = async (campaignId: string) => {
-  try {
+  return safeAction(async () => {
     if (!campaignId) {
       return {
         ok: false,
         message: "ID da campanha é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(campaignId)) {
       return {
@@ -140,25 +120,17 @@ export const getBattlesByCampaign = async (campaignId: string) => {
       ok: true,
       data: serializeData(battles),
     };
-  } catch (error) {
-    console.error("Error getting battles:", error);
-    return {
-      ok: false,
-      message: "Erro ao obter batalhas",
-    };
-  }
+  });
 };
 
 export const getAllBattlesByCharacterId = async (characterId: string) => {
-  try {
+  return safeAction(async () => {
     if (!characterId) {
       return {
         ok: false,
         message: "ID do personagem é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(characterId)) {
       return {
@@ -181,25 +153,17 @@ export const getAllBattlesByCharacterId = async (characterId: string) => {
       ok: true,
       data: serializeData(battles),
     };
-  } catch (error) {
-    console.error("Error getting battles by character:", error);
-    return {
-      ok: false,
-      message: "Erro ao obter batalhas por personagem",
-    };
-  }
+  });
 };
 
 export const getActiveBattlesByCharacterId = async (characterId: string) => {
-  try {
+  return safeAction(async () => {
     if (!characterId) {
       return {
         ok: false,
         message: "ID do personagem é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(characterId)) {
       return {
@@ -217,20 +181,14 @@ export const getActiveBattlesByCharacterId = async (characterId: string) => {
       ok: true,
       data: serializeData(battles),
     };
-  } catch (error) {
-    console.error("Error getting active battles by character:", error);
-    return {
-      ok: false,
-      message: "Erro ao obter batalhas ativas por personagem",
-    };
-  }
+  });
 };
 
 export const updateBattle = async (
   id: string,
   battleParams: Partial<BattleDocument>,
 ) => {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
@@ -244,8 +202,6 @@ export const updateBattle = async (
         message: "Dados da batalha são obrigatórios",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {
       return {
@@ -270,7 +226,7 @@ export const updateBattle = async (
       };
     }
 
-    if (existingBattle.owner.toString() !== userData._id.toString()) {
+    if (!verifyBattleMaster(existingBattle, userData._id)) {
       return {
         ok: false,
         message: "Apenas o mestre pode atualizar esta batalha",
@@ -295,25 +251,17 @@ export const updateBattle = async (
       ok: true,
       data: serializeData(battle),
     };
-  } catch (error) {
-    console.error("Error updating battle:", error);
-    return {
-      ok: false,
-      message: "Erro ao atualizar batalha",
-    };
-  }
+  });
 };
 
 export const deleteBattle = async (id: string) => {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
         message: "ID da batalha é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {
       return {
@@ -333,7 +281,7 @@ export const deleteBattle = async (id: string) => {
     }
 
     const userData = await getCurrentUser();
-    if (!userData || battle.owner.toString() !== userData._id.toString()) {
+    if (!verifyBattleMaster(battle, userData?._id)) {
       return {
         ok: false,
         message: "Apenas o mestre pode deletar esta batalha",
@@ -349,13 +297,7 @@ export const deleteBattle = async (id: string) => {
       ok: true,
       message: "Batalha deletada com sucesso",
     };
-  } catch (error) {
-    console.error("Error deleting battle:", error);
-    return {
-      ok: false,
-      message: "Erro ao deletar batalha",
-    };
-  }
+  });
 };
 
 export const getBattles = async ({
@@ -367,9 +309,7 @@ export const getBattles = async ({
   filterType?: "all" | "my";
   campaignId?: string;
 } = {}) => {
-  try {
-    await connectDB();
-
+  return safeAction(async () => {
     const queryObj: any = {};
 
     if (query) {
@@ -406,50 +346,41 @@ export const getBattles = async ({
       ok: true,
       data: serializeData(battles),
     };
-  } catch (error) {
-    console.error("Error getting battles:", error);
-    return {
-      ok: false,
-      message: "Erro ao buscar batalhas",
-      data: [],
-    };
-  }
+  });
 };
 
 export const getAllBattles = async () => {
-  await connectDB();
+  return safeAction(async () => {
+    const battles = await Battle.find()
+      .populate({
+        path: "owner",
+        select: "name",
+        model: User,
+      })
+      .populate({
+        path: "campaign",
+        select: "name imageUrl",
+        model: Campaign,
+      });
 
-  const battles = await Battle.find()
-    .populate({
-      path: "owner",
-      select: "name",
-      model: User,
-    })
-    .populate({
-      path: "campaign",
-      select: "name imageUrl",
-      model: Campaign,
-    });
-
-  return {
-    ok: true,
-    data: serializeData(battles),
-  };
+    return {
+      ok: true,
+      data: serializeData(battles),
+    };
+  });
 };
 
 export const addCharacterToBattle = async (
   battleId: string,
   characterId: string,
 ) => {
-  try {
+  return safeAction(async () => {
     if (!battleId || !characterId) {
       return {
         ok: false,
         message: "ID da batalha e do personagem são obrigatórios",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(battleId)) {
       return {
@@ -473,6 +404,16 @@ export const addCharacterToBattle = async (
         message: "Batalha não encontrada",
       };
     }
+
+    const userData = await getCurrentUser();
+    if (!verifyBattleMaster(battleVerify, userData?._id)) {
+      return {
+        ok: false,
+        message: "Apenas o mestre pode adicionar personagens à batalha",
+        data: null,
+      };
+    }
+
     const characterExists = battleVerify.characters.some(
       (character: CharacterDocument) => character.toString() === characterId,
     );
@@ -503,28 +444,20 @@ export const addCharacterToBattle = async (
       ok: true,
       data: serializeData(battle),
     };
-  } catch (error) {
-    console.error("Error adding character to battle:", error);
-    return {
-      ok: false,
-      message: "Erro ao adicionar personagem à batalha",
-    };
-  }
+  });
 };
 
 export const removeCharacterFromBattle = async (
   characterId: string,
   battleId: string,
 ) => {
-  try {
+  return safeAction(async () => {
     if (!battleId || !characterId) {
       return {
         ok: false,
         message: "ID da batalha e do personagem são obrigatórios",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(battleId)) {
       return {
@@ -537,6 +470,25 @@ export const removeCharacterFromBattle = async (
       return {
         ok: false,
         message: "ID de personagem inválido",
+      };
+    }
+
+    const battleToCheck = await Battle.findById(battleId);
+    if (!battleToCheck) {
+      return {
+        ok: false,
+        message: "Batalha não encontrada",
+      };
+    }
+
+    const userData = await getCurrentUser();
+    // Allow GM to remove.
+    // TODO: Determine if character owner can also remove themselves (leave battle).
+    // For now, restricting to GM as requested in security audit.
+    if (!verifyBattleMaster(battleToCheck, userData?._id)) {
+      return {
+        ok: false,
+        message: "Apenas o mestre pode remover personagens da batalha",
       };
     }
 
@@ -561,42 +513,37 @@ export const removeCharacterFromBattle = async (
       message: "Personagem removido da batalha com sucesso",
       data: serializeData(battle),
     };
-  } catch (error) {
-    console.error("Error removing character from battle:", error);
-    return {
-      ok: false,
-      message: "Erro ao remover personagem da batalha",
-    };
-  }
+  });
 };
 
 export const getAllBattlesByUser = async () => {
-  await connectDB();
-  const user = await getCurrentUser();
+  return safeAction(async () => {
+    const user = await getCurrentUser();
 
-  if (!user) {
+    if (!user) {
+      return {
+        ok: false,
+        message: "Usuário não encontrado",
+      };
+    }
+
+    const battles = await Battle.find({ owner: user._id })
+      .populate({
+        path: "owner",
+        select: "name",
+        model: User,
+      })
+      .populate({
+        path: "campaign",
+        select: "name imageUrl",
+        model: Campaign,
+      });
+
     return {
-      ok: false,
-      message: "Usuário não encontrado",
+      ok: true,
+      data: serializeData(battles),
     };
-  }
-
-  const battles = await Battle.find({ owner: user._id })
-    .populate({
-      path: "owner",
-      select: "name",
-      model: User,
-    })
-    .populate({
-      path: "campaign",
-      select: "name imageUrl",
-      model: Campaign,
-    });
-
-  return {
-    ok: true,
-    data: serializeData(battles),
-  };
+  });
 };
 
 export const createQuickCharacters = async (
@@ -604,7 +551,7 @@ export const createQuickCharacters = async (
   names: string[],
   alignment: "ally" | "enemy" = "ally",
 ) => {
-  try {
+  return safeAction(async () => {
     if (!battleId) {
       return {
         ok: false,
@@ -619,8 +566,6 @@ export const createQuickCharacters = async (
       };
     }
 
-    await connectDB();
-
     const battle = await Battle.findById(battleId);
     const userData = await getCurrentUser();
 
@@ -631,7 +576,7 @@ export const createQuickCharacters = async (
       };
     }
 
-    if (!userData || battle.owner.toString() !== userData._id.toString()) {
+    if (!verifyBattleMaster(battle, userData?._id)) {
       return {
         ok: false,
         message: "Apenas o mestre pode criar personagens rápidos",
@@ -664,46 +609,41 @@ export const createQuickCharacters = async (
       data: serializeData(updatedBattle),
       message: `${createdCharacters.length} personagens criados e adicionados com sucesso`,
     };
-  } catch (error) {
-    console.error("Error creating quick characters:", error);
-    return {
-      ok: false,
-      message: "Erro ao criar personagens rápidos",
-    };
-  }
+  });
 };
 
 export const getBattleStatsByUser = async () => {
-  await connectDB();
-  const user = await getCurrentUser();
+  return safeAction(async () => {
+    const user = await getCurrentUser();
 
-  if (!user) {
+    if (!user) {
+      return {
+        ok: false,
+        message: "Usuário não encontrado",
+      };
+    }
+
+    const [total, active, recent] = await Promise.all([
+      Battle.countDocuments({ owner: user._id }),
+      Battle.countDocuments({ owner: user._id, active: true }),
+      Battle.find({ owner: user._id })
+        .populate({
+          path: "owner",
+          select: "name",
+          model: User,
+        })
+        .populate({
+          path: "campaign",
+          select: "name imageUrl",
+          model: Campaign,
+        })
+        .sort({ createdAt: -1 })
+        .limit(3),
+    ]);
+
     return {
-      ok: false,
-      message: "Usuário não encontrado",
+      ok: true,
+      data: serializeData({ total, active, recent }),
     };
-  }
-
-  const [total, active, recent] = await Promise.all([
-    Battle.countDocuments({ owner: user._id }),
-    Battle.countDocuments({ owner: user._id, active: true }),
-    Battle.find({ owner: user._id })
-      .populate({
-        path: "owner",
-        select: "name",
-        model: User,
-      })
-      .populate({
-        path: "campaign",
-        select: "name imageUrl",
-        model: Campaign,
-      })
-      .sort({ createdAt: -1 })
-      .limit(3),
-  ]);
-
-  return {
-    ok: true,
-    data: serializeData({ total, active, recent }),
-  };
+  });
 };

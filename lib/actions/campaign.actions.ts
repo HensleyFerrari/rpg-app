@@ -1,12 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { connectDB } from "../mongodb";
 import Campaign, { CampaignDocument } from "@/models/Campaign";
 import { findByEmail, getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
 import User from "@/models/User";
 import { getCharactersByCampaign } from "./character.actions";
+import { verifyCampaignOwner } from "../auth";
+import { safeAction } from "./safe-action";
 
 interface CampaignResponse {
   ok: boolean;
@@ -14,18 +15,13 @@ interface CampaignResponse {
   data?: CampaignDocument | CampaignDocument[] | null;
 }
 
-// Add this helper function at the top of the file
-const serializeData = (data: any) => {
-  return JSON.parse(JSON.stringify(data));
-};
+import { serializeData } from "../utils";
 
 export async function getCampaigns({
   query,
   filterType,
 }: { query?: string; filterType?: "all" | "my" } = {}) {
-  try {
-    await connectDB();
-
+  return safeAction(async () => {
     const queryObj: any = {};
 
     if (query) {
@@ -46,12 +42,7 @@ export async function getCampaigns({
       .lean();
 
     return serializeData(campaigns);
-  } catch (error) {
-    console.error("Erro ao buscar campanhas:", error);
-    throw new Error(
-      "Falha ao carregar campanhas. Por favor, tente novamente mais tarde."
-    );
-  }
+  });
 }
 
 type createCamp = {
@@ -67,15 +58,13 @@ export const createCampaign = async ({
   description = "",
   imageUrl = "",
 }: createCamp): Promise<CampaignResponse> => {
-  try {
+  return safeAction(async () => {
     if (!name || !email) {
       return {
         ok: false,
         message: "Nome e email são obrigatórios",
       };
     }
-
-    await connectDB();
 
     const user = await findByEmail(email);
 
@@ -113,25 +102,17 @@ export const createCampaign = async ({
       message: "Campanha criada com sucesso!",
       data: campaign,
     };
-  } catch (error: any) {
-    console.error("Error creating campaign:", error);
-    return {
-      ok: false,
-      message: error.message || "Não foi possível criar sua campanha",
-    };
-  }
+  });
 };
 
 export const getCampaignById = async (id: string) => {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
         message: "ID da campanha é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {
       return {
@@ -168,19 +149,12 @@ export const getCampaignById = async (id: string) => {
       message: "Campanha encontrada com sucesso",
       data: campaign,
     };
-  } catch (error: unknown) {
-    console.error("Error fetching campaign:", error);
-    return {
-      ok: false,
-      message: "Falha ao buscar campanha",
-    };
-  }
+  });
 };
 
 export const getMyCampaigns = async () => {
-  try {
+  return safeAction(async () => {
     const userData = await getCurrentUser();
-    await connectDB();
 
     const user = await findByEmail(userData.email);
 
@@ -213,13 +187,7 @@ export const getMyCampaigns = async () => {
       message: "Campanhas encontradas com sucesso",
       data: campaigns,
     };
-  } catch (error: any) {
-    console.error("Error fetching user campaigns:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao buscar suas campanhas",
-    };
-  }
+  });
 };
 
 export const updateCampaign = async (
@@ -229,9 +197,9 @@ export const updateCampaign = async (
     description: string;
     imageUrl: string;
     isAccepptingCharacters: boolean;
-  }>
+  }>,
 ): Promise<CampaignResponse> => {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
@@ -246,12 +214,33 @@ export const updateCampaign = async (
       };
     }
 
-    await connectDB();
-
     if (!mongoose.isValidObjectId(id)) {
       return {
         ok: false,
         message: "ID de campanha inválido",
+      };
+    }
+
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        ok: false,
+        message: "Você precisa estar logado para realizar esta ação",
+      };
+    }
+
+    const campaign = await Campaign.findById(id);
+    if (!campaign) {
+      return {
+        ok: false,
+        message: "Campanha não encontrada",
+      };
+    }
+
+    if (!verifyCampaignOwner(campaign, user._id)) {
+      return {
+        ok: false,
+        message: "Você não tem permissão para editar esta campanha",
       };
     }
 
@@ -263,13 +252,13 @@ export const updateCampaign = async (
     const updatedCampaignData = await Campaign.findByIdAndUpdate(
       id,
       { ...updates },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedCampaignData) {
       return {
         ok: false,
-        message: "Campanha não encontrada",
+        message: "Falha ao atualizar campanha",
         data: null,
       };
     }
@@ -285,17 +274,11 @@ export const updateCampaign = async (
       message: "Campanha atualizada com sucesso",
       data: updatedCampaign,
     };
-  } catch (error: any) {
-    console.error("Error updating campaign:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao atualizar campanha",
-    };
-  }
+  });
 };
 
 export const deleteCampaign = async (id: string): Promise<CampaignResponse> => {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
@@ -303,7 +286,8 @@ export const deleteCampaign = async (id: string): Promise<CampaignResponse> => {
       };
     }
 
-    await connectDB();
+    // connectDB() is typically handled by safeAction or a global middleware
+    // await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {
       return {
@@ -312,12 +296,35 @@ export const deleteCampaign = async (id: string): Promise<CampaignResponse> => {
       };
     }
 
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        ok: false,
+        message: "Você precisa estar logado para realizar esta ação",
+      };
+    }
+
+    const campaign = await Campaign.findById(id);
+    if (!campaign) {
+      return {
+        ok: false,
+        message: "Campanha não encontrada",
+      };
+    }
+
+    if (!verifyCampaignOwner(campaign, user._id)) {
+      return {
+        ok: false,
+        message: "Você não tem permissão para excluir esta campanha",
+      };
+    }
+
     const deletedCampaign = await Campaign.findByIdAndDelete(id);
 
     if (!deletedCampaign) {
       return {
         ok: false,
-        message: "Campanha não encontrada",
+        message: "Falha ao excluir campanha",
         data: null,
       };
     }
@@ -329,29 +336,15 @@ export const deleteCampaign = async (id: string): Promise<CampaignResponse> => {
       ok: true,
       message: "Campanha excluída com sucesso",
     };
-  } catch (error: any) {
-    console.error("Error deleting campaign:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao excluir campanha",
-    };
-  }
+  });
 };
 
 export const countCampaigns = async () => {
-  try {
-    await connectDB();
-
+  return safeAction(async () => {
     const count = await Campaign.countDocuments();
 
     return serializeData(count);
-  } catch (error: any) {
-    console.error("Error counting campaigns:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao contar campanhas",
-    };
-  }
+  });
 };
 
 export const joinCampaign = async ({
@@ -361,15 +354,13 @@ export const joinCampaign = async ({
   campaignId: string;
   userId: string;
 }): Promise<CampaignResponse> => {
-  try {
+  return safeAction(async () => {
     if (!campaignId || !userId) {
       return {
         ok: false,
         message: "ID da campanha e ID do usuário são obrigatórios",
       };
     }
-
-    await connectDB();
 
     if (
       !mongoose.isValidObjectId(campaignId) ||
@@ -398,32 +389,27 @@ export const joinCampaign = async ({
       ok: true,
       message: "Você entrou na campanha com sucesso",
     };
-  } catch (error: any) {
-    console.error("Error joining campaign:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao entrar na campanha",
-    };
-  }
+  });
 };
 
 export const getCampaignStatsByUser = async () => {
-  await connectDB();
-  const user = await getCurrentUser();
+  return safeAction(async () => {
+    const user = await getCurrentUser();
 
-  if (!user) {
+    if (!user) {
+      return {
+        ok: false,
+        message: "Usuário não encontrado",
+      };
+    }
+
+    const [total] = await Promise.all([
+      Campaign.countDocuments({ owner: user._id }),
+    ]);
+
     return {
-      ok: false,
-      message: "Usuário não encontrado",
+      ok: true,
+      data: serializeData({ total }),
     };
-  }
-
-  const [total] = await Promise.all([
-    Campaign.countDocuments({ owner: user._id }),
-  ]);
-
-  return {
-    ok: true,
-    data: serializeData({ total }),
-  };
+  });
 };
