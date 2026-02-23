@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import NPC, { NPCDocument } from "@/models/NPC";
-import { connectDB } from "../mongodb";
 import { getCurrentUser } from "./user.actions";
 import mongoose from "mongoose";
 
@@ -12,9 +11,8 @@ interface NPCResponse {
   data?: NPCDocument | NPCDocument[] | null;
 }
 
-const serializeData = (data: any) => {
-  return JSON.parse(JSON.stringify(data));
-};
+import { safeAction } from "./safe-action";
+import { serializeData } from "../utils";
 
 // Create NPC
 export async function createNPC({
@@ -25,15 +23,13 @@ export async function createNPC({
   status = "alive",
   visible = true,
 }: Partial<NPCDocument>): Promise<NPCResponse> {
-  try {
+  return safeAction(async () => {
     if (!name || !campaign) {
       return {
         ok: false,
         message: "Nome e campanha são obrigatórios",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(campaign)) {
       return {
@@ -76,26 +72,18 @@ export async function createNPC({
       message: "NPC criado com sucesso!",
       data: newNPC,
     };
-  } catch (error: any) {
-    console.error("Error creating NPC:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao criar NPC",
-    };
-  }
+  });
 }
 
 // Get NPC by ID
 export async function getNPCById(id: string): Promise<NPCResponse> {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
         message: "ID do NPC é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {
       return {
@@ -123,28 +111,21 @@ export async function getNPCById(id: string): Promise<NPCResponse> {
       message: "NPC encontrado",
       data: npc,
     };
-  } catch (error: any) {
-    console.error("Error fetching NPC:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao buscar NPC",
-    };
-  }
+  });
 }
 
 // Get NPCs by Campaign
+// Get NPCs by Campaign
 export async function getNPCsByCampaign(
-  campaignId: string
+  campaignId: string,
 ): Promise<NPCResponse> {
-  try {
+  return safeAction(async () => {
     if (!campaignId) {
       return {
         ok: false,
         message: "ID da campanha é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(campaignId)) {
       return {
@@ -172,21 +153,15 @@ export async function getNPCsByCampaign(
       message: "NPCs encontrados",
       data: npcs,
     };
-  } catch (error: any) {
-    console.error("Error fetching campaign NPCs:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao buscar NPCs da campanha",
-    };
-  }
+  });
 }
 
 // Update NPC
 export async function updateNPC(
   id: string,
-  updates: Partial<NPCDocument>
+  updates: Partial<NPCDocument>,
 ): Promise<NPCResponse> {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
@@ -201,8 +176,6 @@ export async function updateNPC(
       };
     }
 
-    await connectDB();
-
     if (!mongoose.isValidObjectId(id)) {
       return {
         ok: false,
@@ -213,7 +186,7 @@ export async function updateNPC(
     const updatedNPCData = await NPC.findByIdAndUpdate(
       id,
       { ...updates },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedNPCData) {
@@ -236,26 +209,18 @@ export async function updateNPC(
       message: "NPC atualizado com sucesso",
       data: updatedNPC,
     };
-  } catch (error: any) {
-    console.error("Error updating NPC:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao atualizar NPC",
-    };
-  }
+  });
 }
 
 // Delete NPC
 export async function deleteNPC(id: string): Promise<NPCResponse> {
-  try {
+  return safeAction(async () => {
     if (!id) {
       return {
         ok: false,
         message: "ID do NPC é obrigatório",
       };
     }
-
-    await connectDB();
 
     if (!mongoose.isValidObjectId(id)) {
       return {
@@ -288,11 +253,5 @@ export async function deleteNPC(id: string): Promise<NPCResponse> {
       ok: true,
       message: "NPC excluído com sucesso",
     };
-  } catch (error: any) {
-    console.error("Error deleting NPC:", error);
-    return {
-      ok: false,
-      message: error.message || "Falha ao excluir NPC",
-    };
-  }
+  });
 }
