@@ -156,7 +156,7 @@ export const getMyCampaigns = async () => {
   return safeAction(async () => {
     const userData = await getCurrentUser();
 
-    const user = await findByEmail(userData.email);
+    const user = userData;
 
     if (!user || !user._id) {
       return {
