@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
+import { FloatingMenu } from "@/components/floating-menu";
 
 export const metadata: Metadata = {
   title: "Drpg - Dashboard",
@@ -20,12 +19,11 @@ export default async function RootLayout({
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
+    <>
       <main className="w-screen overflow-auto">
-        <SidebarTrigger />
         <div className="p-8 ">{children}</div>
       </main>
-    </SidebarProvider>
+      <FloatingMenu />
+    </>
   );
 }
