@@ -30,10 +30,12 @@ const CampaignsPage = async ({
   const query = params.q;
   const filterType = params.filter;
 
-  const campaignsResponse = await getCampaigns({ query, filterType });
-  const campaigns = Array.isArray(campaignsResponse) ? campaignsResponse : [];
+  const [campaignsResponse, currentUser] = await Promise.all([
+    getCampaigns({ query, filterType }),
+    getCurrentUser()
+  ]);
 
-  const currentUser = await getCurrentUser();
+  const campaigns = Array.isArray(campaignsResponse) ? campaignsResponse : [];
   const currentUrl = "/dashboard/campaigns";
 
   // Construct search params string for preserving filters
