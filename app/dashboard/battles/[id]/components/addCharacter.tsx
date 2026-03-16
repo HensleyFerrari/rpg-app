@@ -86,13 +86,27 @@ const AddCharacterModal = () => {
       let successCount = 0;
       let lastError = "";
 
-      // Add characters sequentially
-      for (const characterId of selectedCharacters) {
-        const response = await addCharacterToBattle(battleId, characterId);
-        if (response.ok) {
+      // Add characters in parallel
+      const promises = selectedCharacters.map(async (characterId) => {
+        try {
+          const response = await addCharacterToBattle(battleId, characterId);
+          if (response.ok) {
+            return { success: true };
+          }
+          return { success: false, error: response.message || "Failed to add character" };
+        } catch (error: unknown) {
+          const err = error as Error;
+          return { success: false, error: err.message || "Unknown error" };
+        }
+      });
+
+      const results = await Promise.all(promises);
+
+      for (const result of results) {
+        if (result.success) {
           successCount++;
         } else {
-          lastError = response.message || "Failed to add character";
+          lastError = result.error as string;
         }
       }
 
