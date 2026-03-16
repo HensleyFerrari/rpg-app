@@ -619,10 +619,9 @@ export async function getAccessibleCharacters(): Promise<CharacterResponse> {
     }
 
     // Find campaigns owned by the user
-    const ownedCampaigns = await Campaign.find({
+    const campaignIds = await Campaign.distinct("_id", {
       owner: currentUser._id,
-    }).select("_id");
-    const campaignIds = ownedCampaigns.map((c) => c._id);
+    });
 
     // Find characters that are either owned by the user OR belong to one of their campaigns
     const charactersData = await Character.find({
