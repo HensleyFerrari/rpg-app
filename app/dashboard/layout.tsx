@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-import { cookies } from "next/headers";
 import { GlobalModals } from "./_components/global-modals";
 import { DashboardBreadcrumb } from "@/components/dashboard-breadcrumb";
+import { FloatingMenu } from "@/components/floating-menu";
 
 export const metadata: Metadata = {
   title: "Drpg - Dashboard",
@@ -15,23 +13,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
-
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger />
-          <div className="h-4 w-px bg-border mx-2" />
-          <DashboardBreadcrumb />
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-8">
-          <GlobalModals />
-          {children}
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="flex flex-col min-h-screen">
+      <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+        <DashboardBreadcrumb />
+      </header>
+      <div className="flex flex-1 flex-col gap-4 p-8">
+        <GlobalModals />
+        {children}
+      </div>
+      <FloatingMenu />
+    </div>
   );
 }

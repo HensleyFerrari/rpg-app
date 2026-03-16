@@ -15,18 +15,9 @@ export function GlobalModals() {
   const [createBattleDraft, setCreateBattleDraft] = useState<any>(null);
 
   useEffect(() => {
-    if (searchParams.get("action") === "new-battle") {
-      setIsCreateBattleModalOpen(true);
-    } else {
-      // If the param is removed (e.g. browser back button), close it.
-      // However, we also have manual onOpenChange logic below.
-      // It's safer to sync state to param if param dictates existence.
-      // But for closing, we usually use the modal's internal close.
-      if (isCreateBattleModalOpen && searchParams.get("action") !== "new-battle") {
-        setIsCreateBattleModalOpen(false);
-      }
-    }
-  }, [searchParams, isCreateBattleModalOpen]);
+    const action = searchParams.get("action");
+    setIsCreateBattleModalOpen(action === "new-battle");
+  }, [searchParams]);
 
   const handleCreateBattleOpenChange = (open: boolean) => {
     setIsCreateBattleModalOpen(open);
