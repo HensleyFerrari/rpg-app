@@ -8,7 +8,7 @@ import Campaign from "@/models/Campaign";
 import Character, { CharacterDocument } from "@/models/Character";
 import { getCurrentUser } from "./user.actions";
 import { getAllDamagesByBattleId } from "./damage.actions";
-import { triggerBattleUpdate } from "../pusher";
+import { triggerBattleUpdate } from "../websocket";
 import { safeAction } from "./safe-action";
 import { serializeData } from "../utils";
 import { verifyBattleMaster } from "../auth";

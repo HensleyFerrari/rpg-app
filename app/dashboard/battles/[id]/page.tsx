@@ -1,10 +1,8 @@
 "use client";
 
-import Pusher from "pusher-js";
-
 import { getBattleById } from "@/lib/actions/battle.actions";
 import { useParams } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -151,6 +149,8 @@ const BattlePage = () => {
     return calculateHealingStats(battle?.rounds || []);
   }, [battle?.rounds]);
 
+  const fetchBattleRef = useRef<() => Promise<void>>();
+
   useEffect(() => {
     const fetchBattle = async () => {
       try {
@@ -169,22 +169,61 @@ const BattlePage = () => {
       }
     };
 
+    fetchBattleRef.current = fetchBattle;
     fetchBattle();
 
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-    });
+    // WebSocket connection with auto-reconnect
+    let ws: WebSocket | null = null;
+    let reconnectTimeout: ReturnType<typeof setTimeout>;
+    let reconnectAttempts = 0;
+    let intentionalClose = false;
 
-    const channel = pusher.subscribe(`battle-${id}`);
+    const connect = () => {
+      if (intentionalClose) return;
 
-    channel.bind("battle-updated", () => {
-      console.log("Received battle update signal, refetching...");
-      fetchBattle();
-    });
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      ws = new WebSocket(`${protocol}//${window.location.host}/ws?battleId=${id}`);
+
+      ws.onopen = () => {
+        console.log(`[WS] Connected to battle-${id}`);
+        reconnectAttempts = 0;
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "battle-updated") {
+            console.log("Received battle update signal, refetching...");
+            fetchBattleRef.current?.();
+          }
+        } catch (err) {
+          console.error("[WS] Error parsing message:", err);
+        }
+      };
+
+      ws.onclose = () => {
+        if (intentionalClose) return;
+        const delay = Math.min(1000 * 2 ** reconnectAttempts, 30000);
+        console.log(`[WS] Disconnected. Reconnecting in ${delay}ms...`);
+        reconnectTimeout = setTimeout(() => {
+          reconnectAttempts++;
+          connect();
+        }, delay);
+      };
+
+      ws.onerror = () => {
+        // Errors are followed by onclose, so reconnect logic runs there
+      };
+    };
+
+    connect();
 
     return () => {
-      channel.unbind_all();
-      channel.unsubscribe();
+      intentionalClose = true;
+      clearTimeout(reconnectTimeout);
+      if (ws) {
+        ws.close();
+      }
     };
   }, [id]);
 

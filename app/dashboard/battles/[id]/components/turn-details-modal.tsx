@@ -121,7 +121,7 @@ export function TurnDetailsModal({
         toast.success("Turno atualizado com sucesso");
         setIsEditing(false);
         // Close modal or keep open with updated data? 
-        // Logic usually updates parent via revalidatePath/pusher, preventing stale data might require closing or refetching. 
+        // Logic usually updates parent via revalidatePath/websocket, preventing stale data might require closing or refetching. 
         // For now, let's keep it simple.
         onOpenChange(false);
       } else {

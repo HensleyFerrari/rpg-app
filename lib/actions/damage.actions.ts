@@ -7,7 +7,7 @@ import User from "@/models/User";
 import { getBattleById } from "./battle.actions";
 import { getCharacterById } from "./character.actions";
 import { getCurrentUser } from "./user.actions";
-import { triggerBattleUpdate } from "../pusher";
+import { triggerBattleUpdate } from "../websocket";
 import { safeAction } from "./safe-action";
 
 import { serializeData } from "../utils";
@@ -43,8 +43,21 @@ export const createDamage = async (damage: any) => {
     const isBattleMaster = verifyBattleMaster(battleInfo.data, user?._id);
     let canCreate = isBattleMaster;
 
-    if (characterInfo && user) {
-      if (canEditCharacter(characterInfo.data, user._id)) {
+    if (characterInfo?.data && user) {
+      // characterInfo.data is serialized, so owner is { _id, name } object
+      const charOwnerId =
+        typeof characterInfo.data.owner === "object"
+          ? characterInfo.data.owner._id
+          : characterInfo.data.owner;
+      if (charOwnerId?.toString() === user._id?.toString()) {
+        canCreate = true;
+      }
+      // Also check if user is the campaign owner (GM)
+      const campaignOwnerId =
+        typeof characterInfo.data.campaign?.owner === "object"
+          ? characterInfo.data.campaign.owner._id
+          : characterInfo.data.campaign?.owner;
+      if (campaignOwnerId?.toString() === user._id?.toString()) {
         canCreate = true;
       }
     }

@@ -12,7 +12,7 @@ import {
   getActiveBattlesByCharacterId,
 } from "./battle.actions";
 import Damage from "@/models/Damage";
-import { triggerBattleUpdate } from "../pusher";
+import { triggerBattleUpdate } from "../websocket";
 import { safeAction } from "./safe-action";
 import { serializeData } from "../utils";
 import {
