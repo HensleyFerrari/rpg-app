@@ -139,12 +139,12 @@ export default function SettingsPage() {
   }, []);
 
   const handleAvatarUpdate = async () => {
-    if (!user?._id) {
+    if (!user) {
       toast.error("Usuário não autenticado");
       return;
     }
 
-    const result = await updateAvatar(user._id, avatarUrl);
+    const result = await updateAvatar(avatarUrl);
 
     if (!result.ok) {
       toast.error(result.message);

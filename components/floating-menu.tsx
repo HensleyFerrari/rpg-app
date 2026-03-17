@@ -9,14 +9,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ModeToggle } from "@/components/theme-toggle";
 import {
@@ -25,7 +17,6 @@ import {
   Crown,
   LayoutDashboard,
   LogOut,
-  Sparkles,
   Swords,
   User,
   UserCircle,
