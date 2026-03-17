@@ -1,0 +1,72 @@
+app/dashboard/battles/[id]/components/addCharacter.tsx:51: setCharacters([]);
+app/dashboard/battles/[id]/components/addCharacter.tsx:65: setCharacters(availableCharacters);
+app/dashboard/battles/[id]/components/addCharacter.tsx:81: setIsSubmitting(true);
+app/dashboard/battles/[id]/components/addCharacter.tsx:112: setIsOpen(false);
+app/dashboard/battles/[id]/components/addCharacter.tsx:113: setSelectedCharacters([]);
+app/dashboard/battles/[id]/components/addCharacter.tsx:129: setIsSubmitting(false);
+app/dashboard/battles/[id]/components/addCharacter.tsx:146: setIsSubmitting(true);
+app/dashboard/battles/[id]/components/addCharacter.tsx:166: setIsOpen(false);
+app/dashboard/battles/[id]/components/addCharacter.tsx:167: setQuickNames("");
+app/dashboard/battles/[id]/components/addCharacter.tsx:180: setIsSubmitting(false);
+app/dashboard/battles/[id]/components/addCharacter.tsx:185: setSelectedCharacters((current) =>
+app/dashboard/battles/[id]/components/addCharacter.tsx:254: onValueChange={(value) => setAlignment(value as "ally" | "enemy")}
+app/dashboard/battles/[id]/components/addCharacter.tsx:275: onChange={(e) => setQuickNames(e.target.value)}
+app/dashboard/battles/[id]/components/newDamage.tsx:127: setAllBattleCharacters(battle.data.characters);
+app/dashboard/battles/[id]/components/newDamage.tsx:140: setCharacters(filteredCharacters);
+app/dashboard/battles/[id]/components/newDamage.tsx:142: setUserHasCharacter(true);
+app/dashboard/battles/[id]/components/newDamage.tsx:156: setCharacters(filteredCharacters);
+app/dashboard/battles/[id]/components/newDamage.tsx:157: setUserHasCharacter(true);
+app/dashboard/battles/[id]/components/newDamage.tsx:175: setIsSubmitting(true);
+app/dashboard/battles/[id]/components/newDamage.tsx:199: setOpen(false);
+app/dashboard/battles/[id]/components/newDamage.tsx:218: setIsSubmitting(false);
+app/dashboard/battles/[id]/components/turn-details-modal.tsx:111: setIsSubmitting(true);
+app/dashboard/battles/[id]/components/turn-details-modal.tsx:122: setIsEditing(false);
+app/dashboard/battles/[id]/components/turn-details-modal.tsx:136: setIsSubmitting(false);
+app/dashboard/battles/[id]/components/turn-details-modal.tsx:144: setIsDeleting(true);
+app/dashboard/battles/[id]/components/turn-details-modal.tsx:159: setIsDeleting(false);
+app/dashboard/battles/[id]/components/turn-details-modal.tsx:171: if (!val) setIsEditing(false); // Reset edit mode on close
+app/dashboard/battles/[id]/components/turn-details-modal.tsx:190: setIsEditing(true);
+app/dashboard/battles/[id]/components/turn-details-modal.tsx:332: <Button type="button" variant="outline" onClick={() => setIsEditing(false)} disabled={isSubmitting || isDeleting}>
+app/dashboard/battles/[id]/edit/page.tsx:34: setFormData({
+app/dashboard/battles/[id]/edit/page.tsx:44: setIsLoading(false);
+app/dashboard/battles/[id]/edit/page.tsx:57: setFormData((prev) => ({ ...prev, [name]: value }));
+app/dashboard/battles/[id]/edit/page.tsx:61: setFormData((prev) => ({ ...prev, active: checked }));
+app/dashboard/battles/[id]/edit/page.tsx:66: setFormData((prev) => ({ ...prev, [name]: parseInt(value) || 0 }));
+app/dashboard/battles/[id]/edit/page.tsx:71: setIsLoading(true);
+app/dashboard/battles/[id]/edit/page.tsx:91: setIsLoading(false);
+app/dashboard/battles/[id]/manage/page.tsx:95: setBattle(battleResponse.data);
+app/dashboard/battles/[id]/manage/page.tsx:97: setIsOwner(user._id === battleResponse.data.owner._id);
+app/dashboard/battles/[id]/manage/page.tsx:103: setLoading(false);
+app/dashboard/battles/[id]/manage/page.tsx:120: setBattle(updatedBattle.data);
+app/dashboard/battles/[id]/manage/page.tsx:132: setDamageToDelete(null);
+app/dashboard/battles/[id]/manage/page.tsx:149: setBattle(updatedBattle.data);
+app/dashboard/battles/[id]/manage/page.tsx:161: setCharacterToRemove(null);
+app/dashboard/battles/[id]/manage/page.tsx:223: onClick={() => setIsCharactersExpanded(!isCharactersExpanded)}
+app/dashboard/battles/[id]/manage/page.tsx:264: setCharacterToRemove(character._id);
+app/dashboard/battles/[id]/manage/page.tsx:279: <AlertDialogCancel onClick={() => setCharacterToRemove(null)}>Cancelar</AlertDialogCancel>
+app/dashboard/battles/[id]/manage/page.tsx:313: onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+app/dashboard/battles/[id]/manage/page.tsx:385: setDamageToDelete(round._id);
+app/dashboard/battles/[id]/manage/page.tsx:400: <AlertDialogCancel onClick={() => setDamageToDelete(null)}>Cancelar</AlertDialogCancel>
+app/dashboard/battles/[id]/page.tsx:159: setBattle(battle.data);
+app/dashboard/battles/[id]/page.tsx:161: setCurrentUser(user);
+app/dashboard/battles/[id]/page.tsx:168: setLoading(false);
+app/dashboard/battles/[id]/page.tsx:193: setBattle(event.detail);
+app/dashboard/battles/[id]/page.tsx:336: <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => setIsEditModalOpen(true)}>
+app/dashboard/battles/[id]/page.tsx:488: setSelectedTurn(round);
+app/dashboard/battles/[id]/page.tsx:489: setIsTurnDetailsModalOpen(true);
+app/dashboard/battles/[id]/page.tsx:822: setBattle((prev) =>
+app/dashboard/battles/[id]/page.tsx:929: setBattle((prev) =>
+app/dashboard/battles/battles-client.tsx:66: onError={() => setError(true)}
+app/dashboard/battles/battles-client.tsx:214: setTimeout(() => onEdit(battle), 50);
+app/dashboard/battles/battles-client.tsx:251: setSelectedBattle(battle);
+app/dashboard/battles/battles-client.tsx:252: setIsEditModalOpen(true);
+app/dashboard/battles/components/battle-filters.tsx:71: onChange={(e) => setSearch(e.target.value)}
+app/dashboard/battles/components/create-battle-modal.tsx:89: setIsLoadingCampaigns(true);
+app/dashboard/battles/components/create-battle-modal.tsx:93: setCampaigns(myCampaigns);
+app/dashboard/battles/components/create-battle-modal.tsx:101: setIsLoadingCampaigns(false);
+app/dashboard/battles/components/create-battle-modal.tsx:112: setIsLoading(true);
+app/dashboard/battles/components/create-battle-modal.tsx:149: setIsLoading(false);
+app/dashboard/battles/components/edit-battle-modal.tsx:76: setIsLoading(true);
+app/dashboard/battles/components/edit-battle-modal.tsx:92: setIsLoading(false);
+app/dashboard/battles/components/edit-battle-modal.tsx:94: setTimeout(() => {
+app/dashboard/battles/components/edit-battle-modal.tsx:103: setIsLoading(false);

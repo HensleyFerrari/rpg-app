@@ -108,13 +108,14 @@ export function CharacterModal() {
     resolver: zodResolver(characterFormSchema),
     defaultValues,
   });
+  const { reset } = form;
 
   // Resetar form quando o modal fecha ou muda de modo
   useEffect(() => {
     if (!isOpen) {
-      form.reset(defaultValues);
+      reset(defaultValues);
     }
-  }, [isOpen, form, defaultValues]);
+  }, [isOpen, defaultValues, reset]);
 
   // Carregar Dados Iniciais (Campanhas e Personagem se for Edição)
   useEffect(() => {
@@ -146,7 +147,7 @@ export function CharacterModal() {
               return;
             }
 
-            form.reset({
+            reset({
               name: char.name,
               campaign: char.campaign._id,
               characterUrl: char.characterUrl || "",
@@ -178,19 +179,7 @@ export function CharacterModal() {
     };
 
     loadData();
-  }, [isOpen, editId, isCreateMode, campaignParam, isNpcFromUrl, form, defaultValues, handleClose]);
-  // Wait, handleClose is used inside loadData? No.
-  // Oh, wait, in one error message it said handleClose missing deps in effect at line 163?
-  // Previous lint output: 163:6 Warning: React Hook useEffect has missing dependencies: 'defaultValues', 'form', and 'handleClose'.
-  // But wait, line 163 corresponds to the end of the effect. Let's see inside the effect. 
-  // Line 128 calls handleClose().
-  // And line 143 calls handleClose().
-  // So yes, need handleClose.
-
-  // So I need to define handleClose BEFORE this effect or use hoisting (which const doesn't support) or wrap in useCallback above.
-  // I must move handleClose definition UP.
-
-
+  }, [isOpen, editId, isCreateMode, campaignParam, isNpcFromUrl, defaultValues, handleClose, reset, form]);
 
   const onSubmit = async (values: CharacterFormValues) => {
     setIsSubmitting(true);

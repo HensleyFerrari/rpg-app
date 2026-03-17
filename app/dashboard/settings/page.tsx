@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -119,7 +119,7 @@ function ChangePasswordForm() {
   );
 }
 
-export default function SettingsPage() {
+function SettingsContent() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [user, setUser] = useState<any>(null);
 
@@ -235,8 +235,6 @@ export default function SettingsPage() {
                     <ChangePasswordForm />
                   </div>
                   <Separator />
-                  {/* TODO: Adicionar opção de exclusão de conta */}
-                  {/* TODO: Adicionar histórico de sessões ativas */}
                 </div>
               </CardContent>
             </Card>
@@ -251,12 +249,6 @@ export default function SettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* TODO: Adicionar opções de notificação para:
-                    - Novas mensagens em campanhas
-                    - Atualizações de batalhas
-                    - Solicitações de participação
-                    - Novidades do sistema
-                */}
               </CardContent>
             </Card>
           </TabsContent>
@@ -264,4 +256,12 @@ export default function SettingsPage() {
       </div>
     </div>
   );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div>Loading settings...</div>}>
+      <SettingsContent />
+    </Suspense>
+  )
 }

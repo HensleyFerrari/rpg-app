@@ -21,6 +21,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { Suspense } from "react";
+
 const CampaignsPage = async ({
   searchParams,
 }: {
@@ -60,7 +62,9 @@ const CampaignsPage = async ({
           </Link>
         </div>
 
-        <CampaignFilters />
+        <Suspense fallback={<div>Loading filters...</div>}>
+          <CampaignFilters />
+        </Suspense>
       </div>
 
       {campaigns.length === 0 ? (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { User2, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,6 +25,11 @@ export function CharacterAvatar({
   autoHeight = false,
 }: CharacterAvatarProps) {
   const [error, setError] = useState(false);
+
+  // Reset error when src changes to avoid being stuck in error state forever
+  useEffect(() => {
+    setError(false);
+  }, [src]);
 
   if (autoHeight) {
     return (

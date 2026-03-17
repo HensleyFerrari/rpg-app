@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import React from "react";
 import { GlobalModals } from "./_components/global-modals";
 import { DashboardBreadcrumb } from "@/components/dashboard-breadcrumb";
 import { FloatingMenu } from "@/components/floating-menu";
@@ -19,7 +20,9 @@ export default async function RootLayout({
         <DashboardBreadcrumb />
       </header>
       <div className="flex flex-1 flex-col gap-4 p-8">
-        <GlobalModals />
+        <React.Suspense fallback={null}>
+          <GlobalModals />
+        </React.Suspense>
         {children}
       </div>
       <FloatingMenu />

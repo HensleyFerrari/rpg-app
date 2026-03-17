@@ -60,15 +60,16 @@ export function EditBattleModal({
     },
   });
 
+  const { reset } = form;
   useEffect(() => {
     if (battle) {
-      form.reset({
+      reset({
         name: battle.name,
         active: battle.active,
         is_visible_to_players: battle.is_visible_to_players || false,
       });
     }
-  }, [battle, form]);
+  }, [battle, reset]);
 
   const onSubmit = async (values: zod.infer<typeof formSchema>) => {
     if (!battle) return;
