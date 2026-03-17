@@ -13,16 +13,20 @@ import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoading(true);
+    setError("");
     const formData = new FormData(event.currentTarget);
     const res = await signIn("credentials", {
       email: formData.get("email"),
@@ -31,6 +35,7 @@ export function LoginForm({
     });
     if (res?.error) {
       setError(res.error as string);
+      setIsLoading(false);
     }
     if (res?.ok) {
       return router.push("/dashboard");
@@ -71,8 +76,15 @@ export function LoginForm({
                 </div>
                 <Input id="password" type="password" name="password" />
               </div>
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Entrando...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

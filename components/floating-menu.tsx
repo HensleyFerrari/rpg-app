@@ -9,14 +9,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ModeToggle } from "@/components/theme-toggle";
 import {
@@ -25,7 +17,6 @@ import {
   Crown,
   LayoutDashboard,
   LogOut,
-  Sparkles,
   Swords,
   User,
   UserCircle,
@@ -85,6 +76,7 @@ export function FloatingMenu() {
         <PopoverTrigger asChild>
           <Button
             size="icon"
+            aria-label="Abrir menu de navegação"
             className="h-14 w-14 rounded-full shadow-lg shadow-primary/50 transition-all hover:scale-110 hover:shadow-primary/70 bg-primary text-primary-foreground hover:opacity-90"
           >
             <AlignJustify className="h-6 w-6" />
