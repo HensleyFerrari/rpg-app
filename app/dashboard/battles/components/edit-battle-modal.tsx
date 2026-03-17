@@ -61,14 +61,15 @@ export function EditBattleModal({
   });
 
   useEffect(() => {
-    if (battle) {
+    if (open && battle) {
       form.reset({
         name: battle.name,
         active: battle.active,
         is_visible_to_players: battle.is_visible_to_players || false,
       });
     }
-  }, [battle, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const onSubmit = async (values: zod.infer<typeof formSchema>) => {
     if (!battle) return;
