@@ -42,12 +42,19 @@ export const getCurrentUser = cache(async () => {
   }
 });
 
-export async function updateAvatar(userId: string, avatarUrl: string) {
+export async function updateAvatar(avatarUrl: string) {
   try {
     await connectDB();
 
+    // Security Fix: Prevent IDOR by using the authenticated session
+    // instead of trusting a client-provided user ID
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return { ok: false, message: "Usuário não autenticado" };
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
-      userId,
+      currentUser._id,
       { avatarUrl },
       { new: true }
     );
