@@ -16,9 +16,10 @@ jest.mock("next/cache", () => ({
 }));
 
 // Mock getCurrentUser
+const mockUserId = new mongoose.Types.ObjectId();
 jest.mock("@/lib/actions/user.actions", () => ({
   getCurrentUser: jest.fn(() => ({
-    _id: new mongoose.Types.ObjectId(),
+    _id: mockUserId,
     email: "test@test.com",
   })),
 }));
@@ -30,6 +31,7 @@ describe("Character Actions", () => {
   beforeEach(async () => {
     // Create a test user
     testUser = await User.create({
+      _id: mockUserId,
       email: "test@test.com",
       username: "testuser",
       name: "Test User",

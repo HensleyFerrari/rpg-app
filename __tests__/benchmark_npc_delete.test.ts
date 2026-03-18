@@ -11,6 +11,16 @@ jest.mock('next/cache', () => ({
   revalidatePath: jest.fn(),
 }));
 
+// Mock getCurrentUser
+const mockUserId = new mongoose.Types.ObjectId();
+jest.mock("@/lib/actions/user.actions", () => ({
+  ...jest.requireActual("@/lib/actions/user.actions"),
+  getCurrentUser: jest.fn(() => ({
+    _id: mockUserId,
+    email: "test@test.com",
+  })),
+}));
+
 describe('NPC Delete Performance Benchmark', () => {
   let userId: string;
   let campaignId: string;
@@ -19,6 +29,7 @@ describe('NPC Delete Performance Benchmark', () => {
     // Clean up is done by setup.ts afterEach, but we need to populate data
     // Create a user
     const user = await User.create({
+      _id: mockUserId,
       name: 'Test User',
       email: 'test@example.com',
       password: 'password123',
@@ -28,14 +39,14 @@ describe('NPC Delete Performance Benchmark', () => {
     // Create a campaign
     const campaign = await Campaign.create({
       name: 'Test Campaign',
-      owner: userId,
+      owner: mockUserId,
       description: 'A test campaign',
     });
     campaignId = campaign._id.toString();
   });
 
   it('measures execution time for deleteNPC', async () => {
-    const iterations = 1000;
+    const iterations = 50; // Use a smaller iteration count for Jest tests to prevent timeout
     let totalTime = 0;
 
     for (let i = 0; i < iterations; i++) {
