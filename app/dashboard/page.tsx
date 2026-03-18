@@ -114,60 +114,87 @@ const Dashboard = async () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Batalhas
-            </CardTitle>
-            <Swords className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalBattles}</div>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-emerald-500 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded">
-                {activeBattles} ativas
-              </span>
-              <span className="text-xs text-muted-foreground">
-                no total
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/dashboard/battles" className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xl h-full group">
+          <Card className="h-full transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:border-slate-300 dark:hover:border-slate-700">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                Batalhas
+              </CardTitle>
+              <div className="p-2 rounded-full bg-indigo-50 dark:bg-indigo-900/20 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 transition-colors">
+                <Swords className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalBattles}</div>
+              <div className="flex items-center justify-between mt-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-emerald-500 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded">
+                    {activeBattles} ativas
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    no total
+                  </span>
+                </div>
+                <span className="text-xs flex items-center gap-1 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Ver <ArrowRight className="h-3 w-3" />
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Personagens
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalCharacters}</div>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-emerald-500 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded flex items-center gap-1">
-                <Target className="h-3 w-3" /> {aliveCharacters}
-              </span>
-              <span className="text-xs text-red-500 font-medium bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded flex items-center gap-1">
-                <Skull className="h-3 w-3" /> {deadCharacters}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/dashboard/personagens" className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xl h-full group">
+          <Card className="h-full transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:border-slate-300 dark:hover:border-slate-700">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                Personagens
+              </CardTitle>
+              <div className="p-2 rounded-full bg-emerald-50 dark:bg-emerald-900/20 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40 transition-colors">
+                <Users className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalCharacters}</div>
+              <div className="flex items-center justify-between mt-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-emerald-500 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <Target className="h-3 w-3" /> {aliveCharacters}
+                  </span>
+                  <span className="text-xs text-red-500 font-medium bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <Skull className="h-3 w-3" /> {deadCharacters}
+                  </span>
+                </div>
+                <span className="text-xs flex items-center gap-1 text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Ver <ArrowRight className="h-3 w-3" />
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Campanhas
-            </CardTitle>
-            <Crown className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalCampaigns}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Mundos criados
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/dashboard/campaigns" className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xl h-full group">
+          <Card className="h-full transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:border-slate-300 dark:hover:border-slate-700">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                Campanhas
+              </CardTitle>
+              <div className="p-2 rounded-full bg-amber-50 dark:bg-amber-900/20 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40 transition-colors">
+                <Crown className="h-4 w-4 text-amber-500 dark:text-amber-400" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalCampaigns}</div>
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-xs text-muted-foreground">
+                  Mundos criados
+                </p>
+                <span className="text-xs flex items-center gap-1 text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Ver <ArrowRight className="h-3 w-3" />
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Recent Activity Grid */}
