@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!user) {
-          throw new Error("Usuário não encontrado");
+          throw new Error("Email ou senha inválidos");
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isPasswordCorrect) {
-          throw new Error("Senha incorreta");
+          throw new Error("Email ou senha inválidos");
         }
 
         return {
