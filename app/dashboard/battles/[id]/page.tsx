@@ -21,6 +21,7 @@ import {
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { EditBattleModal } from "../components/edit-battle-modal";
 import { TurnDetailsModal } from "./components/turn-details-modal";
@@ -264,14 +265,24 @@ const BattlePage = () => {
 
             <div className="flex items-center gap-2">
               {currentUser?._id === battle.owner._id ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  onClick={() => setIsEditModalOpen(true)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        onClick={() => setIsEditModalOpen(true)}
+                        aria-label="Editar batalha"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Editar batalha</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ) : null}
             </div>
           </div>
