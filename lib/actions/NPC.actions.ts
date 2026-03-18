@@ -13,6 +13,7 @@ interface NPCResponse {
 
 import { safeAction } from "./safe-action";
 import { serializeData } from "../utils";
+import { checkOwnership, verifyCampaignOwner } from "../auth";
 
 // Create NPC
 export async function createNPC({
@@ -183,6 +184,26 @@ export async function updateNPC(
       };
     }
 
+    const npcToUpdate = await NPC.findById(id).populate("campaign");
+    if (!npcToUpdate) {
+      return { ok: false, message: "NPC não encontrado" };
+    }
+
+    const actualUser = await getCurrentUser();
+    if (!actualUser) {
+      return { ok: false, message: "Usuário não autenticado" };
+    }
+
+    const isOwner = checkOwnership(npcToUpdate.owner, actualUser._id);
+    const isCampaignOwner = verifyCampaignOwner(npcToUpdate.campaign as any, actualUser._id);
+
+    if (!isOwner && !isCampaignOwner) {
+      return {
+        ok: false,
+        message: "Você não tem permissão para editar este NPC",
+      };
+    }
+
     const updatedNPCData = await NPC.findByIdAndUpdate(
       id,
       { ...updates },
@@ -226,6 +247,26 @@ export async function deleteNPC(id: string): Promise<NPCResponse> {
       return {
         ok: false,
         message: "ID de NPC inválido",
+      };
+    }
+
+    const npcToDelete = await NPC.findById(id).populate("campaign");
+    if (!npcToDelete) {
+      return { ok: false, message: "NPC não encontrado" };
+    }
+
+    const actualUser = await getCurrentUser();
+    if (!actualUser) {
+      return { ok: false, message: "Usuário não autenticado" };
+    }
+
+    const isOwner = checkOwnership(npcToDelete.owner, actualUser._id);
+    const isCampaignOwner = verifyCampaignOwner(npcToDelete.campaign as any, actualUser._id);
+
+    if (!isOwner && !isCampaignOwner) {
+      return {
+        ok: false,
+        message: "Você não tem permissão para excluir este NPC",
       };
     }
 
