@@ -631,6 +631,26 @@ export async function updateCharacterStatus(
       };
     }
 
+    const actualUser = await getCurrentUser();
+    if (!actualUser) {
+      return { ok: false, message: "Usuário não autenticado" };
+    }
+
+    const characterData = await Character.findById(characterId).populate("campaign");
+    if (!characterData) {
+      return {
+        ok: false,
+        message: "Personagem não encontrado",
+      };
+    }
+
+    if (!canEditCharacter(characterData, actualUser._id)) {
+      return {
+        ok: false,
+        message: "Você não tem permissão para editar este personagem",
+      };
+    }
+
     const updatedCharacter = await Character.findByIdAndUpdate(
       characterId,
       { status },
