@@ -193,7 +193,7 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
             </Button>
 
             {/* Desktop Action Button */}
-            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg hidden md:flex" asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg hidden md:flex" aria-label="Ver detalhes da batalha" asChild>
               <Link href={`/dashboard/battles/${battle._id}`}>
                 <ChevronRight className="h-5 w-5 text-slate-400" />
               </Link>
@@ -202,7 +202,7 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
             {currentUser?._id === battle.owner?._id && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg shrink-0">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg shrink-0" aria-label="Opções da batalha">
                     <MoreVertical className="h-4 w-4 text-slate-400" />
                   </Button>
                 </DropdownMenuTrigger>

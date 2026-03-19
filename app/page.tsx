@@ -204,7 +204,7 @@ export default function Home() {
             © 2026 Drpg. Todos os direitos reservados.
           </p>
           <div className="flex gap-6">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" aria-label="Link para o Github">
               <Github className="h-5 w-5" />
             </Button>
           </div>
