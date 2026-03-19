@@ -186,7 +186,7 @@ const CharacterPage = () => {
           {hasEditPermission && (
             <div className="flex items-center gap-2">
               <Link href={`?editCharacter=${id}`}>
-                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" aria-label="Editar personagem">
                   <Edit className="w-4 h-4 text-muted-foreground" />
                 </Button>
               </Link>

@@ -238,7 +238,7 @@ const Dashboard = async () => {
                         </p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Ir para a batalha" asChild>
                       <Link href={`/dashboard/battles/${battle._id}`}>
                         <ArrowRight className="h-4 w-4" />
                       </Link>
