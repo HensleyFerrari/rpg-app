@@ -23,6 +23,7 @@ import {
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import * as z from "zod";
 import {
   Form,
@@ -122,6 +123,7 @@ function ChangePasswordForm() {
 export default function SettingsPage() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [user, setUser] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -131,12 +133,12 @@ export default function SettingsPage() {
         setAvatarUrl(userData.avatarUrl || "");
       } else {
         // Redirect to login if no user is found
-        window.location.href = "/login";
+        router.push("/login");
       }
     };
 
     fetchUser();
-  }, []);
+  }, [router]);
 
   const handleAvatarUpdate = async () => {
     if (!user) {

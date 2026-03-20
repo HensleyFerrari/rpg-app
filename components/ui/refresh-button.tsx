@@ -2,13 +2,13 @@
 
 import { Button } from "./button";
 import { RefreshCcw } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const RefreshButton = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const handleRefresh = () => {
-    const currentPath = window.location.pathname;
-    router.push(currentPath);
+    router.push(pathname);
   };
 
   return (
