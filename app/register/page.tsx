@@ -16,7 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Card,
   CardContent,
@@ -24,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Loader2, AlertCircle } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -39,6 +40,7 @@ const formSchema = z.object({
 
 export default function Register() {
   const [error, setError] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -51,6 +53,8 @@ export default function Register() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    setError(undefined);
     const r = await register({
       email: values.email,
       password: values.password,
@@ -59,6 +63,7 @@ export default function Register() {
 
     if (r?.error) {
       setError(r.error);
+      setIsLoading(false);
       return;
     } else {
       return router.push("/login");
@@ -74,6 +79,8 @@ export default function Register() {
         <CardContent>
           {error && (
             <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Erro ao criar conta</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -133,8 +140,15 @@ export default function Register() {
                 )}
               />
 
-              <Button type="submit" className="w-full mt-6">
-                Sign up
+              <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Criando conta...
+                  </>
+                ) : (
+                  "Criar conta"
+                )}
               </Button>
             </form>
           </Form>
