@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -119,7 +119,7 @@ function ChangePasswordForm() {
   );
 }
 
-export default function SettingsPage() {
+function SettingsContent() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [user, setUser] = useState<any>(null);
 
@@ -263,5 +263,13 @@ export default function SettingsPage() {
         </Tabs>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 }
