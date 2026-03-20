@@ -362,10 +362,14 @@ export const getBattles = async ({
   query,
   filterType,
   campaignId,
+  page = 1,
+  limit = 10,
 }: {
   query?: string;
   filterType?: "all" | "my";
   campaignId?: string;
+  page?: number;
+  limit?: number;
 } = {}) => {
   try {
     await connectDB();
@@ -389,22 +393,33 @@ export const getBattles = async ({
       }
     }
 
-    const battles = await Battle.find(queryObj)
-      .populate({
-        path: "owner",
-        select: "name",
-        model: User,
-      })
-      .populate({
-        path: "campaign",
-        select: "name imageUrl",
-        model: Campaign,
-      })
-      .sort({ createdAt: -1 });
+    const skip = (page - 1) * limit;
+
+    const [total, battles] = await Promise.all([
+      Battle.countDocuments(queryObj),
+      Battle.find(queryObj)
+        .populate({
+          path: "owner",
+          select: "name",
+          model: User,
+        })
+        .populate({
+          path: "campaign",
+          select: "name imageUrl",
+          model: Campaign,
+        })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+    ]);
 
     return {
       ok: true,
       data: serializeData(battles),
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      totalCount: total,
     };
   } catch (error) {
     console.error("Error getting battles:", error);
@@ -689,17 +704,13 @@ export const getBattleStatsByUser = async () => {
     Battle.countDocuments({ owner: user._id, active: true }),
     Battle.find({ owner: user._id })
       .populate({
-        path: "owner",
-        select: "name",
-        model: User,
-      })
-      .populate({
         path: "campaign",
         select: "name imageUrl",
         model: Campaign,
       })
       .sort({ createdAt: -1 })
-      .limit(3),
+      .limit(3)
+      .lean(),
   ]);
 
   return {

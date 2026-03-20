@@ -35,6 +35,9 @@ interface CharacterResponse {
   ok: boolean;
   message: string;
   data?: CharacterDocument | CharacterDocument[] | null;
+  totalPages?: number;
+  currentPage?: number;
+  totalCount?: number;
 }
 
 export async function createCharacter({
@@ -261,6 +264,8 @@ export async function getCharacterById(id: string) {
 
 export async function getCharactersByCampaign(
   campaignId: string,
+  page = 1,
+  limit = 10,
 ): Promise<CharacterResponse> {
   try {
     if (!campaignId) {
@@ -278,19 +283,20 @@ export async function getCharactersByCampaign(
         message: "ID de campanha inválido",
       };
     }
-    const charactersData = await Character.find({ campaign: campaignId })
-      .populate("owner", "username name _id")
-      .sort({ createdAt: -1 });
+
+    const skip = (page - 1) * limit;
+
+    const [total, charactersData] = await Promise.all([
+      Character.countDocuments({ campaign: campaignId }),
+      Character.find({ campaign: campaignId })
+        .populate("owner", "username name _id")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+    ]);
 
     const characters = charactersData;
-
-    if (characters.length === 0) {
-      return {
-        ok: true,
-        message: "Nenhum personagem encontrado para esta campanha",
-        data: [],
-      };
-    }
 
     // Check if the current user is the owner of the campaign
     // Since we populate "campaign" in getCharacterById but here we just have campaignId,
@@ -327,6 +333,9 @@ export async function getCharactersByCampaign(
       ok: true,
       message: "Personagens encontrados",
       data: serializeData(filteredCharacters),
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      totalCount: total,
     };
   } catch (error: any) {
     console.error("Error fetching campaign characters:", error);
@@ -338,34 +347,40 @@ export async function getCharactersByCampaign(
   }
 }
 
-export async function getCharactersByOwner(): Promise<CharacterResponse> {
+export async function getCharactersByOwner(
+  page = 1,
+  limit = 10,
+): Promise<CharacterResponse> {
   try {
     await connectDB();
 
     const actualUser = await getCurrentUser();
 
-    const charactersData = await Character.find({ owner: actualUser?._id })
-      .populate({
-        path: "campaign",
-        select: "name _id",
-        model: Campaign,
-      })
-      .sort({ createdAt: -1 });
+    const skip = (page - 1) * limit;
+
+    const [total, charactersData] = await Promise.all([
+      Character.countDocuments({ owner: actualUser?._id }),
+      Character.find({ owner: actualUser?._id })
+        .populate({
+          path: "campaign",
+          select: "name _id",
+          model: Campaign,
+        })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+    ]);
 
     const characters = serializeData(charactersData);
-
-    if (characters.length === 0) {
-      return {
-        ok: true,
-        message: "Nenhum personagem encontrado para este usuário",
-        data: [],
-      };
-    }
 
     return {
       ok: true,
       message: "Personagens encontrados",
       data: characters,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      totalCount: total,
     };
   } catch (error: any) {
     console.error("Error fetching owner characters:", error);
@@ -604,7 +619,10 @@ export async function getAllCharacters(): Promise<CharacterResponse> {
   }
 }
 
-export async function getAccessibleCharacters(): Promise<CharacterResponse> {
+export async function getAccessibleCharacters(
+  page = 1,
+  limit = 10,
+): Promise<CharacterResponse> {
   try {
     await connectDB();
 
@@ -624,28 +642,32 @@ export async function getAccessibleCharacters(): Promise<CharacterResponse> {
     }).select("_id");
     const campaignIds = ownedCampaigns.map((c) => c._id);
 
-    // Find characters that are either owned by the user OR belong to one of their campaigns
-    const charactersData = await Character.find({
+    const queryObj = {
       $or: [{ owner: currentUser._id }, { campaign: { $in: campaignIds } }],
-    })
-      .populate("owner", "username name _id")
-      .populate("campaign", "name _id")
-      .sort({ createdAt: -1 });
+    };
+
+    const skip = (page - 1) * limit;
+
+    const [total, charactersData] = await Promise.all([
+      Character.countDocuments(queryObj),
+      Character.find(queryObj)
+        .populate("owner", "username name _id")
+        .populate("campaign", "name _id")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+    ]);
 
     const characters = serializeData(charactersData);
-
-    if (characters.length === 0) {
-      return {
-        ok: true,
-        message: "Nenhum personagem encontrado",
-        data: [],
-      };
-    }
 
     return {
       ok: true,
       message: "Personagens encontrados",
       data: characters,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      totalCount: total,
     };
   } catch (error: any) {
     console.error("Error fetching accessible characters:", error);
@@ -776,13 +798,9 @@ export const getCharacterStatsByOwner = async () => {
     Character.countDocuments({ owner: user._id, status: "alive" }),
     Character.countDocuments({ owner: user._id, status: "dead" }),
     Character.find({ owner: user._id })
-      .populate({
-        path: "campaign",
-        select: "name _id",
-        model: Campaign,
-      })
       .sort({ createdAt: -1 })
-      .limit(3),
+      .limit(3)
+      .lean(),
   ]);
 
   return {

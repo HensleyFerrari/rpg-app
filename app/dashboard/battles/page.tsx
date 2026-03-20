@@ -8,13 +8,14 @@ export const dynamic = 'force-dynamic';
 const BattlesDashboard = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; filter?: "all" | "my"; campaign?: string }>;
+  searchParams: Promise<{ q?: string; filter?: "all" | "my"; campaign?: string; page?: string }>;
 }) => {
-  const { q: query, filter: filterType, campaign: campaignId } = await searchParams;
+  const { q: query, filter: filterType, campaign: campaignId, page } = await searchParams;
+  const currentPage = parseInt(page || "1", 10);
 
   const [currentUser, battles, campaigns] = await Promise.all([
     getCurrentUser(),
-    getBattles({ query, filterType, campaignId }),
+    getBattles({ query, filterType, campaignId, page: currentPage, limit: 10 }),
     getCampaigns()
   ]);
 
@@ -26,6 +27,8 @@ const BattlesDashboard = async ({
         allBattles={allBattles}
         currentUser={currentUser}
         campaigns={Array.isArray(campaigns) ? campaigns : []}
+        totalPages={battles.totalPages || 1}
+        currentPage={currentPage}
       />
     </div>
   );

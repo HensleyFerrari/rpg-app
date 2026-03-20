@@ -1,5 +1,6 @@
 import { getAccessibleCharacters, getCharactersByOwner, getCharactersByCampaign } from "@/lib/actions/character.actions";
 import { getCampaigns } from "@/lib/actions/campaign.actions";
+import { Pagination } from "@/components/Pagination";
 import { UserPlus, Heart, AlertCircle, Users, VenetianMask, Skull } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,12 +20,14 @@ interface PageProps {
   searchParams: {
     filter?: string;
     campaignId?: string;
+    page?: string;
   };
 }
 
 export default async function Personagens({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
-  const { filter, campaignId } = resolvedParams;
+  const { filter, campaignId, page } = resolvedParams;
+  const currentPage = parseInt(page || "1", 10);
 
   // Fetch campaigns for the filter dropdown
   const campaignsResponse = await getCampaigns();
@@ -37,16 +40,16 @@ export default async function Personagens({ searchParams }: PageProps) {
   let description = "Gerencie todos os personagens e NPCs das suas aventuras.";
 
   if (filter === "mine") {
-    response = await getCharactersByOwner();
+    response = await getCharactersByOwner(currentPage, 12);
     title = "Meus Personagens";
     description = "Gerencie seus heróis e NPCs criados por você.";
   } else if (campaignId) {
-    response = await getCharactersByCampaign(campaignId);
+    response = await getCharactersByCampaign(campaignId, currentPage, 12);
     const campaign = campaigns.find((c: any) => c._id === campaignId);
     title = campaign ? `Personagens: ${campaign.name}` : "Personagens da Campanha";
     description = "Personagens vinculados a esta campanha specific.";
   } else {
-    response = await getAccessibleCharacters();
+    response = await getAccessibleCharacters(currentPage, 12);
   }
 
   const characters = response.ok ? (response.data as any[]) || [] : [];
@@ -175,6 +178,7 @@ export default async function Personagens({ searchParams }: PageProps) {
           </TabsContent>
         </Tabs>
       )}
+      <Pagination totalPages={response.totalPages || 1} currentPage={currentPage} />
       <CharacterModal />
     </div>
   );

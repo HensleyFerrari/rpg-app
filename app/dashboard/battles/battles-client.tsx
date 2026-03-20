@@ -31,6 +31,7 @@ import {
   Shield
 } from "lucide-react";
 import { BattleFilters } from "./components/battle-filters";
+import { Pagination } from "@/components/Pagination";
 
 import { useState } from "react";
 import { useSearchParams, usePathname } from "next/navigation";
@@ -227,7 +228,19 @@ const BattleList = ({ battles, currentUser, onEdit }: { battles: any[], currentU
   </div>
 );
 
-export default function BattlesDashboardClient({ allBattles, currentUser, campaigns }: { allBattles: any[], currentUser: any, campaigns: any[] }) {
+export default function BattlesDashboardClient({
+  allBattles,
+  currentUser,
+  campaigns,
+  totalPages,
+  currentPage
+}: {
+  allBattles: any[],
+  currentUser: any,
+  campaigns: any[],
+  totalPages: number,
+  currentPage: number
+}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
@@ -309,11 +322,14 @@ export default function BattlesDashboardClient({ allBattles, currentUser, campai
 
         {
           allBattles.length > 0 ? (
-            <BattleList
-              battles={allBattles}
-              currentUser={currentUser}
-              onEdit={handleEditBattle}
-            />
+            <>
+              <BattleList
+                battles={allBattles}
+                currentUser={currentUser}
+                onEdit={handleEditBattle}
+              />
+              <Pagination totalPages={totalPages} currentPage={currentPage} />
+            </>
           ) : (
             <Card className="border-dashed border-2 bg-transparent">
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
