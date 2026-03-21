@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Popover,
   PopoverContent,
@@ -54,6 +54,7 @@ const items = [
 
 export function FloatingMenu() {
   const pathname = usePathname();
+  const router = useRouter();
   const [actualUser, setActualUser] = useState<{
     name?: string;
     avatarUrl?: string;
@@ -154,7 +155,7 @@ export function FloatingMenu() {
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all group text-red-500 hover:bg-red-500/10 hover:text-red-500"
                   onClick={() => {
                     signOut({ redirect: false }).then(() => {
-                      window.location.href = "/";
+                      router.push("/");
                     });
                   }}
                 >
