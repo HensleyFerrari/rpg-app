@@ -23,6 +23,7 @@ import {
 import Image from "next/image";
 import { CharacterAvatar } from "@/components/CharacterAvatar";
 import { CampaignModal } from "./campaigns/components/campaign-modal";
+import { Suspense } from "react";
 
 export const dynamic = 'force-dynamic';
 
@@ -55,7 +56,9 @@ const Dashboard = async () => {
 
   return (
     <div className="flex flex-col gap-8 p-6 max-w-7xl mx-auto w-full">
-      <CampaignModal />
+      <Suspense fallback={null}>
+        <CampaignModal />
+      </Suspense>
 
       {/* Header Section */}
       <div className="space-y-4">
@@ -284,7 +287,7 @@ const Dashboard = async () => {
                         </p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Ir para o personagem" asChild>
                       <Link href={`/dashboard/personagens/${char._id}`}>
                         <ArrowRight className="h-4 w-4" />
                       </Link>

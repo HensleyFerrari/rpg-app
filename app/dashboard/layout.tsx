@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GlobalModals } from "./_components/global-modals";
 import { DashboardBreadcrumb } from "@/components/dashboard-breadcrumb";
 import { FloatingMenu } from "@/components/floating-menu";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Drpg - Dashboard",
@@ -19,7 +20,9 @@ export default async function RootLayout({
         <DashboardBreadcrumb />
       </header>
       <div className="flex flex-1 flex-col gap-4 p-8">
-        <GlobalModals />
+        <Suspense fallback={null}>
+          <GlobalModals />
+        </Suspense>
         {children}
       </div>
       <FloatingMenu />

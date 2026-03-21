@@ -55,9 +55,8 @@ export function CharacterCardActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8" disabled={isLoading}>
+        <Button variant="ghost" size="icon" className="h-8 w-8" disabled={isLoading} aria-label="Opções do personagem">
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-4 w-4" />}
-          <span className="sr-only">Abrir menu</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
