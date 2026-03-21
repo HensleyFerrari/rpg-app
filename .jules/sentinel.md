@@ -6,3 +6,7 @@
 **Vulnerability:** IDOR in `updateCharacterStatus` allowed any user to toggle character status (`alive`/`dead`) by providing a valid character ID, without verifying ownership or campaign GM status.
 **Learning:** Single-field toggle functions require the same robust authorization checks (`checkOwnership`, `verifyCampaignOwner`, `canEditCharacter`) as full update endpoints, otherwise they are vulnerable to unauthorized modifications.
 **Prevention:** Always ensure the user executing a mutation action is authorized to modify the target resource before executing the `findByIdAndUpdate` (or equivalent) database query.
+## 2025-10-25 - Add Server-Side Input Validation on User Registration
+**Vulnerability:** The `register` server action (`actions/register.ts`) trusted client-provided inputs (`values: any`) without validating them on the server-side, potentially exposing the application to injection or invalid data and it was logging raw errors `console.log(e)` which could leak sensitive internal details.
+**Learning:** Client-side validation is easily bypassed. Server actions must implement strict server-side input validation and error handling to ensure data integrity and prevent information leakage.
+**Prevention:** Always use a validation library like `zod` to validate all incoming data in server actions before processing it, and use generic error messages in catch blocks.
