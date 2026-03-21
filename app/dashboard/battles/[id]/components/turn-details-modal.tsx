@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { CharacterAvatar } from "@/components/CharacterAvatar";
 import {
   Pencil,
   X,
@@ -172,7 +173,7 @@ export function TurnDetailsModal({
     }}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pr-8">
             <div className="flex items-center gap-2">
               <Badge variant="outline">Rodada {turn.round}</Badge>
               <DialogTitle>Detalhes do Turno</DialogTitle>
@@ -385,7 +386,17 @@ export function TurnDetailsModal({
                   <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                     <User className="w-3 h-3" /> Origem
                   </span>
-                  <p className="text-sm font-medium truncate">{turn.character?.name || "Sistema"}</p>
+                  <div className="flex items-center gap-2">
+                    {turn.character && (
+                      <CharacterAvatar
+                        src={turn.character.characterUrl || turn.character.imageUrl}
+                        alt={turn.character.name}
+                        size={24}
+                        isNpc={turn.character.isNpc}
+                      />
+                    )}
+                    <p className="text-sm font-medium truncate">{turn.character?.name || "Sistema"}</p>
+                  </div>
                 </div>
               )}
               {!isEvent && (
@@ -393,7 +404,17 @@ export function TurnDetailsModal({
                   <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                     <Target className="w-3 h-3" /> Alvo
                   </span>
-                  <p className="text-sm font-medium truncate">{turn.target?.name || "N/A"}</p>
+                  <div className="flex items-center gap-2">
+                    {turn.target && (
+                      <CharacterAvatar
+                        src={turn.target.characterUrl || turn.target.imageUrl}
+                        alt={turn.target.name}
+                        size={24}
+                        isNpc={turn.target.isNpc}
+                      />
+                    )}
+                    <p className="text-sm font-medium truncate">{turn.target?.name || "N/A"}</p>
+                  </div>
                 </div>
               )}
             </div>
