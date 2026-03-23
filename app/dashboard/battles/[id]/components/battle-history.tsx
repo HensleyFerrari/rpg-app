@@ -28,29 +28,32 @@ export const BattleHistory = memo(function BattleHistory({
   currentUser,
   onOpenTurnDetails,
 }: BattleHistoryProps) {
-  const allyDamage = battle.rounds?.reduce(
-    (acc, round) =>
-      acc +
-      (round.type !== "heal" &&
-      (!round.character?.alignment || round.character.alignment === "ally")
-        ? round.damage
-        : 0),
-    0
-  ) ?? 0;
+  const allyDamage =
+    battle.rounds?.reduce(
+      (acc, round) =>
+        acc +
+        (round.type !== "heal" &&
+        (!round.character?.alignment || round.character.alignment === "ally")
+          ? round.damage
+          : 0),
+      0,
+    ) ?? 0;
 
-  const enemyDamage = battle.rounds?.reduce(
-    (acc, round) =>
-      acc +
-      (round.type !== "heal" && round.character?.alignment === "enemy"
-        ? round.damage
-        : 0),
-    0
-  ) ?? 0;
+  const enemyDamage =
+    battle.rounds?.reduce(
+      (acc, round) =>
+        acc +
+        (round.type !== "heal" && round.character?.alignment === "enemy"
+          ? round.damage
+          : 0),
+      0,
+    ) ?? 0;
 
-  const totalHeal = battle.rounds?.reduce(
-    (acc, round) => acc + (round.type === "heal" ? round.damage : 0),
-    0
-  ) ?? 0;
+  const totalHeal =
+    battle.rounds?.reduce(
+      (acc, round) => acc + (round.type === "heal" ? round.damage : 0),
+      0,
+    ) ?? 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -69,7 +72,7 @@ export const BattleHistory = memo(function BattleHistory({
                       ? "bg-green-500/5 border-green-500/20 hover:bg-green-500/10"
                       : round.isCritical
                         ? "bg-amber-500/5 border-amber-500/20 hover:bg-amber-500/10"
-                        : "border-border/50 hover:border-border"
+                        : "border-border/50 hover:border-border",
                 )}
               >
                 <div className="shrink-0">
@@ -96,7 +99,7 @@ export const BattleHistory = memo(function BattleHistory({
                           "font-semibold text-sm sm:text-base truncate",
                           round.character?.alignment === "enemy"
                             ? "text-red-500"
-                            : "text-foreground"
+                            : "text-foreground",
                         )}
                       >
                         {round.character?.name || "Evento"}
@@ -112,24 +115,19 @@ export const BattleHistory = memo(function BattleHistory({
                       ) : null}
                     </div>
 
-                    {(round.type === "other" || round.description) ? (
+                    {round.type === "other" || round.description ? (
                       <div className="text-xs sm:text-sm text-muted-foreground italic min-w-0">
                         {round.type === "other" &&
                         round.description?.startsWith("[TURNO_ALTERADO]") ? (
                           <span className="text-blue-500 font-medium not-italic flex items-center gap-1">
                             <History className="h-3 w-3" />
-                            {round.description.replace(
-                              "[TURNO_ALTERADO] ",
-                              ""
-                            )}
+                            {round.description.replace("[TURNO_ALTERADO] ", "")}
                           </span>
-                        ) : (
-                          round.description ? (
-                            <p className="line-clamp-2 border-l-2 border-primary/20 pl-2">
-                              {round.description}
-                            </p>
-                          ) : null
-                        )}
+                        ) : round.description ? (
+                          <p className="line-clamp-2 border-l-2 border-primary/20 pl-2">
+                            {round.description}
+                          </p>
+                        ) : null}
                       </div>
                     ) : null}
                   </div>
@@ -150,7 +148,7 @@ export const BattleHistory = memo(function BattleHistory({
                               "flex items-center gap-1.5 px-3 py-1 rounded-full text-sm shadow-sm border",
                               round.isCritical
                                 ? "text-amber-100 bg-amber-600 border-amber-500"
-                                : "text-zinc-100 bg-zinc-600 border-zinc-500"
+                                : "text-zinc-100 bg-zinc-600 border-zinc-500",
                             )}
                           >
                             <SwordsIcon className="h-3.5 w-3.5" />
@@ -178,6 +176,7 @@ export const BattleHistory = memo(function BattleHistory({
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6 text-muted-foreground hover:text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                      aria-label="Ver detalhes do turno"
                       onClick={() => onOpenTurnDetails(round)}
                     >
                       <Info className="h-4 w-4" />
