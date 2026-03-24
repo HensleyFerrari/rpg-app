@@ -10,7 +10,7 @@ import { getCurrentUser } from "./user.actions";
 import { getAllDamagesByBattleId } from "./damage.actions";
 import { triggerBattleUpdate } from "../pusher";
 import { safeAction } from "./safe-action";
-import { serializeData } from "../utils";
+import { serializeData, escapeRegExp } from "../utils";
 import { verifyBattleMaster } from "../auth";
 
 export const createBattle = async (BattleParams: any) => {
@@ -313,7 +313,7 @@ export const getBattles = async ({
     const queryObj: any = {};
 
     if (query) {
-      queryObj.name = { $regex: query, $options: "i" };
+      queryObj.name = { $regex: escapeRegExp(query), $options: "i" };
     }
 
     if (filterType === "my") {

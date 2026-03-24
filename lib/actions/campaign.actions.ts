@@ -15,7 +15,7 @@ interface CampaignResponse {
   data?: CampaignDocument | CampaignDocument[] | null;
 }
 
-import { serializeData } from "../utils";
+import { serializeData, escapeRegExp } from "../utils";
 
 export async function getCampaigns({
   query,
@@ -25,7 +25,7 @@ export async function getCampaigns({
     const queryObj: any = {};
 
     if (query) {
-      queryObj.name = { $regex: query, $options: "i" };
+      queryObj.name = { $regex: escapeRegExp(query), $options: "i" };
     }
 
     if (filterType === "my") {

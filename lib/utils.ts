@@ -9,6 +9,10 @@ export const serializeData = (data: any) => {
   return JSON.parse(JSON.stringify(data));
 };
 
+export function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
+
 export interface ServerActionResponse<T = any> {
   ok: boolean;
   message: string;
