@@ -19,6 +19,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { Loader2 } from "lucide-react";
 
 type FormData = {
   name: string;
@@ -257,6 +258,7 @@ export function CampaignModal() {
                 Cancelar
               </Button>
               <Button type="submit" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
                 {isLoading ? "Salvando..." : (isNew ? "Criar Campanha" : "Salvar Alterações")}
               </Button>
             </DialogFooter>
