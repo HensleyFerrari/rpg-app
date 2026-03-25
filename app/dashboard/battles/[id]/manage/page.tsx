@@ -80,7 +80,7 @@ const ManageBattlePage = () => {
   const [isOwner, setIsOwner] = useState(false);
   const [damageToDelete, setDamageToDelete] = useState<string | null>(null);
   const [characterToRemove, setCharacterToRemove] = useState<string | null>(
-    null
+    null,
   );
 
   // States for collapsible sections
@@ -119,7 +119,7 @@ const ManageBattlePage = () => {
         if (updatedBattle.ok) {
           setBattle(updatedBattle.data);
           window.dispatchEvent(
-            new CustomEvent("battleUpdated", { detail: updatedBattle.data })
+            new CustomEvent("battleUpdated", { detail: updatedBattle.data }),
           );
         }
       } else {
@@ -139,7 +139,7 @@ const ManageBattlePage = () => {
     try {
       const response = await removeCharacterFromBattle(
         characterToRemove,
-        id as string
+        id as string,
       );
       if (response.ok) {
         toast.success("Personagem removido com sucesso");
@@ -148,7 +148,7 @@ const ManageBattlePage = () => {
         if (updatedBattle.ok) {
           setBattle(updatedBattle.data);
           window.dispatchEvent(
-            new CustomEvent("battleUpdated", { detail: updatedBattle.data })
+            new CustomEvent("battleUpdated", { detail: updatedBattle.data }),
           );
         }
       } else {
@@ -204,11 +204,18 @@ const ManageBattlePage = () => {
     <div className="container mx-auto p-4 max-w-5xl space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight">Painel de Gerenciamento</h1>
-          <p className="text-muted-foreground mt-1">Controle total sobre {battle.name}</p>
+          <h1 className="text-4xl font-extrabold tracking-tight">
+            Painel de Gerenciamento
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Controle total sobre {battle.name}
+          </p>
         </div>
         <Link href={`/dashboard/battles/${id}`}>
-          <Button variant="outline" className="gap-2 hover:bg-muted transition-colors">
+          <Button
+            variant="outline"
+            className="gap-2 hover:bg-muted transition-colors"
+          >
             <ArrowLeft className="h-4 w-4" />
             Voltar para Batalha
           </Button>
@@ -228,15 +235,28 @@ const ManageBattlePage = () => {
               </div>
               <div>
                 <CardTitle className="text-lg">Personagens</CardTitle>
-                <p className="text-xs text-muted-foreground">Gerencie quem participa desta batalha</p>
+                <p className="text-xs text-muted-foreground">
+                  Gerencie quem participa desta batalha
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <AddCharacterModal />
-              {isCharactersExpanded ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
+              {isCharactersExpanded ? (
+                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              )}
             </div>
           </CardHeader>
-          <div className={cn("transition-all duration-300 ease-in-out", isCharactersExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden")}>
+          <div
+            className={cn(
+              "transition-all duration-300 ease-in-out",
+              isCharactersExpanded
+                ? "max-h-[1000px] opacity-100"
+                : "max-h-0 opacity-0 overflow-hidden",
+            )}
+          >
             <CardContent className="pt-0">
               <div className="rounded-xl border bg-card/40 overflow-hidden">
                 <Table>
@@ -248,7 +268,10 @@ const ManageBattlePage = () => {
                   </TableHeader>
                   <TableBody>
                     {battle.characters.map((character) => (
-                      <TableRow key={character._id} className="group hover:bg-muted/40 transition-colors border-muted">
+                      <TableRow
+                        key={character._id}
+                        className="group hover:bg-muted/40 transition-colors border-muted"
+                      >
                         <TableCell className="font-medium py-3">
                           {character.name}
                         </TableCell>
@@ -259,24 +282,31 @@ const ManageBattlePage = () => {
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8 text-muted-foreground group-hover:text-destructive transition-colors"
+                                aria-label="Remover personagem"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setCharacterToRemove(character._id);
                                 }}
                               >
                                 <UserMinus className="h-4 w-4" />
-                                <span className="sr-only">Remover</span>
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar remoção</AlertDialogTitle>
+                                <AlertDialogTitle>
+                                  Confirmar remoção
+                                </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tem certeza que deseja remover <strong>{character.name}</strong> da batalha?
+                                  Tem certeza que deseja remover{" "}
+                                  <strong>{character.name}</strong> da batalha?
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel onClick={() => setCharacterToRemove(null)}>Cancelar</AlertDialogCancel>
+                                <AlertDialogCancel
+                                  onClick={() => setCharacterToRemove(null)}
+                                >
+                                  Cancelar
+                                </AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={handleRemoveCharacter}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -291,10 +321,15 @@ const ManageBattlePage = () => {
                     ))}
                     {battle.characters.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={2} className="text-center py-12 text-muted-foreground">
+                        <TableCell
+                          colSpan={2}
+                          className="text-center py-12 text-muted-foreground"
+                        >
                           <div className="flex flex-col items-center justify-center gap-2">
                             <Users className="h-10 w-10 opacity-10" />
-                            <p className="text-sm">Nenhum personagem na batalha</p>
+                            <p className="text-sm">
+                              Nenhum personagem na batalha
+                            </p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -318,12 +353,25 @@ const ManageBattlePage = () => {
               </div>
               <div>
                 <CardTitle className="text-lg">Histórico de Danos</CardTitle>
-                <p className="text-xs text-muted-foreground">Visualize e gerencie cada evento da batalha</p>
+                <p className="text-xs text-muted-foreground">
+                  Visualize e gerencie cada evento da batalha
+                </p>
               </div>
             </div>
-            {isHistoryExpanded ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
+            {isHistoryExpanded ? (
+              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+            ) : (
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            )}
           </CardHeader>
-          <div className={cn("transition-all duration-300 ease-in-out", isHistoryExpanded ? "max-h-[1000px] opacity-100 overflow-auto" : "max-h-0 opacity-0 overflow-hidden")}>
+          <div
+            className={cn(
+              "transition-all duration-300 ease-in-out",
+              isHistoryExpanded
+                ? "max-h-[1000px] opacity-100 overflow-auto"
+                : "max-h-0 opacity-0 overflow-hidden",
+            )}
+          >
             <CardContent className="pt-0">
               <div className="rounded-xl border bg-card/40 overflow-hidden">
                 <Table>
@@ -332,22 +380,34 @@ const ManageBattlePage = () => {
                       <TableHead className="w-[100px] py-4">Rodada</TableHead>
                       <TableHead className="py-4">Personagem</TableHead>
                       <TableHead className="py-4">Alvo</TableHead>
-                      <TableHead className="text-center w-[120px] py-4">Valor</TableHead>
-                      <TableHead className="text-center w-[150px] py-4">Tipo/Descrição</TableHead>
-                      <TableHead className="text-center w-[100px] py-4">Crítico</TableHead>
-                      <TableHead className="text-right w-[100px] py-4">Ações</TableHead>
+                      <TableHead className="text-center w-[120px] py-4">
+                        Valor
+                      </TableHead>
+                      <TableHead className="text-center w-[150px] py-4">
+                        Tipo/Descrição
+                      </TableHead>
+                      <TableHead className="text-center w-[100px] py-4">
+                        Crítico
+                      </TableHead>
+                      <TableHead className="text-right w-[100px] py-4">
+                        Ações
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {battle.rounds.map((round) => (
-                      <TableRow key={round._id} className="group hover:bg-muted/40 transition-colors border-muted">
+                      <TableRow
+                        key={round._id}
+                        className="group hover:bg-muted/40 transition-colors border-muted"
+                      >
                         <TableCell className="py-3">
                           <span className="inline-flex items-center justify-center rounded-lg bg-primary/10 text-primary w-7 h-7 text-xs font-bold">
                             {round.round}
                           </span>
                         </TableCell>
                         <TableCell className="font-medium py-3">
-                          {round.character?.name || (round.type === "other" ? "Evento" : "N/A")}
+                          {round.character?.name ||
+                            (round.type === "other" ? "Evento" : "N/A")}
                         </TableCell>
                         <TableCell className="py-3">
                           {round.target?.name || "-"}
@@ -357,9 +417,13 @@ const ManageBattlePage = () => {
                         </TableCell>
                         <TableCell className="text-center py-3">
                           {round.type === "damage" ? (
-                            <span className="text-destructive font-medium">Dano</span>
+                            <span className="text-destructive font-medium">
+                              Dano
+                            </span>
                           ) : round.type === "heal" ? (
-                            <span className="text-green-500 font-medium">Cura</span>
+                            <span className="text-green-500 font-medium">
+                              Cura
+                            </span>
                           ) : (
                             <span className="text-muted-foreground italic">
                               {round.description || "Evento"}
@@ -368,9 +432,13 @@ const ManageBattlePage = () => {
                         </TableCell>
                         <TableCell className="text-center py-3">
                           {round.isCritical ? (
-                            <span className="text-amber-500 font-bold text-xs px-2 py-0.5 rounded-full bg-amber-500/10 uppercase">Sim</span>
+                            <span className="text-amber-500 font-bold text-xs px-2 py-0.5 rounded-full bg-amber-500/10 uppercase">
+                              Sim
+                            </span>
                           ) : (
-                            <span className="text-muted-foreground text-xs uppercase">Não</span>
+                            <span className="text-muted-foreground text-xs uppercase">
+                              Não
+                            </span>
                           )}
                         </TableCell>
                         <TableCell className="text-right py-3">
@@ -380,24 +448,31 @@ const ManageBattlePage = () => {
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8 text-muted-foreground group-hover:text-destructive transition-colors"
+                                aria-label="Deletar turno"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setDamageToDelete(round._id);
                                 }}
                               >
                                 <Trash2 className="h-4 w-4" />
-                                <span className="sr-only">Deletar</span>
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                <AlertDialogTitle>
+                                  Confirmar exclusão
+                                </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tem certeza que deseja excluir este registro de dano?
+                                  Tem certeza que deseja excluir este registro
+                                  de dano?
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel onClick={() => setDamageToDelete(null)}>Cancelar</AlertDialogCancel>
+                                <AlertDialogCancel
+                                  onClick={() => setDamageToDelete(null)}
+                                >
+                                  Cancelar
+                                </AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={handleDeleteDamage}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -412,7 +487,10 @@ const ManageBattlePage = () => {
                     ))}
                     {battle.rounds.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                        <TableCell
+                          colSpan={6}
+                          className="text-center py-12 text-muted-foreground"
+                        >
                           <div className="flex flex-col items-center justify-center gap-2">
                             <Swords className="h-10 w-10 opacity-10" />
                             <p className="text-sm">Nenhum dano registrado</p>

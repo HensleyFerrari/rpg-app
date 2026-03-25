@@ -34,6 +34,7 @@ function Breadcrumb({ items, className, showBackButton = true, ...props }: Bread
           className="h-6 w-6 mr-2 shrink-0"
           onClick={() => router.back()}
           title="Voltar"
+          aria-label="Voltar"
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>

@@ -14,3 +14,7 @@
 **Vulnerability:** Regular Expression Denial of Service (ReDoS) vulnerability in `getCampaigns` and `getBattles` server actions where unsanitized user input (`query`) was passed directly to MongoDB's `$regex` operator. An attacker could provide a complex, malicious string that causes exponential backtracking, consuming server CPU and crashing the database.
 **Learning:** Never pass raw user input to a regular expression evaluation context without proper sanitization. The database engine is also susceptible to ReDoS.
 **Prevention:** Always escape user input using a utility function like `escapeRegExp` before utilizing it within a `$regex` or `RegExp` object constructor.
+## 2025-10-26 - Fix ReDoS Vulnerability in MongoDB $regex queries
+**Vulnerability:** The application passed user input directly to the `$regex` operator in MongoDB queries for `getCampaigns` and `getBattles`. This could allow attackers to perform Regular Expression Denial of Service (ReDoS) attacks by crafting complex regex strings.
+**Learning:** Any user input that is passed to a regex evaluation engine needs to be sanitized to prevent attackers from sending deliberately slow-to-evaluate regexes that can freeze the application or database.
+**Prevention:** Always escape regex special characters from user input before passing it to MongoDB `$regex` or the JavaScript `RegExp` constructor. A utility function `escapeRegExp` was added to `lib/utils.ts` and applied where needed.

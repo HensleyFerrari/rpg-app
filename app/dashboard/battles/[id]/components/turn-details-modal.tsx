@@ -45,7 +45,7 @@ import {
   User,
   Target,
   CalendarIcon,
-  Trash
+  Trash,
 } from "lucide-react";
 
 interface TurnDetailsModalProps {
@@ -77,8 +77,11 @@ export function TurnDetailsModal({
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Determine permissions
-  const isOwner = currentUser?._id === turn?.owner?._id || currentUser?._id === turn?.owner;
-  const isGM = currentUser?._id === battle?.owner?._id || currentUser?._id === battle?.owner;
+  const isOwner =
+    currentUser?._id === turn?.owner?._id || currentUser?._id === turn?.owner;
+  const isGM =
+    currentUser?._id === battle?.owner?._id ||
+    currentUser?._id === battle?.owner;
   const canEdit = isOwner || isGM;
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -121,8 +124,8 @@ export function TurnDetailsModal({
       if (result.ok) {
         toast.success("Turno atualizado com sucesso");
         setIsEditing(false);
-        // Close modal or keep open with updated data? 
-        // Logic usually updates parent via revalidatePath/pusher, preventing stale data might require closing or refetching. 
+        // Close modal or keep open with updated data?
+        // Logic usually updates parent via revalidatePath/pusher, preventing stale data might require closing or refetching.
         // For now, let's keep it simple.
         onOpenChange(false);
       } else {
@@ -167,10 +170,13 @@ export function TurnDetailsModal({
   const battleCharacters = battle?.characters || [];
 
   return (
-    <Dialog open={open} onOpenChange={(val) => {
-      onOpenChange(val);
-      if (!val) setIsEditing(false); // Reset edit mode on close
-    }}>
+    <Dialog
+      open={open}
+      onOpenChange={(val) => {
+        onOpenChange(val);
+        if (!val) setIsEditing(false); // Reset edit mode on close
+      }}
+    >
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <div className="flex items-center justify-between pr-8">
@@ -179,29 +185,38 @@ export function TurnDetailsModal({
               <DialogTitle>Detalhes do Turno</DialogTitle>
             </div>
             {canEdit && !isEditing && (
-              <Button variant="ghost" size="sm" onClick={() => {
-                form.reset({
-                  character: turn?.character?._id || "",
-                  target: turn?.target?._id || "none",
-                  type: turn?.type || "damage",
-                  damage: turn?.damage || 0,
-                  description: turn?.description || "",
-                  isCritical: turn?.isCritical || false,
-                });
-                setIsEditing(true);
-              }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  form.reset({
+                    character: turn?.character?._id || "",
+                    target: turn?.target?._id || "none",
+                    type: turn?.type || "damage",
+                    damage: turn?.damage || 0,
+                    description: turn?.description || "",
+                    isCritical: turn?.isCritical || false,
+                  });
+                  setIsEditing(true);
+                }}
+              >
                 <Pencil className="w-4 h-4 mr-1" /> Editar
               </Button>
             )}
           </div>
           <DialogDescription>
-            {isEditing ? "Edite as informações do turno." : "Informações detalhadas sobre este evento na batalha."}
+            {isEditing
+              ? "Edite as informações do turno."
+              : "Informações detalhadas sobre este evento na batalha."}
           </DialogDescription>
         </DialogHeader>
 
         {isEditing ? (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 py-2"
+            >
               <FormField
                 control={form.control}
                 name="type"
@@ -209,7 +224,11 @@ export function TurnDetailsModal({
                   <FormItem>
                     <FormLabel>Tipo</FormLabel>
                     <FormControl>
-                      <Tabs onValueChange={field.onChange} defaultValue={field.value} className="w-full">
+                      <Tabs
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="w-full"
+                      >
                         <TabsList className="grid w-full grid-cols-3">
                           <TabsTrigger value="damage">Dano</TabsTrigger>
                           <TabsTrigger value="heal">Cura</TabsTrigger>
@@ -233,7 +252,9 @@ export function TurnDetailsModal({
                           <Input
                             type="number"
                             {...field}
-                            onChange={e => field.onChange(parseInt(e.target.value) || 0)}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value) || 0)
+                            }
                           />
                         </FormControl>
                       </FormItem>
@@ -245,9 +266,16 @@ export function TurnDetailsModal({
                   control={form.control}
                   name="character"
                   render={({ field }) => (
-                    <FormItem className={form.watch("type") === "other" ? "col-span-2" : ""}>
+                    <FormItem
+                      className={
+                        form.watch("type") === "other" ? "col-span-2" : ""
+                      }
+                    >
                       <FormLabel>Origem</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione..." />
@@ -255,7 +283,9 @@ export function TurnDetailsModal({
                         </FormControl>
                         <SelectContent>
                           {battleCharacters.map((char: any) => (
-                            <SelectItem key={char._id} value={char._id}>{char.name}</SelectItem>
+                            <SelectItem key={char._id} value={char._id}>
+                              {char.name}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -272,7 +302,10 @@ export function TurnDetailsModal({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Alvo</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Nenhum" />
@@ -281,7 +314,9 @@ export function TurnDetailsModal({
                           <SelectContent>
                             <SelectItem value="none">Nenhum</SelectItem>
                             {battleCharacters.map((char: any) => (
-                              <SelectItem key={char._id} value={char._id}>{char.name}</SelectItem>
+                              <SelectItem key={char._id} value={char._id}>
+                                {char.name}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -295,7 +330,10 @@ export function TurnDetailsModal({
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-center space-x-2 space-y-0 rounded-md border p-3 mt-auto">
                         <FormControl>
-                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
                         </FormControl>
                         <FormLabel className="font-normal cursor-pointer">
                           Crítico?
@@ -313,7 +351,10 @@ export function TurnDetailsModal({
                   <FormItem>
                     <FormLabel>Descrição</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Detalhes opcionais..." />
+                      <Textarea
+                        {...field}
+                        placeholder="Detalhes opcionais..."
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -324,17 +365,31 @@ export function TurnDetailsModal({
                   type="button"
                   variant="destructive"
                   size="icon"
+                  aria-label="Deletar turno"
                   onClick={handleDelete}
                   disabled={isSubmitting || isDeleting}
                 >
-                  {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash className="w-4 h-4" />}
+                  {isDeleting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash className="w-4 h-4" />
+                  )}
                 </Button>
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" onClick={() => setIsEditing(false)} disabled={isSubmitting || isDeleting}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditing(false)}
+                    disabled={isSubmitting || isDeleting}
+                  >
                     <X className="w-4 h-4 mr-1" /> Cancelar
                   </Button>
                   <Button type="submit" disabled={isSubmitting || isDeleting}>
-                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-1" />}
+                    {isSubmitting ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4 mr-1" />
+                    )}
                     Salvar
                   </Button>
                 </div>
@@ -349,10 +404,16 @@ export function TurnDetailsModal({
                 <>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                      {isHeal ? <Heart className="w-4 h-4" /> : <Swords className="w-4 h-4" />}
+                      {isHeal ? (
+                        <Heart className="w-4 h-4" />
+                      ) : (
+                        <Swords className="w-4 h-4" />
+                      )}
                       {isHeal ? "Cura Realizada" : "Dano Causado"}
                     </span>
-                    <span className={`text-2xl font-bold ${isHeal ? "text-green-500" : "text-amber-500"}`}>
+                    <span
+                      className={`text-2xl font-bold ${isHeal ? "text-green-500" : "text-amber-500"}`}
+                    >
                       {turn.damage}
                     </span>
                   </div>
@@ -389,13 +450,17 @@ export function TurnDetailsModal({
                   <div className="flex items-center gap-2">
                     {turn.character && (
                       <CharacterAvatar
-                        src={turn.character.characterUrl || turn.character.imageUrl}
+                        src={
+                          turn.character.characterUrl || turn.character.imageUrl
+                        }
                         alt={turn.character.name}
                         size={24}
                         isNpc={turn.character.isNpc}
                       />
                     )}
-                    <p className="text-sm font-medium truncate">{turn.character?.name || "Sistema"}</p>
+                    <p className="text-sm font-medium truncate">
+                      {turn.character?.name || "Sistema"}
+                    </p>
                   </div>
                 </div>
               )}
@@ -413,7 +478,9 @@ export function TurnDetailsModal({
                         isNpc={turn.target.isNpc}
                       />
                     )}
-                    <p className="text-sm font-medium truncate">{turn.target?.name || "N/A"}</p>
+                    <p className="text-sm font-medium truncate">
+                      {turn.target?.name || "N/A"}
+                    </p>
                   </div>
                 </div>
               )}
@@ -433,7 +500,9 @@ export function TurnDetailsModal({
                 <span className="text-muted-foreground flex items-center gap-2">
                   <User className="w-4 h-4" /> Registrado por
                 </span>
-                <span className="font-medium">{turn.owner?.name || "Sistema"}</span>
+                <span className="font-medium">
+                  {turn.owner?.name || "Sistema"}
+                </span>
               </div>
             </div>
           </div>
