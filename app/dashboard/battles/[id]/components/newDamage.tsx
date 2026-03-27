@@ -120,8 +120,10 @@ const NewDamage = ({ className, variant = "default" }: NewDamageProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const user = await getCurrentUser();
-      const battle = await getBattleById(id as string);
+      const [user, battle] = await Promise.all([
+        getCurrentUser(),
+        getBattleById(id as string),
+      ]);
 
       if (battle.data && battle.data.characters) {
         setAllBattleCharacters(battle.data.characters);
@@ -132,11 +134,9 @@ const NewDamage = ({ className, variant = "default" }: NewDamageProps) => {
           battle.data.campaign._id
         );
         if (characters.data && Array.isArray(characters.data)) {
-          const filteredCharacters: any = characters.data.filter((char) => {
-            if (char.status === "alive") {
-              return char;
-            }
-          });
+          const filteredCharacters: any = characters.data.filter(
+            (char: any) => char.status === "alive"
+          );
           setCharacters(filteredCharacters);
         }
         setUserHasCharacter(true);
@@ -148,11 +148,9 @@ const NewDamage = ({ className, variant = "default" }: NewDamageProps) => {
         );
 
         if (userCharacters && Array.isArray(userCharacters)) {
-          const filteredCharacters: any = userCharacters.filter((char) => {
-            if (char.status === "alive") {
-              return char;
-            }
-          });
+          const filteredCharacters: any = userCharacters.filter(
+            (char: any) => char.status === "alive"
+          );
           setCharacters(filteredCharacters);
           setUserHasCharacter(true);
         }
