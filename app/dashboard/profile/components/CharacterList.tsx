@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CharacterDocument } from "@/models/Character";
+import { CharacterDocument } from "@/modules/rpg/character/character.model";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, ArrowRight } from "lucide-react";

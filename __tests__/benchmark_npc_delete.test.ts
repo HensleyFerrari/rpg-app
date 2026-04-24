@@ -1,10 +1,10 @@
 
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import mongoose from 'mongoose';
-import { deleteNPC } from '@/lib/actions/NPC.actions';
-import NPC from '@/models/NPC';
-import User from '@/models/User';
-import Campaign from '@/models/Campaign';
+import { deleteNPC } from '@/modules/rpg/character/npc.actions';
+import NPC from '@/modules/rpg/character/npc.model';
+import User from '@/modules/platform/user/user.model';
+import Campaign from '@/modules/rpg/campaign/campaign.model';
 
 // Mock next/cache
 jest.mock('next/cache', () => ({
@@ -13,8 +13,8 @@ jest.mock('next/cache', () => ({
 
 // Mock getCurrentUser
 const mockUserId = new mongoose.Types.ObjectId();
-jest.mock("@/lib/actions/user.actions", () => ({
-  ...jest.requireActual("@/lib/actions/user.actions"),
+jest.mock("@/modules/platform/user/user.actions", () => ({
+  ...jest.requireActual("@/modules/platform/user/user.actions"),
   getCurrentUser: jest.fn(() => ({
     _id: mockUserId,
     email: "test@test.com",

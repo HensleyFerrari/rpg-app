@@ -1,6 +1,6 @@
-import { getCurrentUser } from "@/lib/actions/user.actions";
-import { getMyCampaigns } from "@/lib/actions/campaign.actions";
-import { getCharactersByOwner } from "@/lib/actions/character.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
+import { getMyCampaigns } from "@/modules/rpg/campaign/campaign.actions";
+import { getCharactersByOwner } from "@/modules/rpg/character/character.actions";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { StatsCards } from "./components/StatsCards";
 import { CampaignList } from "./components/CampaignList";

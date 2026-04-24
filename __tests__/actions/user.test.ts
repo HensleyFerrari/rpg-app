@@ -1,11 +1,11 @@
-import { changePassword } from "@/lib/actions/user.actions";
+import { changePassword } from "@/modules/platform/user/user.actions";
 import { auth } from "@/auth";
-import User from "@/models/User";
+import User from "@/modules/platform/user/user.model";
 import bcrypt from "bcryptjs";
 
 jest.mock("@/auth");
-jest.mock("@/models/User");
-jest.mock("@/lib/mongodb");
+jest.mock("@/modules/platform/user/user.model");
+jest.mock("@/shared/db/mongodb");
 jest.mock("bcryptjs");
 
 describe("changePassword", () => {

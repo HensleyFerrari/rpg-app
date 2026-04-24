@@ -2,10 +2,10 @@ import {
   addCharacterToBattle,
   createQuickCharacters,
   getBattleById,
-} from "@/lib/actions/battle.actions";
+} from "@/modules/rpg/battle/battle.actions";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getCharactersByCampaign } from "@/lib/actions/character.actions";
+import { getCharactersByCampaign } from "@/modules/rpg/character/character.actions";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CharacterDocument } from "@/models/Character";
+import { CharacterDocument } from "@/modules/rpg/character/character.model";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {

@@ -6,8 +6,8 @@ import type {
 import type { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectDB } from "@/lib/mongodb";
-import User from "@/models/User";
+import { connectDB } from "@/shared/db/mongodb";
+import User from "@/modules/platform/user/user.model";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {

@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { createCampaign, updateCampaign, getCampaignById } from "@/lib/actions/campaign.actions";
+import { createCampaign, updateCampaign, getCampaignById } from "@/modules/rpg/campaign/campaign.actions";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";

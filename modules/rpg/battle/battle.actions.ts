@@ -1,17 +1,17 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import Battle, { BattleDocument } from "@/models/Battle";
+import Battle, { BattleDocument } from "@/modules/rpg/battle/battle.model";
 import mongoose from "mongoose";
-import User from "@/models/User";
-import Campaign from "@/models/Campaign";
-import Character, { CharacterDocument } from "@/models/Character";
-import { getCurrentUser } from "./user.actions";
-import { getAllDamagesByBattleId } from "./damage.actions";
-import { triggerBattleUpdate } from "../pusher";
-import { safeAction } from "./safe-action";
-import { serializeData, escapeRegExp } from "../utils";
-import { verifyBattleMaster } from "../auth";
+import User from "@/modules/platform/user/user.model";
+import Campaign from "@/modules/rpg/campaign/campaign.model";
+import Character, { CharacterDocument } from "@/modules/rpg/character/character.model";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
+import { getAllDamagesByBattleId } from "@/modules/rpg/battle/damage.actions";
+import { triggerBattleUpdate } from "@/shared/infrastructure/pusher";
+import { safeAction } from "@/shared/actions/safe-action";
+import { serializeData, escapeRegExp } from "@/shared/utils/utils";
+import { verifyBattleMaster } from "@/modules/rpg/battle/permissions";;
 
 export const createBattle = async (BattleParams: any) => {
   return safeAction(async () => {

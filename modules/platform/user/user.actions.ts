@@ -1,7 +1,7 @@
 "use server";
 
-import { connectDB } from "../mongodb";
-import User from "@/models/User";
+import { connectDB } from "@/shared/db/mongodb";
+import User from "@/modules/platform/user/user.model";
 import { auth } from "@/auth";
 import { cache } from "react";
 import bcrypt from "bcryptjs";

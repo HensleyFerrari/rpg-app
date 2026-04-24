@@ -1,6 +1,6 @@
-import { getBattles } from "@/lib/actions/battle.actions";
-import { getCurrentUser } from "@/lib/actions/user.actions";
-import { getCampaigns } from "@/lib/actions/campaign.actions";
+import { getBattles } from "@/modules/rpg/battle/battle.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
+import { getCampaigns } from "@/modules/rpg/campaign/campaign.actions";
 import BattlesDashboardClient from "./battles-client";
 
 export const dynamic = 'force-dynamic';

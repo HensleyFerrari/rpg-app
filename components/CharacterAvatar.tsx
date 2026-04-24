@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { User2, Shield } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 interface CharacterAvatarProps {
   src?: string;

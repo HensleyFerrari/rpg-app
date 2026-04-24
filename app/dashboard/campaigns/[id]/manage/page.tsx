@@ -2,9 +2,9 @@
 
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { getCampaignById } from "@/lib/actions/campaign.actions";
-import { deleteCharacter } from "@/lib/actions/character.actions";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+import { getCampaignById } from "@/modules/rpg/campaign/campaign.actions";
+import { deleteCharacter } from "@/modules/rpg/character/character.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

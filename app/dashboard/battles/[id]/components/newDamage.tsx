@@ -1,10 +1,10 @@
-import { getBattleById } from "@/lib/actions/battle.actions";
+import { getBattleById } from "@/modules/rpg/battle/battle.actions";
 import {
   getCharactersByActualUserAndCampaign,
   getCharactersByCampaign,
-} from "@/lib/actions/character.actions";
-import { createDamage } from "@/lib/actions/damage.actions";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+} from "@/modules/rpg/character/character.actions";
+import { createDamage } from "@/modules/rpg/battle/damage.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";

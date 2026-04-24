@@ -1,9 +1,9 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import "../models/Character";
-import "../models/Campaign";
-import "../models/Battle";
-import "../models/Damage";
+import "../modules/rpg/character/character.model";
+import "../modules/rpg/campaign/campaign.model";
+import "../modules/rpg/battle/battle.model";
+import "../modules/rpg/battle/damage.model";
 
 let mongod: MongoMemoryServer;
 

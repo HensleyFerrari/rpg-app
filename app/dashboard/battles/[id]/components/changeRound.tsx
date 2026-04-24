@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { getBattleById, updateBattle } from "@/lib/actions/battle.actions";
-import { createDamage } from "@/lib/actions/damage.actions";
+import { getBattleById, updateBattle } from "@/modules/rpg/battle/battle.actions";
+import { createDamage } from "@/modules/rpg/battle/damage.actions";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 

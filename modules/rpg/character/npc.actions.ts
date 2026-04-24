@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import NPC, { NPCDocument } from "@/models/NPC";
-import { getCurrentUser } from "./user.actions";
+import NPC, { NPCDocument } from "@/modules/rpg/character/npc.model";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import mongoose from "mongoose";
 
 interface NPCResponse {
@@ -11,9 +11,10 @@ interface NPCResponse {
   data?: NPCDocument | NPCDocument[] | null;
 }
 
-import { safeAction } from "./safe-action";
-import { serializeData } from "../utils";
-import { checkOwnership, verifyCampaignOwner } from "../auth";
+import { safeAction } from "@/shared/actions/safe-action";
+import { serializeData } from "@/shared/utils/utils";
+import { checkOwnership } from "@/modules/platform/auth/permissions";
+import { verifyCampaignOwner } from "@/modules/rpg/campaign/permissions";;
 
 // Create NPC
 export async function createNPC({

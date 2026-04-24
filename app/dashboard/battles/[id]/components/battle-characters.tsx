@@ -1,10 +1,10 @@
 import { memo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { Shield, Swords } from "lucide-react";
 import { Skull, Heart } from "lucide-react";
 import { CharacterAvatar } from "@/components/CharacterAvatar";
-import { updateCharacterStatus } from "@/lib/actions/character.actions";
+import { updateCharacterStatus } from "@/modules/rpg/character/character.actions";
 import { toast } from "sonner";
 import type { Battle, User } from "../types";
 

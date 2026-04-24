@@ -31,8 +31,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { getMyCampaigns } from "@/lib/actions/campaign.actions";
-import { createBattle } from "@/lib/actions/battle.actions";
+import { getMyCampaigns } from "@/modules/rpg/campaign/campaign.actions";
+import { createBattle } from "@/modules/rpg/battle/battle.actions";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const formSchema = zod.object({

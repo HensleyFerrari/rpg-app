@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { updateDamage, deleteDamage } from "@/lib/actions/damage.actions";
+import { updateDamage, deleteDamage } from "@/modules/rpg/battle/damage.actions";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

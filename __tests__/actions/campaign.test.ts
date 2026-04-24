@@ -4,10 +4,10 @@ import {
   getMyCampaigns,
   updateCampaign,
   deleteCampaign,
-} from "@/lib/actions/campaign.actions";
-import { getCurrentUser } from "@/lib/actions/user.actions";
-import User from "@/models/User";
-import Campaign from "@/models/Campaign";
+} from "@/modules/rpg/campaign/campaign.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
+import User from "@/modules/platform/user/user.model";
+import Campaign from "@/modules/rpg/campaign/campaign.model";
 import mongoose from "mongoose";
 
 // Mock the revalidatePath function
@@ -16,7 +16,7 @@ jest.mock("next/cache", () => ({
 }));
 
 // Mock getCurrentUser and findByEmail
-jest.mock("@/lib/actions/user.actions", () => ({
+jest.mock("@/modules/platform/user/user.actions", () => ({
   getCurrentUser: jest.fn(() => ({
     _id: new mongoose.Types.ObjectId(),
     email: "test@test.com",

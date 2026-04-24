@@ -1,25 +1,22 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import Character, { CharacterDocument } from "@/models/Character";
-import { connectDB } from "../mongodb";
-import User from "@/models/User";
-import Campaign from "@/models/Campaign";
-import { getCurrentUser } from "./user.actions";
+import Character, { CharacterDocument } from "@/modules/rpg/character/character.model";
+import { connectDB } from "@/shared/db/mongodb";
+import User from "@/modules/platform/user/user.model";
+import Campaign from "@/modules/rpg/campaign/campaign.model";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import mongoose from "mongoose";
 import {
   getAllBattlesByCharacterId,
   getActiveBattlesByCharacterId,
-} from "./battle.actions";
-import Damage from "@/models/Damage";
-import { triggerBattleUpdate } from "../pusher";
-import { safeAction } from "./safe-action";
-import { serializeData } from "../utils";
-import {
-  canEditCharacter,
-  canViewCharacter,
-  verifyCampaignOwner,
-} from "../auth";
+} from "@/modules/rpg/battle/battle.actions";
+import Damage from "@/modules/rpg/battle/damage.model";
+import { triggerBattleUpdate } from "@/shared/infrastructure/pusher";
+import { safeAction } from "@/shared/actions/safe-action";
+import { serializeData } from "@/shared/utils/utils";
+import { verifyCampaignOwner } from "@/modules/rpg/campaign/permissions";
+import { canEditCharacter, canViewCharacter } from "@/modules/rpg/character/permissions";;
 
 interface CharacterParams {
   name: string;

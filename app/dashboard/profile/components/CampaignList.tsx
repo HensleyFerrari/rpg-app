@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { CampaignDocument } from "@/models/Campaign";
+import { CampaignDocument } from "@/modules/rpg/campaign/campaign.model";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Crown, ArrowRight } from "lucide-react";

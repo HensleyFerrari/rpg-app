@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import Campaign, { CampaignDocument } from "@/models/Campaign";
-import { findByEmail, getCurrentUser } from "./user.actions";
+import Campaign, { CampaignDocument } from "@/modules/rpg/campaign/campaign.model";
+import { findByEmail, getCurrentUser } from "@/modules/platform/user/user.actions";
 import mongoose from "mongoose";
-import User from "@/models/User";
-import { getCharactersByCampaign } from "./character.actions";
-import { verifyCampaignOwner } from "../auth";
-import { safeAction } from "./safe-action";
+import User from "@/modules/platform/user/user.model";
+import { getCharactersByCampaign } from "@/modules/rpg/character/character.actions";
+import { verifyCampaignOwner } from "@/modules/rpg/campaign/permissions";;
+import { safeAction } from "@/shared/actions/safe-action";
 
 interface CampaignResponse {
   ok: boolean;
@@ -15,7 +15,7 @@ interface CampaignResponse {
   data?: CampaignDocument | CampaignDocument[] | null;
 }
 
-import { serializeData, escapeRegExp } from "../utils";
+import { serializeData, escapeRegExp } from "@/shared/utils/utils";
 
 export async function getCampaigns({
   query,

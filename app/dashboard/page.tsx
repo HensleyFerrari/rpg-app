@@ -6,10 +6,10 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser } from "@/lib/actions/user.actions";
-import { getBattleStatsByUser } from "@/lib/actions/battle.actions";
-import { getCharacterStatsByOwner } from "@/lib/actions/character.actions";
-import { getCampaignStatsByUser } from "@/lib/actions/campaign.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
+import { getBattleStatsByUser } from "@/modules/rpg/battle/battle.actions";
+import { getCharacterStatsByOwner } from "@/modules/rpg/character/character.actions";
+import { getCampaignStatsByUser } from "@/modules/rpg/campaign/campaign.actions";
 import Link from "next/link";
 import {
   Swords,

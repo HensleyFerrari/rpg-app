@@ -1,5 +1,5 @@
-import { connectDB } from "@/lib/mongodb";
-import { ServerActionResponse } from "@/lib/utils";
+import { connectDB } from "@/shared/db/mongodb";
+import { ServerActionResponse } from "@/shared/utils/utils";
 
 export async function safeAction<T = any>(
   handler: () => Promise<ServerActionResponse<T>>,

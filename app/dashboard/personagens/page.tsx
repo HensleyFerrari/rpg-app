@@ -1,5 +1,5 @@
-import { getAccessibleCharacters, getCharactersByOwner, getCharactersByCampaign } from "@/lib/actions/character.actions";
-import { getCampaigns } from "@/lib/actions/campaign.actions";
+import { getAccessibleCharacters, getCharactersByOwner, getCharactersByCampaign } from "@/modules/rpg/character/character.actions";
+import { getCampaigns } from "@/modules/rpg/campaign/campaign.actions";
 import { UserPlus, Heart, AlertCircle, Users, VenetianMask, Skull } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { CharacterFilters } from "./_components/character-filters";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import { CharacterModal } from "./_components/character-modal";
 
 

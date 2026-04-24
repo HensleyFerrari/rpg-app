@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { updateCharacter } from "@/lib/actions/character.actions";
+import { updateCharacter } from "@/modules/rpg/character/character.actions";
 import { MoreHorizontal, User, UserCog } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";

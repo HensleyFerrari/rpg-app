@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { updateBattle, getBattleById } from "@/lib/actions/battle.actions";
+import { updateBattle, getBattleById } from "@/modules/rpg/battle/battle.actions";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

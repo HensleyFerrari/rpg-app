@@ -5,11 +5,11 @@ import {
   updateBattle,
   deleteBattle,
   addCharacterToBattle,
-} from "@/lib/actions/battle.actions";
-import User from "@/models/User";
-import Campaign from "@/models/Campaign";
-import Battle from "@/models/Battle";
-import Character from "@/models/Character";
+} from "@/modules/rpg/battle/battle.actions";
+import User from "@/modules/platform/user/user.model";
+import Campaign from "@/modules/rpg/campaign/campaign.model";
+import Battle from "@/modules/rpg/battle/battle.model";
+import Character from "@/modules/rpg/character/character.model";
 import mongoose from "mongoose";
 
 // Mock the revalidatePath function
@@ -19,7 +19,7 @@ jest.mock("next/cache", () => ({
 
 // Mock getCurrentUser
 const mockUserId = new mongoose.Types.ObjectId();
-jest.mock("@/lib/actions/user.actions", () => ({
+jest.mock("@/modules/platform/user/user.actions", () => ({
   getCurrentUser: jest.fn(() => ({
     _id: mockUserId,
     email: "test@test.com",

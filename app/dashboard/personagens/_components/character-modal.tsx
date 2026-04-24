@@ -33,9 +33,9 @@ import {
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
-import { createCharacter, updateCharacter, getCharacterById } from "@/lib/actions/character.actions";
-import { getCampaigns } from "@/lib/actions/campaign.actions";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+import { createCharacter, updateCharacter, getCharacterById } from "@/modules/rpg/character/character.actions";
+import { getCampaigns } from "@/modules/rpg/campaign/campaign.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import { Switch } from "@/components/ui/switch";
 
 // Schema unificado

@@ -1,6 +1,6 @@
 "use client";
 
-import { getBattleById } from "@/lib/actions/battle.actions";
+import { getBattleById } from "@/modules/rpg/battle/battle.actions";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import {
@@ -18,7 +18,7 @@ import {
   CalendarDays,
   Users,
 } from "lucide-react";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";

@@ -1,17 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import Damage from "@/models/Damage";
-import Battle from "@/models/Battle";
-import User from "@/models/User";
-import { getBattleById } from "./battle.actions";
-import { getCharacterById } from "./character.actions";
-import { getCurrentUser } from "./user.actions";
-import { triggerBattleUpdate } from "../pusher";
-import { safeAction } from "./safe-action";
+import Damage from "@/modules/rpg/battle/damage.model";
+import Battle from "@/modules/rpg/battle/battle.model";
+import User from "@/modules/platform/user/user.model";
+import { getBattleById } from "@/modules/rpg/battle/battle.actions";
+import { getCharacterById } from "@/modules/rpg/character/character.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
+import { triggerBattleUpdate } from "@/shared/infrastructure/pusher";
+import { safeAction } from "@/shared/actions/safe-action";
 
-import { serializeData } from "../utils";
-import { checkOwnership, verifyBattleMaster, canEditCharacter } from "../auth";
+import { serializeData } from "@/shared/utils/utils";
+import { checkOwnership } from "@/modules/platform/auth/permissions";
+import { verifyBattleMaster } from "@/modules/rpg/battle/permissions";
+import { canEditCharacter } from "@/modules/rpg/character/permissions";;
 
 export const createDamage = async (damage: any) => {
   return safeAction(async () => {

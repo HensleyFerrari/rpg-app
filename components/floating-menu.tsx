@@ -22,8 +22,8 @@ import {
   UserCircle,
   UsersRound,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+import { cn } from "@/shared/utils/utils";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 

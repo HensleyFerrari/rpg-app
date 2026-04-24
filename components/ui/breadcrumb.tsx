@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ChevronRight, ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";

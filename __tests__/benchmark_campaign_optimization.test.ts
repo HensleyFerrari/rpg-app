@@ -1,6 +1,6 @@
 
-import { getMyCampaigns } from "@/lib/actions/campaign.actions";
-import User from "@/models/User";
+import { getMyCampaigns } from "@/modules/rpg/campaign/campaign.actions";
+import User from "@/modules/platform/user/user.model";
 import { jest } from "@jest/globals";
 import mongoose from "mongoose";
 

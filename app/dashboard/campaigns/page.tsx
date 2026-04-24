@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { getCampaigns } from "../../../lib/actions/campaign.actions";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import Link from "next/link";
 import { Plus, Dice4, ScrollText, MoreVertical } from "lucide-react";
 import {

@@ -1,5 +1,5 @@
-import { getCurrentUser } from "@/lib/actions/user.actions";
-import User from "@/models/User";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
+import User from "@/modules/platform/user/user.model";
 import { auth } from "@/auth";
 
 // Mock auth

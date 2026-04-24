@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getCampaignById } from "@/lib/actions/campaign.actions";
-import { getCurrentUser } from "@/lib/actions/user.actions";
-import { getBattlesByCampaign } from "@/lib/actions/battle.actions";
+import { getCampaignById } from "@/modules/rpg/campaign/campaign.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
+import { getBattlesByCampaign } from "@/modules/rpg/battle/battle.actions";
 import {
   User,
   Users,

@@ -19,7 +19,7 @@ import {
   changePassword,
   getCurrentUser,
   updateAvatar,
-} from "@/lib/actions/user.actions";
+} from "@/modules/platform/user/user.actions";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

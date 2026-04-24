@@ -3,9 +3,9 @@
 import {
   getBattleById,
   removeCharacterFromBattle,
-} from "@/lib/actions/battle.actions";
-import { deleteDamage } from "@/lib/actions/damage.actions";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+} from "@/modules/rpg/battle/battle.actions";
+import { deleteDamage } from "@/modules/rpg/battle/damage.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 type Battle = {
   _id: string;

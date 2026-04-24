@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { updateBattle } from "@/lib/actions/battle.actions";
+import { updateBattle } from "@/modules/rpg/battle/battle.actions";
 import {
   Form,
   FormControl,

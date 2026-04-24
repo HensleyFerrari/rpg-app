@@ -6,7 +6,7 @@ import Heading from "@tiptap/extension-heading";
 import BulletList from "@tiptap/extension-bullet-list";
 import OrderedList from "@tiptap/extension-ordered-list";
 import ListItem from "@tiptap/extension-list-item";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import {
   Bold,
   Italic,

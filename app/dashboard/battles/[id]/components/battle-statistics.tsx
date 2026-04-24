@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { Crown, Zap, Shield, Swords, Heart } from "lucide-react";
 import { Skull } from "lucide-react";
 import type { BattleRecords, DamageStat, HealingStat } from "../battle-stats";

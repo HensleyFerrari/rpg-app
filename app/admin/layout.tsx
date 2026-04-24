@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getCurrentUser } from "@/lib/actions/user.actions";
+import { getCurrentUser } from "@/modules/platform/user/user.actions";
 import { redirect } from "next/navigation";
 import { FloatingMenu } from "@/components/floating-menu";
 

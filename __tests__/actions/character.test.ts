@@ -4,10 +4,10 @@ import {
   getCharactersByCampaign,
   updateCharacter,
   deleteCharacter,
-} from "@/lib/actions/character.actions";
-import User from "@/models/User";
-import Campaign from "@/models/Campaign";
-import Character from "@/models/Character";
+} from "@/modules/rpg/character/character.actions";
+import User from "@/modules/platform/user/user.model";
+import Campaign from "@/modules/rpg/campaign/campaign.model";
+import Character from "@/modules/rpg/character/character.model";
 import mongoose from "mongoose";
 
 // Mock the revalidatePath function since we're in a test environment
@@ -17,7 +17,7 @@ jest.mock("next/cache", () => ({
 
 // Mock getCurrentUser
 const mockUserId = new mongoose.Types.ObjectId();
-jest.mock("@/lib/actions/user.actions", () => ({
+jest.mock("@/modules/platform/user/user.actions", () => ({
   getCurrentUser: jest.fn(() => ({
     _id: mockUserId,
     email: "test@test.com",
