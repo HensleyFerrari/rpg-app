@@ -1,5 +1,5 @@
 "use server";
-import { connectDB } from "@/lib/mongodb";
+import { connectDB } from "@/shared/db/mongodb";
 import User from "@/modules/platform/user/user.model";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
